@@ -13,6 +13,8 @@ pub struct ProviderImplArgs {
     pub impl_args: Punctuated<ProviderImplArg, Comma>,
 }
 
+// syn 3's `Type` is large enough to trip `large_enum_variant`.
+#[allow(clippy::large_enum_variant)]
 pub enum ProviderImplArg {
     Type(Type),
     Life(Lifetime),

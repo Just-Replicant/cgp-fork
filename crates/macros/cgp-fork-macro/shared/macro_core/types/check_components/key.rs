@@ -3,6 +3,8 @@ use syn::punctuated::Punctuated;
 use syn::token::{Bracket, Comma};
 use syn::{Type, bracketed};
 
+// syn 3's `Type` is large enough to trip `large_enum_variant`.
+#[allow(clippy::large_enum_variant)]
 pub enum CheckKey {
     Single(Type),
     Multi(Punctuated<Type, Comma>),
