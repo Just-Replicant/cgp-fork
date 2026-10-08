@@ -42,7 +42,7 @@ impl ItemCgpProvider {
 
         let item_impl = &self.item_impl;
 
-        let (_, provider_trait_path, _) = item_impl.trait_.as_ref().ok_or_else(|| {
+        let (provider_trait_path, _) = item_impl.trait_.as_ref().ok_or_else(|| {
             Error::new(item_impl.span(), "expect provider trait name to be present")
         })?;
 
