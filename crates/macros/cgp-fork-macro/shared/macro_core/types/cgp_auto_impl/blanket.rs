@@ -59,7 +59,7 @@ pub fn derive_blanket_items(
                 impl_items.push(ImplItem::Type(ImplItemType {
                     attrs: trait_item_type.attrs.clone(),
                     vis: Visibility::Inherited,
-                    defaultness: None,
+                    modifiers: syn::TypeModifiers::default(),
                     type_token: trait_item_type.type_token,
                     ident: trait_item_type.ident.clone(),
                     generics: trait_item_type.generics.clone(),
@@ -79,7 +79,7 @@ pub fn derive_blanket_items(
                 impl_items.push(ImplItem::Fn(ImplItemFn {
                     attrs: trait_item_fn.attrs.clone(),
                     vis: Visibility::Inherited,
-                    defaultness: None,
+                    modifiers: syn::FnModifiers::default(),
                     sig: trait_item_fn.sig.clone(),
                     block,
                 }));
@@ -96,7 +96,7 @@ pub fn derive_blanket_items(
                 impl_items.push(ImplItem::Const(ImplItemConst {
                     attrs: trait_item_const.attrs.clone(),
                     vis: Visibility::Inherited,
-                    defaultness: None,
+                    modifiers: syn::ConstModifiers::default(),
                     const_token: trait_item_const.const_token,
                     ident: trait_item_const.ident.clone(),
                     generics: trait_item_const.generics.clone(),
