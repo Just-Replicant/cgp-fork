@@ -22,6 +22,8 @@ name: Release-plz
 #   the release pull request. With the PAT, that pull request runs Tests.
 #
 # The binary is pinned. This workflow does not use a third-party action.
+# The binary reads the forge token from `--git-token` (`GIT_TOKEN`). It does
+# not read `GITHUB_TOKEN`.
 
 on:
   push:
@@ -59,9 +61,9 @@ jobs:
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
       - name: Run release-plz release
-        run: release-plz release
+        run: release-plz release --git-token "$GIT_TOKEN"
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
+          GIT_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
 
   release-plz-pr:
     name: Release-plz PR
@@ -90,6 +92,6 @@ jobs:
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
       - name: Run release-plz release-pr
-        run: release-plz release-pr
+        run: release-plz release-pr --git-token "$GIT_TOKEN"
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
+          GIT_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
