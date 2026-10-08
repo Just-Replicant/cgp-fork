@@ -43,11 +43,11 @@ impl EvaluatedCgpComponent {
 
         let item_impl = ItemImpl {
             attrs: provider_trait.attrs.clone(),
-            defaultness: None,
+            modifiers: syn::ImplModifiers::default(),
             unsafety: provider_trait.unsafety,
             impl_token: Default::default(),
             generics: impl_generics,
-            trait_: Some((None, provider_trait_path, Default::default())),
+            trait_: Some((provider_trait_path, Default::default())),
             self_ty: Box::new(parse_internal!(#UseContext)),
             brace_token: Default::default(),
             items: impl_items,

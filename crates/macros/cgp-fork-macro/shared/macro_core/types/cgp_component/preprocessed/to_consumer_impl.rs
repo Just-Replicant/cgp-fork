@@ -69,11 +69,11 @@ impl PreprocessedCgpComponent {
 
         let item_impl = ItemImpl {
             attrs: consumer_trait.attrs.clone(),
-            defaultness: None,
+            modifiers: syn::ImplModifiers::default(),
             unsafety: consumer_trait.unsafety,
             impl_token: Impl::default(),
             generics: generics_for_impl,
-            trait_: Some((None, consumer_trait_path, For::default())),
+            trait_: Some((consumer_trait_path, For::default())),
             self_ty: Box::new(parse_internal!(#context_type_ident)),
             brace_token: Brace::default(),
             items: impl_items,
