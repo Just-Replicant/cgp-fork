@@ -6,6 +6,8 @@ use syn::token::At;
 
 use crate::macro_core::types::path::UniPath;
 
+// syn 3's `Type` is large enough to trip `large_enum_variant`.
+#[allow(clippy::large_enum_variant)]
 pub enum UniPathOrType {
     Type(Type),
     Path(UniPath),

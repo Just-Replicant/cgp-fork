@@ -1,7 +1,7 @@
 use proc_macro2::Span;
 use syn::visit::Visit;
 use syn::visit_mut::{self, VisitMut};
-use syn::{Lifetime, ParenthesizedGenericArguments, Type, TypeBareFn, TypeReference};
+use syn::{Lifetime, ParenthesizedGenericArguments, Type, TypeFnPtr, TypeReference};
 
 /// Name every elided lifetime in a type: a reference written without one
 /// (`&T`) and the placeholder `'_`, at any depth.
@@ -73,7 +73,7 @@ impl VisitMut for ElaborateElidedLifetimes {
         }
     }
 
-    fn visit_type_bare_fn_mut(&mut self, _node: &mut TypeBareFn) {}
+    fn visit_type_fn_ptr_mut(&mut self, _node: &mut TypeFnPtr) {}
 
     fn visit_parenthesized_generic_arguments_mut(
         &mut self,
@@ -106,7 +106,7 @@ impl<'ast> Visit<'ast> for CollectLifetimes {
         }
     }
 
-    fn visit_type_bare_fn(&mut self, _node: &'ast TypeBareFn) {}
+    fn visit_type_fn_ptr(&mut self, _node: &'ast TypeFnPtr) {}
 
     fn visit_parenthesized_generic_arguments(
         &mut self,

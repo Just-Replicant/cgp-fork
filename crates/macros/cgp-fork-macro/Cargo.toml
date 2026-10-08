@@ -18,12 +18,12 @@ proc-macro = true
 snapshot = ["dep:prettyplease"]
 
 [dependencies]
-syn         = { version = "2.0.95", features = ["full", "extra-traits", "visit", "visit-mut"] }
-quote       = { version = "1.0.38" }
-proc-macro2 = { version = "1.0.92" }
-itertools   = { version = "0.14.0" }
-prettyplease = { version = "0.2.37", optional = true }
+syn         = { version = "3", features = ["full", "extra-traits", "visit", "visit-mut"] }
+quote       = { version = "1" }
+proc-macro2 = { version = "1" }
+itertools   = { version = "0.14" }
+prettyplease = { version = "0.3", optional = true }
 
 [dev-dependencies]
-insta = { version = "1.48.0" }
-prettyplease = { version = "0.2.37" }
+insta = { version = "1" }
+prettyplease = { version = "0.3" }

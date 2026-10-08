@@ -55,7 +55,15 @@ pub fn parse_implicit_arg(receiver: &Receiver, arg: &PatType) -> syn::Result<Imp
     // `&mut` of an `Option<&mut T>` — and rejects a mutable read without a `&mut
     // self` receiver. The receiver's own mutability never forces a mutable read of
     // an immutably-typed argument.
-    parse_named_field_arg(arg, &receiver.mutability)
+    // `&mut self` stores `mut` on the reference kind. `mut self` stores it on
+    // the receiver, and that form is not a shared-or-exclusive borrow of the
+    // context, so it does not authorize a mutable field read.
+    let receiver_mut = match &receiver.kind {
+        syn::ReceiverKind::Reference(_, _, mutability) => *mutability,
+        _ => None,
+    };
+
+    parse_named_field_arg(arg, &receiver_mut)
 }
 
 pub fn extract_implicit_args(args: &mut Punctuated<FnArg, Comma>) -> syn::Result<Vec<PatType>> {

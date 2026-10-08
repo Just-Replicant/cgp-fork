@@ -33,7 +33,7 @@ impl ItemCgpAutoError {
             ));
         }
 
-        if item_impl.unsafety.is_some() || item_impl.defaultness.is_some() {
+        if item_impl.unsafety.is_some() || item_impl.modifiers.defaultness.is_some() {
             return Err(Error::new_spanned(
                 &item_impl.self_ty,
                 "#[cgp_auto_error] does not support unsafe or default impls",
@@ -168,7 +168,7 @@ impl ItemCgpAutoError {
             generics: Generics::default(),
         };
 
-        let mut items = vec![provider_struct.to_item_struct().into()];
+        let mut items = vec![Item::Struct(provider_struct.to_item_struct())];
         items.extend(self.type_provider_items(&context)?);
         items.extend(self.raise_provider_items(&context)?);
         items.extend(self.wrap_provider_items(&context)?);
@@ -244,7 +244,7 @@ fn lower_provider(
     mut item_impl: ItemImpl,
     span: Span,
 ) -> syn::Result<Vec<Item>> {
-    if let Some((_, _, for_token)) = &mut item_impl.trait_ {
+    if let Some((_, for_token)) = &mut item_impl.trait_ {
         for_token.span = span;
     }
 
@@ -261,8 +261,8 @@ fn lower_provider(
     .lower()?;
 
     Ok(vec![
-        lowered.item_impl.into(),
-        lowered.is_provider_for_impl.into(),
+        Item::Impl(lowered.item_impl),
+        Item::Impl(lowered.is_provider_for_impl),
     ])
 }
 
@@ -304,7 +304,7 @@ fn validate_error_fn(method: &ImplItemFn, expected_args: usize) -> syn::Result<(
             "raise_error and wrap_error take no receiver; they are provider functions",
         ));
     }
-    if method.sig.asyncness.is_some() || method.sig.unsafety.is_some() {
+    if method.sig.asyncness.is_some() || matches!(method.sig.safety, syn::Safety::Unsafe(_)) {
         return Err(Error::new_spanned(
             &method.sig,
             "raise_error and wrap_error must be synchronous safe functions",
@@ -343,7 +343,11 @@ fn is_bare_error(output: &syn::ReturnType) -> bool {
 
 fn is_bare_error_type(ty: &Type) -> bool {
     match ty {
-        Type::Path(TypePath { qself: None, path }) => {
+        Type::Path(TypePath {
+            attrs: _,
+            qself: None,
+            path,
+        }) => {
             path.leading_colon.is_none()
                 && path.segments.len() == 1
                 && path.segments[0].ident == "Error"

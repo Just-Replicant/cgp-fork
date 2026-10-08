@@ -61,11 +61,11 @@ impl DeriveDelegateAttribute {
 
         let item = ItemImpl {
             attrs: provider_trait.attrs.clone(),
-            defaultness: None,
+            modifiers: syn::ImplModifiers::default(),
             unsafety: provider_trait.unsafety,
             impl_token: Default::default(),
             generics,
-            trait_: Some((None, trait_path, Default::default())),
+            trait_: Some((trait_path, Default::default())),
             self_ty: Box::new(provider_type),
             brace_token: Default::default(),
             items: impl_items,

@@ -42,7 +42,7 @@ impl ItemCgpImpl {
             .to_item_impls(&item_impl.generics, &self.args.provider_type)?;
 
         let (provider_trait_path, context_type) = match &item_impl.trait_ {
-            Some((_, path, _)) => {
+            Some((path, _)) => {
                 let provider_trait_path = parse_internal(path.to_token_stream())?;
                 let context_type = item_impl.self_ty.as_ref().clone();
                 (provider_trait_path, context_type)

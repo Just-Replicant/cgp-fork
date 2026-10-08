@@ -82,9 +82,9 @@ impl ItemCgpAutoLog {
             where_clause.predicates.push(bound);
         }
 
-        let mut items = vec![emitted_trait.into()];
-        items.extend(detail_structs.into_iter().map(Item::from));
-        items.push(item_impl.into());
+        let mut items = vec![Item::Trait(emitted_trait)];
+        items.extend(detail_structs.into_iter().map(Item::Struct));
+        items.push(Item::Impl(item_impl));
         Ok(items)
     }
 }
@@ -99,7 +99,7 @@ fn synthesize_log_method(
             "remove the method body; #[cgp_auto_log] logs the arguments through CanLog",
         ));
     }
-    if method.sig.asyncness.is_some() || method.sig.unsafety.is_some() {
+    if method.sig.asyncness.is_some() || matches!(method.sig.safety, syn::Safety::Unsafe(_)) {
         return Err(Error::new_spanned(
             &method.sig,
             "log methods must be synchronous safe functions",
@@ -115,9 +115,8 @@ fn synthesize_log_method(
     let mut inputs = method.sig.inputs.iter();
     match inputs.next() {
         Some(FnArg::Receiver(receiver))
-            if receiver.reference.is_some()
-                && receiver.mutability.is_none()
-                && receiver.colon_token.is_none() => {}
+            if matches!(&receiver.kind, syn::ReceiverKind::Reference(_, _, None))
+                && receiver.mutability.is_none() => {}
         Some(receiver) => {
             return Err(Error::new_spanned(
                 receiver,

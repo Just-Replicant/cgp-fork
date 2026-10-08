@@ -58,7 +58,7 @@ pub fn trait_item_to_delegated_impl_items(
             let impl_item_const = ImplItemConst {
                 attrs: trait_item_const.attrs.clone(),
                 vis: Visibility::Inherited,
-                defaultness: None,
+                modifiers: syn::ConstModifiers::default(),
                 const_token: trait_item_const.const_token,
                 ident: trait_item_const.ident.clone(),
                 generics: trait_item_const.generics.clone(),

@@ -17,7 +17,7 @@ impl ItemBlanketTrait {
         let item_trait = self.item_trait.clone();
         let item_impl = self.to_item_impl()?;
 
-        Ok(vec![item_trait.into(), item_impl.into()])
+        Ok(vec![Item::Trait(item_trait), Item::Impl(item_impl)])
     }
 
     pub fn to_item_impl(&self) -> syn::Result<ItemImpl> {
@@ -63,7 +63,7 @@ impl ItemBlanketTrait {
                     let impl_item_type = ImplItemType {
                         attrs: trait_item_type.attrs.clone(),
                         vis: Visibility::Inherited,
-                        defaultness: None,
+                        modifiers: syn::TypeModifiers::default(),
                         type_token: trait_item_type.type_token,
                         ident: trait_item_type.ident.clone(),
                         generics: trait_item_type.generics.clone(),
@@ -91,7 +91,7 @@ impl ItemBlanketTrait {
                     let impl_item_fn = ImplItemFn {
                         attrs: trait_item_fn.attrs.clone(),
                         vis: Visibility::Inherited,
-                        defaultness: None,
+                        modifiers: syn::FnModifiers::default(),
                         sig: trait_item_fn.sig.clone(),
                         block: fn_block,
                     };
@@ -115,7 +115,7 @@ impl ItemBlanketTrait {
                     let impl_item_const = ImplItemConst {
                         attrs: trait_item_const.attrs.clone(),
                         vis: Visibility::Inherited,
-                        defaultness: None,
+                        modifiers: syn::ConstModifiers::default(),
                         const_token: trait_item_const.const_token,
                         ident: trait_item_const.ident.clone(),
                         generics: trait_item_const.generics.clone(),
@@ -160,11 +160,11 @@ impl ItemBlanketTrait {
 
         let item_impl = ItemImpl {
             attrs: item_trait.attrs.clone(),
-            defaultness: None,
+            modifiers: syn::ImplModifiers::default(),
             unsafety: item_trait.unsafety,
             impl_token: Default::default(),
             generics: impl_generics,
-            trait_: Some((None, trait_path, Default::default())),
+            trait_: Some((trait_path, Default::default())),
             self_ty: Box::new(context_type),
             brace_token: item_trait.brace_token,
             items: impl_items,

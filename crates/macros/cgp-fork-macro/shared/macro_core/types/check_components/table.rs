@@ -27,8 +27,8 @@ impl CheckComponentsTable {
     pub fn to_items(&self) -> syn::Result<Vec<Item>> {
         let (item_trait, item_impls) = self.eval()?;
 
-        let mut items = vec![item_trait.into()];
-        items.extend(item_impls.into_iter().map(Into::into));
+        let mut items = vec![Item::Trait(item_trait)];
+        items.extend(item_impls.into_iter().map(Item::Impl));
 
         Ok(items)
     }

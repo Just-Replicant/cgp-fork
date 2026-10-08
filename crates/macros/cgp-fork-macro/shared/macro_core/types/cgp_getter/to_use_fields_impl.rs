@@ -50,7 +50,7 @@ impl ItemCgpGetter {
                 None,
             )?;
 
-            items.push(method.into());
+            items.push(ImplItem::Fn(method));
 
             let field_type = if let Some(trait_item) = &field_assoc_type {
                 let trait_item_ident = &trait_item.ident;

@@ -8,6 +8,8 @@ use crate::macro_core::functions::parse_internal;
 use crate::macro_core::traits::ToType;
 use crate::macro_core::types::field::Symbol;
 
+// syn 3's `Type` is large enough to trip `large_enum_variant`.
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone)]
 pub enum PathElement {
     Type(Type),

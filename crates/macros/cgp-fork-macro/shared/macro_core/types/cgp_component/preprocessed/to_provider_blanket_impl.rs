@@ -81,11 +81,11 @@ impl PreprocessedCgpComponent {
 
         let provider_blanket_impl = ItemImpl {
             attrs: provider_trait.attrs.clone(),
-            defaultness: None,
+            modifiers: syn::ImplModifiers::default(),
             unsafety: provider_trait.unsafety,
             impl_token: Impl::default(),
             generics: impl_generics,
-            trait_: Some((None, trait_path, For::default())),
+            trait_: Some((trait_path, For::default())),
             self_ty: Box::new(parse_internal!(#provider_type)),
             brace_token: Brace::default(),
             items: impl_items,

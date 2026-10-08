@@ -31,7 +31,7 @@ pub fn signature_to_delegated_impl_item_fn(
     let item = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: syn::FnModifiers::default(),
         sig: signature.clone(),
         block: body,
     };

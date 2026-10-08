@@ -31,26 +31,21 @@ pub fn replace_self_receiver(
     replaced_ident: &Ident,
     replaced_type: &Type,
 ) -> FnArg {
-    match (&receiver.reference, &receiver.mutability) {
-        (None, None) => {
-            parse_quote!(#replaced_ident : #replaced_type)
-        }
-        (Some((_and, None)), None) => {
-            parse_quote!(#replaced_ident : & #replaced_type)
-        }
-        (Some((_and, Some(life))), None) => {
-            parse_quote!(#replaced_ident : & #life #replaced_type)
-        }
-        (Some((_and, None)), Some(_mut)) => {
-            parse_quote!(#replaced_ident : &mut #replaced_type)
-        }
-        (Some((_and, Some(life))), Some(_mut)) => {
-            parse_quote!(#replaced_ident : & #life mut #replaced_type)
-        }
-        (None, Some(_mut)) => {
-            // Owned mutable receiver `mut self`: `mut` binds the parameter, not
-            // the type, so it must precede the identifier — `mut ctx: Context`.
+    match &receiver.kind {
+        syn::ReceiverKind::Reference(_, life, mutability) => match (life, mutability) {
+            (None, None) => parse_quote!(#replaced_ident : & #replaced_type),
+            (Some(life), None) => parse_quote!(#replaced_ident : & #life #replaced_type),
+            (None, Some(_mut)) => parse_quote!(#replaced_ident : &mut #replaced_type),
+            (Some(life), Some(_mut)) => {
+                parse_quote!(#replaced_ident : & #life mut #replaced_type)
+            }
+        },
+        // `self` and `self: Type` both become an owned context parameter. A
+        // typed receiver's type is not copied; the caller supplies the context
+        // type. `mut` on an owned receiver binds the parameter.
+        _ if receiver.mutability.is_some() => {
             parse_quote!(mut #replaced_ident : #replaced_type)
         }
+        _ => parse_quote!(#replaced_ident : #replaced_type),
     }
 }

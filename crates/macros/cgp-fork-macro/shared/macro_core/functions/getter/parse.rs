@@ -140,9 +140,9 @@ fn validate_getter_method_signature(signature: &Signature) -> syn::Result<()> {
         ));
     }
 
-    if signature.unsafety.is_some() {
+    if let syn::Safety::Unsafe(unsafe_token) = &signature.safety {
         return Err(Error::new(
-            signature.unsafety.span(),
+            unsafe_token.span(),
             "getter method must not be unsafe fn",
         ));
     }
@@ -226,16 +226,15 @@ fn parse_phantom_arg_type(phantom_arg: &FnArg) -> syn::Result<Type> {
 
 fn parse_receiver(context_ident: &Ident, arg: &FnArg) -> syn::Result<(ReceiverMode, Option<Mut>)> {
     match arg {
-        FnArg::Receiver(receiver) => {
-            if receiver.reference.is_none() {
-                Err(Error::new(
-                    receiver.span(),
-                    "first argument to getter method must be a reference to self, i.e. `&self`",
-                ))
-            } else {
-                Ok((ReceiverMode::SelfReceiver, receiver.mutability))
+        FnArg::Receiver(receiver) => match &receiver.kind {
+            syn::ReceiverKind::Reference(_, _, mutability) => {
+                Ok((ReceiverMode::SelfReceiver, *mutability))
             }
-        }
+            _ => Err(Error::new(
+                receiver.span(),
+                "first argument to getter method must be a reference to self, i.e. `&self`",
+            )),
+        },
         FnArg::Typed(arg) => match arg.ty.as_ref() {
             Type::Reference(ty) => {
                 let mut receiver = ty.elem.clone();

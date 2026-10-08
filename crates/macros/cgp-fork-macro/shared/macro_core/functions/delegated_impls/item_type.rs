@@ -7,7 +7,7 @@ pub fn trait_to_impl_item_type(trait_type: &TraitItemType, delegated_type: Type)
     ImplItemType {
         attrs: trait_type.attrs.clone(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: syn::TypeModifiers::default(),
         type_token: trait_type.type_token,
         ident: trait_type.ident.clone(),
         generics: trait_type.generics.clone(),

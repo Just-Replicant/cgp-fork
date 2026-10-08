@@ -21,7 +21,7 @@ impl ItemCgpAutoImpl {
     pub fn to_items(&self) -> syn::Result<Vec<Item>> {
         let (item_trait, item_impl) = self.to_blanket_impl()?;
 
-        Ok(vec![item_trait.into(), item_impl.into()])
+        Ok(vec![Item::Trait(item_trait), Item::Impl(item_impl)])
     }
 
     /// Build the blanket impl for a fresh `__Context__` generic, inserted ahead
