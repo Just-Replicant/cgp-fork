@@ -80,20 +80,14 @@ impl DispatchMethod {
             }
         };
 
-        // A typed receiver such as `self: Box<Self>` is not the enum or a borrow of
-        // it, so no value-handler matcher can take it.
-        if receiver.colon_token.is_some() {
-            return Err(Error::new_spanned(
-                receiver,
-                "Dispatcher method receiver must be `self`, `&self`, or `&mut self`",
-            ));
-        }
-
         let mut introduced_lifetimes = Vec::new();
 
-        let receiver = match &receiver.reference {
-            None => DispatchReceiver::Owned,
-            Some((_, lifetime)) => {
+        // A typed receiver such as `self: Box<Self>` is not the enum or a borrow of
+        // it, so no value-handler matcher can take it. `mut` on `&mut self` lives
+        // on the reference kind, not on the receiver.
+        let receiver = match &receiver.kind {
+            syn::ReceiverKind::Value => DispatchReceiver::Owned,
+            syn::ReceiverKind::Reference(_, lifetime, mutability) => {
                 let lifetime = match lifetime {
                     Some(lifetime) => lifetime.clone(),
                     None => {
@@ -103,11 +97,17 @@ impl DispatchMethod {
                     }
                 };
 
-                if receiver.mutability.is_some() {
+                if mutability.is_some() {
                     DispatchReceiver::Mut(lifetime)
                 } else {
                     DispatchReceiver::Ref(lifetime)
                 }
+            }
+            _ => {
+                return Err(Error::new_spanned(
+                    receiver,
+                    "Dispatcher method receiver must be `self`, `&self`, or `&mut self`",
+                ));
             }
         };
 
@@ -294,7 +294,7 @@ impl DispatchMethod {
         let impl_item = ImplItem::Fn(ImplItemFn {
             attrs: Default::default(),
             vis: Visibility::Inherited,
-            defaultness: None,
+            modifiers: syn::FnModifiers::default(),
             sig: signature,
             block: parse_internal!({ #method_body }),
         });
