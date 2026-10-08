@@ -52,7 +52,7 @@ pub fn derive_blanket_impl(
 
         let method = derive_getter_method(&context_arg, field, &tag_type, None)?;
 
-        items.push(method.into());
+        items.push(ImplItem::Fn(method));
 
         let field_type = if let Some(trait_item) = &field_assoc_type {
             let trait_item_ident = &trait_item.ident;

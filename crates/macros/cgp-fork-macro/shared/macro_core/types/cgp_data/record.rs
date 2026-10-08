@@ -20,8 +20,8 @@ impl ItemCgpRecord {
 
         let mut items = Vec::new();
 
-        items.extend(has_field_impls.into_iter().map(Item::from));
-        items.extend(has_fields_impls.into_iter().map(Item::from));
+        items.extend(has_field_impls.into_iter().map(Item::Impl));
+        items.extend(has_fields_impls.into_iter().map(Item::Impl));
         items.extend(build_field_impls);
 
         Ok(items)
@@ -56,15 +56,15 @@ impl ItemCgpRecord {
         let has_field_impls = derive_has_field_impls(item_struct, &builder_ident)?;
 
         let mut items = vec![
-            builder_struct.into(),
-            has_builder_impl.into(),
-            into_builder_impl.into(),
-            partial_data_impl.into(),
-            finalize_build_impl.into(),
+            Item::Struct(builder_struct),
+            Item::Impl(has_builder_impl),
+            Item::Impl(into_builder_impl),
+            Item::Impl(partial_data_impl),
+            Item::Impl(finalize_build_impl),
         ];
 
-        items.extend(update_field_impls.into_iter().map(Item::from));
-        items.extend(has_field_impls.into_iter().map(Item::from));
+        items.extend(update_field_impls.into_iter().map(Item::Impl));
+        items.extend(has_field_impls.into_iter().map(Item::Impl));
 
         Ok(items)
     }

@@ -17,7 +17,7 @@ impl ItemCgpType {
 
         let item_impls = self.to_item_provider_impls()?.to_item_impls()?;
 
-        items.extend(item_impls.into_iter().map(Item::from));
+        items.extend(item_impls.into_iter().map(Item::Impl));
 
         Ok(items)
     }

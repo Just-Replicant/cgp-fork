@@ -16,8 +16,8 @@ impl ItemCgpAutoGetter {
     }
 
     pub fn to_items(&self) -> syn::Result<Vec<Item>> {
-        let item_trait = self.item_trait.clone().into();
-        let item_impl = self.to_blanket_impl()?.into();
+        let item_trait = Item::Trait(self.item_trait.clone());
+        let item_impl = Item::Impl(self.to_blanket_impl()?);
 
         Ok(vec![item_trait, item_impl])
     }

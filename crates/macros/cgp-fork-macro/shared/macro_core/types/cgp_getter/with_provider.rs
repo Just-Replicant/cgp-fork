@@ -93,7 +93,7 @@ impl ItemCgpGetter {
             Some(provider_ident.clone()),
         )?;
 
-        items.push(method.into());
+        items.push(ImplItem::Fn(method));
 
         let mut where_clause = provider_generics.make_where_clause().clone();
         where_clause.predicates.push(parse_internal! {

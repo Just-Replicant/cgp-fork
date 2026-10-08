@@ -20,8 +20,8 @@ impl ItemCgpVariant {
 
         let mut items = Vec::new();
 
-        items.extend(has_fields.into_iter().map(Item::from));
-        items.extend(from_variant_impls.into_iter().map(Item::from));
+        items.extend(has_fields.into_iter().map(Item::Impl));
+        items.extend(from_variant_impls.into_iter().map(Item::Impl));
         items.extend(extract_field);
 
         Ok(items)
@@ -77,19 +77,19 @@ impl ItemCgpVariant {
             derive_extract_field_impls(item_enum, &extractor_ref_ident, true)?;
 
         let mut items = vec![
-            extractor_enum.into(),
-            extractor_ref_enum.into(),
-            partial_data_impl.into(),
-            partial_ref_data_impl.into(),
-            has_extractor_impl.into(),
-            has_extractor_ref_impl.into(),
-            has_extractor_mut_impl.into(),
-            finalize_extract_impl.into(),
-            finalize_extract_ref_impl.into(),
+            Item::Enum(extractor_enum),
+            Item::Enum(extractor_ref_enum),
+            Item::Impl(partial_data_impl),
+            Item::Impl(partial_ref_data_impl),
+            Item::Impl(has_extractor_impl),
+            Item::Impl(has_extractor_ref_impl),
+            Item::Impl(has_extractor_mut_impl),
+            Item::Impl(finalize_extract_impl),
+            Item::Impl(finalize_extract_ref_impl),
         ];
 
-        items.extend(extractor_impls.into_iter().map(Item::from));
-        items.extend(extractor_ref_impls.into_iter().map(Item::from));
+        items.extend(extractor_impls.into_iter().map(Item::Impl));
+        items.extend(extractor_ref_impls.into_iter().map(Item::Impl));
 
         Ok(items)
     }

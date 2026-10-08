@@ -33,7 +33,7 @@ pub fn extract_helper_items(
     let (emitted_trait, helper_impl) =
         derive_blanket_items(context_type, &helper_trait, item_impl.generics.clone())?;
 
-    Ok(vec![emitted_trait.into(), helper_impl.into()])
+    Ok(vec![Item::Trait(emitted_trait), Item::Impl(helper_impl)])
 }
 
 fn helper_trait(trait_ident: &Ident, helpers: &[ImplItemFn]) -> syn::Result<ItemTrait> {
