@@ -117,12 +117,11 @@ impl LoweredCgpImpl {
         // form) aim the synthesized `for` at the provider trait the user wrote, so
         // no structural token of the generated impl carries the macro `call_site`.
         let for_token = match &item_impl.trait_ {
-            Some((_, _, for_token)) => *for_token,
+            Some((_, for_token)) => *for_token,
             None => For(self.provider_trait_path.span()),
         };
 
         out_impl.trait_ = Some((
-            None,
             parse_internal(provider_trait_path.to_token_stream())?,
             for_token,
         ));
