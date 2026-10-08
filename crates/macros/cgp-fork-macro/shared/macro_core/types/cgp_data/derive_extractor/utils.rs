@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{Field, FieldMutability, Fields, FieldsUnnamed, Type, Variant, Visibility};
+use syn::{Field, FieldModifiers, Fields, FieldsUnnamed, Type, Variant, Visibility};
 
 use crate::macro_core::exports::Nil;
 use crate::macro_core::parse_internal;
@@ -134,11 +134,12 @@ pub fn type_to_variant_fields(type_: &Type) -> Fields {
     Fields::Unnamed(FieldsUnnamed {
         unnamed: Punctuated::from_iter([Field {
             attrs: Vec::new(),
-            ident: None,
             vis: Visibility::Inherited,
-            ty: type_.clone(),
+            modifiers: FieldModifiers::default(),
+            ident: None,
             colon_token: None,
-            mutability: FieldMutability::None,
+            ty: type_.clone(),
+            default: None,
         }]),
         paren_token: Default::default(),
     })
