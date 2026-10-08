@@ -24,7 +24,7 @@ impl PreprocessedItemCgpFn {
         let item_trait = self.to_item_trait()?;
         let item_impl = self.to_item_impl()?;
 
-        Ok(vec![item_trait.into(), item_impl.into()])
+        Ok(vec![Item::Trait(item_trait), Item::Impl(item_impl)])
     }
 
     pub fn to_item_trait(&self) -> syn::Result<ItemTrait> {
@@ -39,6 +39,7 @@ impl PreprocessedItemCgpFn {
 
         let trait_item_fn = TraitItemFn {
             attrs: item_fn.attrs.clone(),
+            modifiers: syn::FnModifiers::default(),
             sig: item_fn.sig.clone(),
             default: None,
             semi_token: None,
