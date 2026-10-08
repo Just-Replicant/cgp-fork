@@ -29,7 +29,7 @@ Cargo workspace, edition 2024, resolver 3, toolchain **1.98.1** ([rust-toolchain
 - **Format:** `cargo +nightly fmt --all`
 - **Lint:** `cargo clippy --all-features --all-targets -- -D warnings` and `cargo clippy --no-default-features --all-targets -- -D warnings`
 - **Test:** `cargo nextest run --all-features --no-fail-fast --workspace`. Behavior: `cargo nextest run -p cgp-fork --all-features`. Parsers: `cargo nextest run -p cgp-fork-macro`.
-- **Release:** a push to `main` runs [release-plz](https://release-plz.dev). A `feat`, `fix`, `perf`, or breaking commit opens a release pull request that bumps the shared version and [CHANGELOG.md](CHANGELOG.md). Merging that pull request publishes the crates and tags `v<version>`.
+- **Release:** a push to `main` runs [release-plz](https://release-plz.dev). A `feat`, `fix`, `perf`, `refactor`, or breaking commit opens a release pull request that bumps the shared version and [CHANGELOG.md](CHANGELOG.md). Merging that pull request publishes the crates and tags `v<version>`.
 - Post-codegen compile failures are UI fixtures in `cargo-cgp`. See [crates/tests/AGENTS.md](crates/tests/AGENTS.md).
 - A wiring check or expansion snapshot passes when it compiles.
 
