@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.9.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.0...v0.9.1) - 2026-10-08
+
+### Changed
+
+- *(delegate-component)* stop clearing the removed const eq token
+- *(derive-extractor)* build tuple fields with syn 3 field modifiers
+- *(visitors)* ignore the attrs field on syn 3 type paths
+- *(elaborate-lifetimes)* visit syn 3 function-pointer types
+- *(replace-self)* expand syn 3 receiver kinds into context parameters
+- *(implicits)* take receiver mutability from syn 3 reference kinds
+- *(getter)* reject unsafe and owned receivers through syn 3
+- *(cgp-auto-dispatch)* match syn 3 receiver kinds and fn modifiers
+- *(cgp-fn)* add syn 3 trait-fn modifiers and name item variants
+- *(cgp-auto-log)* follow syn 3 items, safety, and receivers
+- *(cgp-auto-error)* follow syn 3 impl, safety, and type-path shapes
+- *(blanket-trait)* emit syn 3 traits, impls, and item modifiers
+- *(macro)* name syn 3 item variants instead of Into
+- *(provider-impl)* clear defaultness through syn 3 impl modifiers
+- *(cgp-provider)* read the syn 3 impl trait pair
+- *(cgp-impl)* read the syn 3 impl trait pair
+- *(macro)* build item impls with syn 3 headers
+- *(cgp-auto-impl)* fill syn 3 impl-item modifiers
+- *(delegated-impls)* fill syn 3 impl-item modifiers
+- *(cgp-fork-macro)* compile the shared sources from inside the crate
+- *(test-util)* move the snapshot helper library under cgp-fork-macro/shared
+- *(extra-macro-lib)* move the extra macro entries under cgp-fork-macro/shared
+- *(extra-macro-core)* move the extra macro parsers under cgp-fork-macro/shared
+- *(macro-lib)* move the macro entries under cgp-fork-macro/shared
+- *(macro-core)* move the parser sources under cgp-fork-macro/shared
+
 ## v0.9.0 (2026-09-29)
 
 New features:
