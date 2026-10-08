@@ -7,12 +7,15 @@
 # `cgp-fork-macro` is published in dependency order under that same version.
 
 [workspace]
-release_always = false
+# Publish whenever the committed version is newer than crates.io, including
+# when GitHub does not associate that push with the release pull request.
+release_always = true
 repo_url = "https://github.com/Just-Replicant/cgp-fork"
 # A release PR is opened only when a commit since the last release matches.
-# `test`, `refactor`, `docs`, and `chore` commits stay on main until a
-# `feat`, `fix`, `perf`, or breaking commit lands with them.
-release_commits = '^(feat|fix|perf)(\([^)]*\))?!?:|^\w+(\([^)]*\))?!:'
+# `refactor` is included so a refactor of the crates bumps the patch version.
+# `test`, `docs`, `chore`, and `ci` stay on main until a matching commit
+# lands with them. A `!` on any type is breaking and also matches.
+release_commits = '^(feat|fix|perf|refactor)(\([^)]*\))?!?:|^\w+(\([^)]*\))?!:'
 git_release_enable = false
 git_tag_enable = false
 changelog_update = false
