@@ -89,7 +89,6 @@ impl DelegateTable {
                             })
                 {
                     let mut const_param = const_param.clone();
-                    const_param.eq_token = None;
                     const_param.default = None;
                     *param = GenericParam::Const(const_param);
                 }
