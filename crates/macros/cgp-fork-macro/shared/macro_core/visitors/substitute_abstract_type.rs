@@ -22,7 +22,11 @@ use crate::macro_core::types::attributes::UseTypeAttribute;
 /// segment is not a bare alias, so a genuine `Self::Error` or a `Foo<Error>` head
 /// is left alone.
 pub fn bare_alias_ident(ty: &Type) -> Option<&Ident> {
-    if let Type::Path(TypePath { qself: None, path }) = ty
+    if let Type::Path(TypePath {
+        attrs: _,
+        qself: None,
+        path,
+    }) = ty
         && path.leading_colon.is_none()
         && path.segments.len() == 1
     {

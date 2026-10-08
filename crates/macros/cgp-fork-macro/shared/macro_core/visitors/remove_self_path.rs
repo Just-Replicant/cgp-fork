@@ -7,7 +7,11 @@ pub struct RemoveSelfPathVisitor<'a> {
 
 impl VisitMut for RemoveSelfPathVisitor<'_> {
     fn visit_type_mut(&mut self, node: &mut Type) {
-        if let Type::Path(TypePath { qself: None, path }) = node
+        if let Type::Path(TypePath {
+            attrs: _,
+            qself: None,
+            path,
+        }) = node
             && path.leading_colon.is_none()
             && path.segments.len() >= 2
             && path.segments[0].ident == "Self"
