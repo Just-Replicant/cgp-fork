@@ -42,9 +42,12 @@ delegate_components! {
     }
 }
 
+/// Inner table for a shared borrow of the input beside `args`.
+pub struct MatchFirstWithFieldHandlersInputsRef<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Input: HasFieldHandlers<MapExtractFirstFieldAndHandle<Provider>>, Args, Provider>
-    new MatchFirstWithFieldHandlersInputsRef<Provider> {
+    MatchFirstWithFieldHandlersInputsRef<Provider> {
         <'a> (&'a Input, Args):
             MatchFirstWithHandlersRef<Input::Handlers>
     }
