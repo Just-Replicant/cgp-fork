@@ -5,7 +5,7 @@
     `Nil` is commonly used as the `Tail` of a [`Cons`](super::Cons) type, to terminate the list.
     When used on its own, it represents an empty type-level list.
 
-    Read more about type-level lists, a.k.a. the product types, in [`Cons`].
+    Read more about type-level lists, a.k.a. the product types, in [`Cons`](super::Cons).
 */
 #[derive(Eq, PartialEq, Clone, Default, Debug)]
 pub struct Nil;
