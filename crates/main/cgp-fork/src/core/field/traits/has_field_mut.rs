@@ -3,6 +3,7 @@ use core::ops::DerefMut;
 
 use crate::core::field::traits::{FieldGetter, HasField};
 
+/// Mutable access to the value stored under `Tag`.
 pub trait HasFieldMut<Tag>: HasField<Tag> {
     fn get_field_mut(&mut self, tag: PhantomData<Tag>) -> &mut Self::Value;
 }
