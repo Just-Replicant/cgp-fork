@@ -16,6 +16,7 @@ pub trait UpdateField<Tag, M: MapType> {
     /// This builder after the field has been replaced.
     type Output;
 
+    /// Writes `value` into `Tag` and returns the previous contents.
     fn update_field(
         self,
         _tag: PhantomData<Tag>,
