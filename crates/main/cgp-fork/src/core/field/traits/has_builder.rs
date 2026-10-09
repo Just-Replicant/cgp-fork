@@ -4,6 +4,7 @@
 /// fields start out absent; [`BuildField`](crate::core::field::traits::BuildField) fills them and
 /// [`FinalizeBuild`](crate::core::field::traits::FinalizeBuild) finishes it.
 pub trait HasBuilder {
+    /// The partial value, one slot per field.
     type Builder;
 
     fn builder() -> Self::Builder;
