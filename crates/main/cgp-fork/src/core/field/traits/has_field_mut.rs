@@ -9,6 +9,7 @@ pub trait HasFieldMut<Tag>: HasField<Tag> {
     fn get_field_mut(&mut self, tag: PhantomData<Tag>) -> &mut Self::Value;
 }
 
+/// Provider form of [`HasFieldMut`].
 pub trait MutFieldGetter<Context, Tag>: FieldGetter<Context, Tag> {
     fn get_field_mut(context: &mut Context, tag: PhantomData<Tag>) -> &mut Self::Value;
 }
