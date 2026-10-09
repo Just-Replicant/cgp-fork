@@ -52,6 +52,10 @@ pub trait ExtractField<Tag> {
     fn extract_field(self, _tag: PhantomData<Tag>) -> Result<Self::Value, Self::Remainder>;
 }
 
+/// Turns an uninhabited remainder into any type.
+///
+/// Implemented for [`Void`](crate::core::field::types::Void) and `Infallible`. Calling it means
+/// every variant was consumed, so the remainder cannot exist.
 pub trait FinalizeExtract {
     fn finalize_extract<T>(self) -> T;
 }
