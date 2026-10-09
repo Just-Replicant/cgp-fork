@@ -236,6 +236,22 @@ pub fn cgp_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `#[cgp_fn]` turns a function with `#[implicit]` parameters into a trait and a blanket impl.
+
+    Each `#[implicit]` parameter is removed from the signature and read from a same-named field
+    of the context through `HasField`. The function name becomes the trait name in PascalCase,
+    unless the attribute names a different trait.
+
+    ## Example
+
+    ```rust,ignore
+    #[cgp_fn]
+    pub fn greet(&self, #[implicit] name: &str) {
+        println!("Hello, {name}!");
+    }
+    ```
+*/
 #[proc_macro_attribute]
 pub fn cgp_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     crate::macro_lib::cgp_fn(attr.into(), item.into())
