@@ -21,9 +21,12 @@ delegate_components! {
     }
 }
 
+/// Promotes a `TryComputer`, and forwards the other handler components through [`PromoteComputer`].
+pub struct PromoteTryComputer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteTryComputer<Provider> {
+    PromoteTryComputer<Provider> {
         TryComputerComponent: TryPromote<Provider>,
         [
             ComputerRefComponent,
