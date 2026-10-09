@@ -7,6 +7,7 @@ use crate::core::field::traits::MapType;
 /// [`BuildField`](crate::core::field::traits::BuildField) and [`TakeField`](crate::core::field::traits::TakeField)
 /// are the two directions: present to absent, and absent to present.
 pub trait UpdateField<Tag, M: MapType> {
+    /// The type stored under `Tag`.
     type Value;
 
     type Mapper: MapType;
