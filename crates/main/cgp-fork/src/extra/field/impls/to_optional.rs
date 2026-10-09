@@ -1,6 +1,7 @@
 use crate::core::field::impls::{IsNothing, IsOptional, IsPresent};
 use crate::core::field::traits::{HasBuilder, TransformMap, TransformMapFields};
 
+/// A builder whose fields are `Option`s, so each one may be left unset.
 pub trait HasOptionalBuilder {
     type Builder;
 
