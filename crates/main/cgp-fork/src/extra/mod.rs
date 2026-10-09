@@ -1,3 +1,4 @@
+/// Handler matchers, computers, and the producers programs usually import.
 pub mod prelude;
 
 pub mod dispatch;
