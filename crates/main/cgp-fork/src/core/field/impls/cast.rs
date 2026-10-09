@@ -19,6 +19,7 @@ pub trait CanUpcast<Target> {
 /// Succeeds when every field of `Target` can be extracted. `Remainder` is the source with
 /// those fields removed, so the caller can keep using it.
 pub trait CanDowncast<Target> {
+    /// The source after `Target`'s fields have been removed.
     type Remainder;
 
     fn downcast(self, _tag: PhantomData<Target>) -> Result<Target, Self::Remainder>;
