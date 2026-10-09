@@ -10,6 +10,7 @@ pub mod core;
 /// Handlers, dispatch, logging, and the other providers built on [`core`].
 pub mod extra;
 
+/// The names most programs import: `use cgp_fork::prelude::*;`.
 pub mod prelude;
 
 /// Names the macro expansion refers to. A superset of [`prelude`], so generated
