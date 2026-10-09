@@ -4,6 +4,7 @@ use crate::extra::handler::{
     Computer, ComputerComponent, Handler, HandlerComponent, TryComputer, TryComputerComponent,
 };
 
+/// Runs `Provider` on a builder, then [`CanBuildFrom`](crate::core::field::impls::CanBuildFrom) merges that output back in.
 pub struct BuildAndMerge<Provider = UseContext>(pub PhantomData<Provider>);
 
 #[cgp_provider]
