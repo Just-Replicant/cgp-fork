@@ -11,6 +11,7 @@ use crate::core::field::types::{Cons, Field, Nil};
 /// `Ok` is the finished value when every field is `Some`. `Err` is the name of the first field
 /// that is still `None`.
 pub trait FinalizeOptional: PartialData {
+    /// Builds the target, or returns the static name of a field that was `None`.
     fn finalize_optional(self) -> Result<Self::Target, &'static str>;
 }
 
