@@ -10,6 +10,7 @@ use crate::core::field::types::{Either, Field, Void};
 /// The source must contain every field `Target` names. A leftover field is unreachable:
 /// the remainder is a [`Void`](crate::core::field::types::Void) (or `Infallible`) and is discarded.
 pub trait CanUpcast<Target> {
+    /// Moves the fields `Target` needs out of `self`.
     fn upcast(self, _tag: PhantomData<Target>) -> Target;
 }
 
