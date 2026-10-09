@@ -24,6 +24,7 @@ where
 
 /// Wraps every present field in `Some` and every absent field in `None`.
 pub trait ToOptional {
+    /// This builder with each field mapped to `Option`.
     type Output;
 
     fn to_optional(self) -> Self::Output;
