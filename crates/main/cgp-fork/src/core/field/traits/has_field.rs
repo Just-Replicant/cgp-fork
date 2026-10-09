@@ -53,6 +53,7 @@ pub trait HasField<Tag> {
 
 /// Provider form of [`HasField`]: `Self` is the getter, and the context is a parameter.
 pub trait FieldGetter<Context, Tag> {
+    /// The type stored under `Tag`.
     type Value;
 
     fn get_field(context: &Context, _tag: PhantomData<Tag>) -> &Self::Value;
