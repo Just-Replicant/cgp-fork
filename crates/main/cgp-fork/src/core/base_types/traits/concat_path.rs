@@ -1,5 +1,6 @@
 use crate::core::base_types::types::{Nil, PathCons};
 
+/// Appends `Other` to the end of a type-level [`PathCons`](crate::core::base_types::types::PathCons) list.
 pub trait ConcatPath<Other: ?Sized> {
     type Output: ?Sized;
 }
