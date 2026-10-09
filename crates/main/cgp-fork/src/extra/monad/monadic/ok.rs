@@ -3,6 +3,7 @@ use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, Com
 use crate::extra::monad::monadic::ident::IdentMonadic;
 use crate::extra::monad::traits::{ContainsValue, LiftValue, MonadicBind, MonadicTrans};
 
+/// Pipes the `Err` side of `Result`. A successful step's `Ok` value is left in place.
 pub struct OkMonadic;
 
 pub struct OkMonadicTrans<M>(pub PhantomData<M>);
