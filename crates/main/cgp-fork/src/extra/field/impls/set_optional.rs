@@ -11,6 +11,7 @@ pub trait SetOptional<Tag> {
     /// Writes `Some(value)` and drops the previous contents.
     fn set(self, _tag: PhantomData<Tag>, value: Self::Value) -> Self;
 
+    /// Writes `Some(value)` and returns the previous `Option`.
     fn set_optional(
         self,
         _tag: PhantomData<Tag>,
