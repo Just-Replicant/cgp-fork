@@ -4,7 +4,10 @@ use crate::core::field::impls::IsNothing;
 use crate::core::field::traits::{HasFields, MapType, PartialData, UpdateField};
 use crate::core::field::types::{Cons, Field, Nil};
 
-/// Natural transformation from `M1::Map<T>` to `M2::Map<T>`
+/// Converts a value wrapped by `M1` into the same value wrapped by `M2`.
+///
+/// A partial builder uses this to turn an absent field into a present one, or a present field
+/// into an `Option`.
 pub trait TransformMap<M1: MapType, M2: MapType, T> {
     fn transform_mapped(value: M1::Map<T>) -> M2::Map<T>;
 }
