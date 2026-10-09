@@ -16,6 +16,7 @@ pub trait CanTryCompute<Code, Input> {
     /// The success value.
     type Output;
 
+    /// Runs the computation, returning the context error on failure.
     fn try_compute(&self, _code: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
 }
 
