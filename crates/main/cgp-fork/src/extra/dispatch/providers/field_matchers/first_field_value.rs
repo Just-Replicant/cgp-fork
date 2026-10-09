@@ -1,6 +1,7 @@
 use crate::core::prelude::*;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// Unwraps a [`Field`](crate::core::field::types::Field) beside extra arguments and runs `Provider` on `(value, args)`.
 pub struct HandleFirstFieldValue<Provider = UseContext>(pub PhantomData<Provider>);
 
 #[cgp_provider]

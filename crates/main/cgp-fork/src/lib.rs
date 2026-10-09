@@ -1,13 +1,17 @@
 #![no_std]
 #![doc = include_str!("../README.md")]
 #![allow(mixed_script_confusables)]
+#![deny(missing_docs)]
 
 extern crate alloc;
 extern crate self as cgp_fork;
 
+/// Components, providers, and the type-level lists they are wired through.
 pub mod core;
+/// Handlers, dispatch, logging, and the other providers built on [`core`].
 pub mod extra;
 
+/// The names most programs import: `use cgp_fork::prelude::*;`.
 pub mod prelude;
 
 /// Names the macro expansion refers to. A superset of [`prelude`], so generated

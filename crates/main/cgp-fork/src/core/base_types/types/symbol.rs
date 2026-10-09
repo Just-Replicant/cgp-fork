@@ -1,6 +1,10 @@
 use core::fmt::Display;
 use core::marker::PhantomData;
 
+/// A type-level string: `LEN` is the byte length and `Chars` is the [`Chars`](super::Chars) chain.
+///
+/// [`Symbol!`](crate::core::macros::Symbol) builds this from a string literal. The byte length is stored
+/// beside the characters so a symbol can be named without walking the chain.
 pub struct Symbol<const LEN: usize, Chars>(pub PhantomData<Chars>);
 
 use crate::core::base_types::traits::StaticFormat;

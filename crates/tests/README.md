@@ -4,9 +4,7 @@ This directory holds the test suite for Context-Generic Programming, organized *
 CGP concept** — basic delegation, abstract types, implicit arguments, namespaces,
 and so on — rather than by the macro that implements each concept, because a single
 macro such as `delegate_components!` serves many concepts at once. This README is
-the map of what is here and how to run it; [AGENTS.md](AGENTS.md) is the
-authoritative guide to the conventions, and you should read it before adding,
-moving, or refactoring a test.
+the map of what is here and how to run it.
 
 ## The two trees
 
@@ -25,8 +23,9 @@ emits.
 A third category lives in another repository: the cases where a macro *accepts*
 input whose *expansion* then fails to compile are UI fixtures in
 [`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp/blob/main/tests/README.md),
-so each is pinned as the readable error the tool renders for it. AGENTS.md's
-"Adding a failure case" says which of the three a new case belongs in.
+so each is pinned as the readable error the tool renders for it. A new case
+belongs in one of these three places: the main suite, a macro rejection
+target, or a `cargo-cgp` UI fixture.
 
 ## How the tests are laid out
 
@@ -62,5 +61,5 @@ Many tests assert the exact code a macro generates, through the `snapshot_*!`
 macros on `cgp-fork-macro` (feature `snapshot`): each emits the real generated code into the
 module *and* generates a `#[test]` asserting a pretty-printed inline `insta`
 snapshot of it. So a failing snapshot prints a diff of the generated code — accept
-it with `cargo insta` only after confirming the change is intended. Which target
-owns a given macro's snapshot is a convention AGENTS.md sets out.
+it with `cargo insta` only after confirming the change is intended. Snapshot a
+macro in the concept target that owns that macro's feature.

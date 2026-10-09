@@ -9,9 +9,14 @@ use crate::extra::handler::UseInputDelegate;
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
+/// Fallible form of [`CanCompute`](crate::extra::handler::CanCompute).
+///
+/// Failure is the context's abstract error from [`HasErrorType`](crate::core::error::HasErrorType).
 pub trait CanTryCompute<Code, Input> {
+    /// The success value.
     type Output;
 
+    /// Runs the computation, returning the context error on failure.
     fn try_compute(&self, _code: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
 }
 
@@ -20,9 +25,12 @@ pub trait CanTryCompute<Code, Input> {
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
+/// [`CanTryCompute`] for a shared borrow of `Input`.
 pub trait CanTryComputeRef<Code, Input> {
+    /// The success value.
     type Output;
 
+    /// Runs the computation on a borrowed `input`.
     fn try_compute_ref(
         &self,
         _code: PhantomData<Code>,

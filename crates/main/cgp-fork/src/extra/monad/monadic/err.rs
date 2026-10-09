@@ -3,8 +3,10 @@ use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, Com
 use crate::extra::monad::monadic::ident::IdentMonadic;
 use crate::extra::monad::traits::{ContainsValue, LiftValue, MonadicBind, MonadicTrans};
 
+/// Pipes the `Ok` side of `Result`. A failing step's `Err` is left in place.
 pub struct ErrMonadic;
 
+/// [`ErrMonadic`] stacked on the inner monad `M`.
 pub struct ErrMonadicTrans<M>(pub PhantomData<M>);
 
 impl<M> MonadicTrans<M> for ErrMonadic {
@@ -28,6 +30,7 @@ where
 impl<Provider> MonadicBind<Provider> for ErrMonadic {
     type Provider = BindErr<IdentMonadic, Provider>;
 }
+/// Runs `Cont` on the `Ok` of a `Result`, in the inner monad `M`.
 pub struct BindErr<M, Cont>(pub PhantomData<(M, Cont)>);
 
 impl<T, E> ContainsValue<Result<T, E>> for ErrMonadic {

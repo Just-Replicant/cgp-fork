@@ -3,6 +3,10 @@ use core::marker::PhantomData;
 use crate::core::field::traits::{FieldGetter, FieldMapper};
 use crate::core::field::types::{Cons, Nil};
 
+/// Runs a [`Cons`](crate::core::field::types::Cons) list of field getters, each on the previous value.
+///
+/// `ChainGetters<Nil>` returns the starting value. Each earlier getter's output is the input of
+/// the next.
 pub struct ChainGetters<Getters>(pub PhantomData<Getters>);
 
 impl<Context, Tag, Getter, RestGetters, ValueA, ValueB> FieldGetter<Context, Tag>

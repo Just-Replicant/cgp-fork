@@ -4,8 +4,6 @@
 //! syntax, or forms CGP deliberately disallows. Each case asserts that the
 //! relevant `cgp-fork-macro-core` parser (or a `cgp-fork-macro-lib` entrypoint) returns an
 //! error rather than silently accepting the input.
-//!
-//! See crates/tests/AGENTS.md ("Adding a failure case").
 #![allow(dead_code)]
 
 pub mod parser_rejections;

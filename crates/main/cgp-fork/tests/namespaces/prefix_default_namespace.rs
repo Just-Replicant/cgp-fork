@@ -58,6 +58,7 @@ snapshot_cgp_component! {
                 >>::Delegate::foo(__context__)
             }
         }
+        /// Component name for [`Foo`]. Choose its provider in `delegate_components!`.
         pub struct FooProviderComponent;
         impl<__Context__> FooProvider<__Context__> for UseContext
         where

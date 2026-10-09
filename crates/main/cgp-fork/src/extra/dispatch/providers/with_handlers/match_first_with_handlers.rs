@@ -4,6 +4,10 @@ use crate::core::prelude::*;
 use crate::extra::dispatch::DispatchMatchers;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// Runs `Handlers` on `(input, args)` and keeps `args` beside a non-matching remainder.
+///
+/// The first handler that returns `Ok` wins. `args` is threaded through so a later handler still
+/// sees them.
 pub struct MatchFirstWithHandlers<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]

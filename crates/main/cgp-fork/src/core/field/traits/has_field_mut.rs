@@ -3,11 +3,15 @@ use core::ops::DerefMut;
 
 use crate::core::field::traits::{FieldGetter, HasField};
 
+/// Mutable access to the value stored under `Tag`.
 pub trait HasFieldMut<Tag>: HasField<Tag> {
+    /// Mutably borrows the value stored under `Tag`.
     fn get_field_mut(&mut self, tag: PhantomData<Tag>) -> &mut Self::Value;
 }
 
+/// Provider form of [`HasFieldMut`].
 pub trait MutFieldGetter<Context, Tag>: FieldGetter<Context, Tag> {
+    /// Mutably borrows `Tag` from `context`.
     fn get_field_mut(context: &mut Context, tag: PhantomData<Tag>) -> &mut Self::Value;
 }
 

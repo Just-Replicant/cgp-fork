@@ -2,7 +2,7 @@
     The `Either` type is used to represent an _anonymous sum type_.
 
     Similar to [`Cons`](crate::core::field::types::Cons), `Either` is used to form a sum type
-    by combining a chain of `Either` types, and terminated with a [`Void`] type.
+    by combining a chain of `Either` types, and terminated with a [`Void`](crate::core::field::types::Void) type.
     But unlike product types, a sum type has values that belong to one
     of the variants in the list.
 
@@ -25,7 +25,9 @@
 */
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub enum Either<Head, Tail> {
+    /// The value is the head of the sum.
     Left(Head),
+    /// The value is somewhere in the rest of the sum.
     Right(Tail),
 }
 
@@ -33,7 +35,7 @@ pub enum Either<Head, Tail> {
     The `Void` type is used to represent the end of an _anonymous sum type_,
     or an _empty_ sum type.
 
-    `Void` is commonly used as the `Tail` of a [`Either`] type, to terminate the list.
+    `Void` is commonly used as the `Tail` of an [`Either`](crate::core::field::types::Either) type, to terminate the list.
     When used on its own, it represents an empty sum type, which can _never be constructed_.
 
     `Void` is functionally the same as the
@@ -43,7 +45,7 @@ pub enum Either<Head, Tail> {
     However, we define a separate `Void` type, to make it more clear that it is
     specifically used for terminating a sum type.
 
-    Read more about sum types in [`Either`].
+    Read more about sum types in [`Either`](crate::core::field::types::Either).
 */
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub enum Void {}

@@ -1,6 +1,7 @@
 /*!
    This crate provides the proc macros used for defining CGP components.
 */
+#![deny(missing_docs)]
 
 use proc_macro::TokenStream;
 
@@ -236,6 +237,22 @@ pub fn cgp_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `#[cgp_fn]` turns a function with `#[implicit]` parameters into a trait and a blanket impl.
+
+    Each `#[implicit]` parameter is removed from the signature and read from a same-named field
+    of the context through `HasField`. The function name becomes the trait name in PascalCase,
+    unless the attribute names a different trait.
+
+    ## Example
+
+    ```rust,ignore
+    #[cgp_fn]
+    pub fn greet(&self, #[implicit] name: &str) {
+        println!("Hello, {name}!");
+    }
+    ```
+*/
 #[proc_macro_attribute]
 pub fn cgp_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     crate::macro_lib::cgp_fn(attr.into(), item.into())
@@ -751,6 +768,22 @@ pub fn derive_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `cgp_namespace!` defines a namespace table: a type-level map from paths to providers.
+
+    The body uses the same entries as [`delegate_components!`](macro@delegate_components).
+    `new Name` declares the table type. `Name: Parent` inherits the parent's entries, and an
+    entry in the child overrides the parent. `#[prefix]` and `open` look providers up in
+    these tables through `RedirectLookup`.
+
+    ```rust,ignore
+    cgp_namespace! {
+        new AppNamespace {
+            @app.error.ErrorRaiserComponent: RaiseFrom,
+        }
+    }
+    ```
+*/
 #[proc_macro]
 pub fn cgp_namespace(body: TokenStream) -> TokenStream {
     crate::macro_lib::cgp_namespace(body.into())
@@ -1007,6 +1040,16 @@ pub fn Product(body: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `product!` builds a value-level `Cons` list from expressions.
+
+    The type of the value is the [`Product!`](macro@Product) of the expression types. An empty
+    `product![]` is `Nil`.
+
+    ```rust,ignore
+    let row: Product![u32, String, bool] = product![2 + 3, "hi".to_owned(), true];
+    ```
+*/
 #[proc_macro]
 pub fn product(body: TokenStream) -> TokenStream {
     crate::macro_lib::product(body.into())
@@ -1114,6 +1157,16 @@ pub fn Enum(body: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `Path!` builds a type-level path from a dotted `@` path.
+
+    Each segment becomes a step in a `PathCons` chain. Namespace wiring uses the same paths
+    to name a component inside a table.
+
+    ```rust,ignore
+    type ErrorRaiser = Path!(@app.error.ErrorRaiserComponent);
+    ```
+*/
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Path(body: TokenStream) -> TokenStream {
@@ -1122,6 +1175,9 @@ pub fn Path(body: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives `HasField` for each field.
+///
+/// Named fields are keyed by `Symbol!("field")`. Positional fields are keyed by `Index<N>`.
 #[proc_macro_derive(HasField)]
 pub fn derive_fields(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_has_field(item.into())
@@ -1129,6 +1185,7 @@ pub fn derive_fields(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives `HasFields`: the type-level [`Struct!`](macro@Struct) or [`Enum!`](macro@Enum) shape.
 #[proc_macro_derive(HasFields)]
 pub fn derive_has_fields(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_has_fields(item.into())
@@ -1136,6 +1193,7 @@ pub fn derive_has_fields(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the partial builder: `HasBuilder`, `BuildField`, and `FinalizeBuild`.
 #[proc_macro_derive(BuildField)]
 pub fn derive_builder(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_build_field(item.into())
@@ -1143,6 +1201,7 @@ pub fn derive_builder(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the extractor that pulls one field out of a struct or one variant out of an enum.
 #[proc_macro_derive(ExtractField)]
 pub fn derive_extractor(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_extract_field(item.into())
@@ -1150,6 +1209,7 @@ pub fn derive_extractor(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives `FromVariant` for each variant, wrapping a payload in that variant.
 #[proc_macro_derive(FromVariant)]
 pub fn derive_from_variant(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_from_variant(item.into())
@@ -1157,6 +1217,7 @@ pub fn derive_from_variant(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the extensible-variant spine: fields, extraction, and `FromVariant` for an enum.
 #[proc_macro_derive(CgpVariant)]
 pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_cgp_variant(item.into())
@@ -1164,6 +1225,7 @@ pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the extensible-record spine: field access, the field list, conversions, and the partial builder.
 #[proc_macro_derive(CgpRecord)]
 pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_cgp_record(item.into())
@@ -1171,6 +1233,7 @@ pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives [`CgpRecord`](derive@CgpRecord) for a struct and [`CgpVariant`](derive@CgpVariant) for an enum.
 #[proc_macro_derive(CgpData)]
 pub fn derive_cgp_data(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_cgp_data(item.into())
@@ -1297,7 +1360,10 @@ pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
         .into()
 }
 
-/// Desugar `async fn` in a trait to `-> impl Future`.
+/// Rewrites `async fn` in a trait to a method that returns `impl Future`.
+///
+/// The desugared method is what `#[cgp_component]` forwards. The future is not automatically
+/// `Send`; `CanSendRun` is the component that asks for a `Send` future.
 #[proc_macro_attribute]
 pub fn async_trait(_attr: TokenStream, stream: TokenStream) -> TokenStream {
     async_impl::impl_async(stream.into()).into()

@@ -1,8 +1,16 @@
+/// The type-level shape of `Self`: a [`Cons`](crate::core::field::types::Cons) or
+/// [`Either`](crate::core::field::types::Either) chain of [`Field`](crate::core::field::types::Field)s.
+///
+/// `#[derive(HasFields)]` and `#[derive(CgpData)]` generate this. Named fields are keyed by
+/// `Symbol!`, positional fields by `Index<N>`.
 pub trait HasFields {
+    /// The product or sum that lists every field.
     type Fields;
 }
 
+/// [`HasFields`] for a shared borrow, so the field list can name references.
 pub trait HasFieldsRef {
+    /// The field list of `&Self`, with each value borrowed for `'a`.
     type FieldsRef<'a>
     where
         Self: 'a;

@@ -5,6 +5,9 @@ use core::fmt::Debug;
 use crate::core::error::{ErrorRaiser, ErrorRaiserComponent, ErrorWrapper, ErrorWrapperComponent};
 use crate::core::prelude::*;
 
+/// Raises and wraps by formatting with `{:?}`, then raising the resulting `String`.
+///
+/// The original value is not kept. The context must be able to raise and wrap a `String`.
 pub struct DebugError;
 
 #[cgp_provider]

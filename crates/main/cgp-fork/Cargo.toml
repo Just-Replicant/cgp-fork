@@ -12,6 +12,10 @@ keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "A language extension for Rust, with pluggable trait implementations at compile-time."
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [features]
 default = ["full"]
 full = ["alloc"]

@@ -1,24 +1,28 @@
 use crate::core::field::traits::MapType;
 use crate::core::field::types::Void;
 
+/// [`MapType`](crate::core::field::traits::MapType) that keeps the value: `Map<T> = T`.
 pub struct IsPresent;
 
 impl MapType for IsPresent {
     type Map<T> = T;
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that drops the value: `Map<T> = ()`.
 pub struct IsNothing;
 
 impl MapType for IsNothing {
     type Map<T> = ();
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that erases the value: `Map<T> = Void`.
 pub struct IsVoid;
 
 impl MapType for IsVoid {
     type Map<T> = Void;
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that wraps the value: `Map<T> = Option<T>`.
 pub struct IsOptional;
 
 impl MapType for IsOptional {

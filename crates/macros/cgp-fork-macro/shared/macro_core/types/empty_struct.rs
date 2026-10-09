@@ -1,16 +1,36 @@
 use quote::{ToTokens, quote_spanned};
 use syn::punctuated::Punctuated;
 use syn::token::Comma;
-use syn::{GenericParam, Generics, Ident, ItemStruct, Type, parse_quote};
+use syn::{Attribute, GenericParam, Generics, Ident, ItemStruct, Type, parse_quote};
 
 use crate::macro_core::exports::Life;
 
 pub struct EmptyStruct {
     pub ident: Ident,
     pub generics: Generics,
+    pub docs: Vec<Attribute>,
 }
 
 impl EmptyStruct {
+    pub fn new(ident: Ident, generics: Generics) -> Self {
+        Self {
+            ident,
+            generics,
+            docs: Vec::new(),
+        }
+    }
+
+    pub fn with_doc(mut self, doc: impl AsRef<str>) -> Self {
+        let lit = syn::LitStr::new(doc.as_ref(), self.ident.span());
+        self.docs.push(parse_quote!(#[doc = #lit]));
+        self
+    }
+
+    pub fn with_doc_attrs(mut self, attrs: impl IntoIterator<Item = Attribute>) -> Self {
+        self.docs.extend(attrs);
+        self
+    }
+
     pub fn to_item_struct(&self) -> ItemStruct {
         parse_quote!(#self)
     }
@@ -20,6 +40,7 @@ impl ToTokens for EmptyStruct {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let struct_ident = &self.ident;
         let struct_generics = &self.generics;
+        let docs = &self.docs;
 
         // Stamp the synthesized `pub struct … ;` tokens with the struct ident's
         // span rather than the macro `call_site`, so a redefinition error
@@ -30,6 +51,7 @@ impl ToTokens for EmptyStruct {
 
         if struct_generics.params.is_empty() {
             tokens.extend(quote_spanned! { span =>
+                #(#docs)*
                 pub struct #struct_ident;
             });
         } else {
@@ -68,6 +90,7 @@ impl ToTokens for EmptyStruct {
             };
 
             tokens.extend(quote_spanned! { span =>
+                #(#docs)*
                 pub struct #struct_ident < #generic_params > (
                     pub ::core::marker::PhantomData< #phantom_type >
                 );

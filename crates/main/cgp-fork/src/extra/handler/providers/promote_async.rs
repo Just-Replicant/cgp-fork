@@ -3,6 +3,10 @@ use crate::extra::handler::{
     AsyncComputer, AsyncComputerComponent, Computer, Handler, HandlerComponent, TryComputer,
 };
 
+/// Lifts a synchronous provider into the async handler family.
+///
+/// A `Computer` becomes an `AsyncComputer` whose future is ready immediately. A `TryComputer`
+/// becomes a `Handler`.
 pub struct PromoteAsync<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

@@ -1,6 +1,8 @@
 use crate::core::field::types::{Cons, Nil};
 
+/// Appends `Item` to the end of a type-level [`Cons`](crate::core::field::types::Cons) list.
 pub trait AppendProduct<Item: ?Sized> {
+    /// The list with `Item` as its last element. [`Nil`](crate::core::field::types::Nil) becomes `Cons<Item, Nil>`.
     type Output;
 }
 

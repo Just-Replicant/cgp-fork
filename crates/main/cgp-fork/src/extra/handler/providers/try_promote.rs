@@ -4,6 +4,10 @@ use crate::extra::handler::{
     TryComputer, TryComputerComponent,
 };
 
+/// Unwraps a provider whose output is already `Result`, instead of wrapping it in another `Ok`.
+///
+/// A `Computer` that returns `Result<T, Error>` becomes a `TryComputer` that returns that same
+/// result. The async form turns it into a `Handler`.
 pub struct TryPromote<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

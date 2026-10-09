@@ -5,9 +5,12 @@ use crate::extra::handler::{
     TryComputerRefComponent, TryPromote,
 };
 
+/// Promotes a `Computer` provider to the ref, try, async, and handler components.
+pub struct PromoteComputer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteComputer<Provider> {
+    PromoteComputer<Provider> {
         ComputerRefComponent: PromoteRef<Provider>,
         TryComputerComponent: Promote<Provider>,
         TryComputerRefComponent: PromoteRef<Provider>,
@@ -18,9 +21,12 @@ delegate_components! {
     }
 }
 
+/// Promotes a `TryComputer`, and forwards the other handler components through [`PromoteComputer`].
+pub struct PromoteTryComputer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteTryComputer<Provider> {
+    PromoteTryComputer<Provider> {
         TryComputerComponent: TryPromote<Provider>,
         [
             ComputerRefComponent,
@@ -34,9 +40,12 @@ delegate_components! {
     }
 }
 
+/// Promotes a `Producer` to `Computer`, then through [`PromoteComputer`].
+pub struct PromoteProducer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteProducer<Provider> {
+    PromoteProducer<Provider> {
         ComputerComponent: Promote<Provider>,
         [
             ComputerRefComponent,
@@ -51,18 +60,24 @@ delegate_components! {
     }
 }
 
+/// Promotes an `AsyncComputer` to the ref and handler components.
+pub struct PromoteAsyncComputer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteAsyncComputer<Provider> {
+    PromoteAsyncComputer<Provider> {
         AsyncComputerRefComponent: PromoteRef<Provider>,
         HandlerComponent: Promote<Provider>,
         HandlerRefComponent: PromoteRef<Provider>,
     }
 }
 
+/// Promotes a `Handler`, and forwards the ref components through [`PromoteAsyncComputer`].
+pub struct PromoteHandler<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteHandler<Provider> {
+    PromoteHandler<Provider> {
         HandlerComponent: TryPromote<Provider>,
         [
             AsyncComputerRefComponent,

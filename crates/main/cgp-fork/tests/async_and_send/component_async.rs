@@ -53,6 +53,7 @@ snapshot_cgp_component! {
                     .await
             }
         }
+        /// Component name for [`CanFetch`]. Choose its provider in `delegate_components!`.
         pub struct FetcherComponent;
         #[async_trait]
         impl<__Context__> Fetcher<__Context__> for UseContext

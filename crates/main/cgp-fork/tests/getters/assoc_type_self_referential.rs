@@ -55,6 +55,7 @@ snapshot_cgp_getter! {
                 >>::Delegate::name(__context__)
             }
         }
+        /// Component name for [`HasName`]. Choose its provider in `delegate_components!`.
         pub struct NameGetterComponent;
         impl<__Context__> NameGetter<__Context__> for UseContext
         where

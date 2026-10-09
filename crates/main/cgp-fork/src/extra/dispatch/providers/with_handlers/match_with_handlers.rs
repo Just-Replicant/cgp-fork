@@ -5,6 +5,10 @@ use crate::core::prelude::*;
 use crate::extra::dispatch::DispatchMatchers;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// Runs `Handlers` against an extensible enum until one variant matches.
+///
+/// Each handler returns `Result`. `Err` means "not this variant" and the next handler runs.
+/// A leftover remainder is uninhabited once every variant has a handler.
 pub struct MatchWithHandlers<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]

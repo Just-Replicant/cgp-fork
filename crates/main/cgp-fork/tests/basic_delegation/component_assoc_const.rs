@@ -57,6 +57,7 @@ snapshot_cgp_component! {
                 >>::Delegate::limit(__context__)
             }
         }
+        /// Component name for [`HasLimit`]. Choose its provider in `delegate_components!`.
         pub struct LimitProviderComponent;
         impl<__Context__> LimitProvider<__Context__> for UseContext
         where

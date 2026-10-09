@@ -1,9 +1,12 @@
 use crate::core::field::impls::{IsNothing, IsOptional, IsPresent};
 use crate::core::field::traits::{HasBuilder, TransformMap, TransformMapFields};
 
+/// A builder whose fields are `Option`s, so each one may be left unset.
 pub trait HasOptionalBuilder {
+    /// The builder with every field wrapped in `Option`.
     type Builder;
 
+    /// An empty optional builder. Every field starts as `None`.
     fn optional_builder() -> Self::Builder;
 }
 
@@ -19,9 +22,12 @@ where
     }
 }
 
+/// Wraps every present field in `Some` and every absent field in `None`.
 pub trait ToOptional {
+    /// This builder with each field mapped to `Option`.
     type Output;
 
+    /// Rewraps each field as an `Option`.
     fn to_optional(self) -> Self::Output;
 }
 
@@ -36,6 +42,9 @@ where
     }
 }
 
+/// [`TransformMap`](crate::core::field::traits::TransformMap) from present or absent fields into `Option`.
+///
+/// A present value becomes `Some`. An absent value becomes `None`.
 pub struct TransformOptional;
 
 impl<T> TransformMap<IsPresent, IsOptional, T> for TransformOptional {

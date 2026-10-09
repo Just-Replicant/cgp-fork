@@ -3,11 +3,15 @@ use core::marker::PhantomData;
 use crate::core::field::impls::IsOptional;
 use crate::core::field::traits::UpdateField;
 
+/// Sets an optional `Tag` field, returning the previous `Option` when asked.
 pub trait SetOptional<Tag> {
+    /// The type stored under `Tag`, inside the `Option`.
     type Value;
 
+    /// Writes `Some(value)` and drops the previous contents.
     fn set(self, _tag: PhantomData<Tag>, value: Self::Value) -> Self;
 
+    /// Writes `Some(value)` and returns the previous `Option`.
     fn set_optional(
         self,
         _tag: PhantomData<Tag>,

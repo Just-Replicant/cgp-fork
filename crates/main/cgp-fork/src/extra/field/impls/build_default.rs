@@ -1,13 +1,18 @@
 use crate::core::field::impls::{CanBuildFrom, IsNothing, IsOptional, IsPresent};
 use crate::core::field::traits::{FinalizeBuild, HasBuilder, TransformMap, TransformMapFields};
 
+/// Builds `Self` from `Source`, filling any field `Source` does not have with `Default::default`.
 pub trait CanBuildWithDefault<Source> {
+    /// Copies `source`'s fields in and defaults the rest.
     fn build_with_default(source: Source) -> Self;
 }
 
+/// Finishes a builder whose missing fields can be replaced with `Default`.
 pub trait CanFinalizeWithDefault {
+    /// The finished value.
     type Output;
 
+    /// Turns absent fields into their default and finalizes the builder.
     fn finalize_with_default(self) -> Self::Output;
 }
 
@@ -34,6 +39,8 @@ where
     }
 }
 
+/// [`TransformMap`](crate::core::field::traits::TransformMap) that keeps a present value and
+/// replaces an absent one with `Default::default`.
 pub struct TransformMapDefault;
 
 impl<T> TransformMap<IsPresent, IsPresent, T> for TransformMapDefault {

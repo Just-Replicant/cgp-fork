@@ -49,6 +49,7 @@ snapshot_cgp_getter! {
                 >>::Delegate::count(__context__)
             }
         }
+        /// Component name for [`HasCount`]. Choose its provider in `delegate_components!`.
         pub struct CountGetterComponent;
         impl<__Context__> CountGetter<__Context__> for UseContext
         where

@@ -77,10 +77,10 @@ impl ItemCgpPreset {
         );
         let with_components = define_with_components_macro(&macro_name, &own_keys, &self.parents);
 
-        let provider = EmptyStruct {
-            ident: Ident::new("Provider", Span::call_site()),
-            generics: Default::default(),
-        };
+        let provider = EmptyStruct::new(
+            Ident::new("Provider", Span::call_site()),
+            Default::default(),
+        );
 
         let name = &self.name;
 

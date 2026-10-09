@@ -10,7 +10,9 @@ use crate::std_error::Error;
 /// `{}` prints the detail alone, so a reporter that walks `source()` prints each message once.
 /// `{:#}` and `{:?}` print the whole chain, joined by `": "`.
 pub struct WrapError {
+    /// The message added in front of [`source`](Self::source).
     pub detail: String,
+    /// The error this detail was attached to.
     pub source: Error,
 }
 

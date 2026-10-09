@@ -8,9 +8,15 @@ use crate::extra::handler::UseInputDelegate;
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Computes an owned `Input` into `Output`.
+///
+/// `Code` selects which computation this is when one context runs several. Wire
+/// `ComputerComponent` to a provider, or derive one with `#[cgp_computer]`.
 pub trait CanCompute<Code, Input> {
+    /// The value `compute` returns.
     type Output;
 
+    /// Runs the computation on an owned `input`.
     fn compute(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
 }
 
@@ -18,9 +24,14 @@ pub trait CanCompute<Code, Input> {
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Computes a shared borrow of `Input`.
+///
+/// The borrowed mirror of [`CanCompute`]. The same `Code` selects the computation.
 pub trait CanComputeRef<Code, Input> {
+    /// The value `compute_ref` returns.
     type Output;
 
+    /// Runs the computation on a borrowed `input`.
     fn compute_ref(&self, _code: PhantomData<Code>, input: &Input) -> Self::Output;
 }
 

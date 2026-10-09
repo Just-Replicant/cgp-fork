@@ -44,6 +44,7 @@ snapshot_cgp_component! {
                 >>::Delegate::area(__context__)
             }
         }
+        /// Component name for [`HasArea`]. Choose its provider in `delegate_components!`.
         pub struct AreaCalculatorComponent;
         pub struct PromoteAreaCalculator<__Provider__>(
             pub ::core::marker::PhantomData<__Provider__>,

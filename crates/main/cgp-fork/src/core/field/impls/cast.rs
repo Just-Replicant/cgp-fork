@@ -5,19 +5,33 @@ use crate::core::field::traits::{
 };
 use crate::core::field::types::{Either, Field, Void};
 
+/// Converts this value into `Target` by moving every field of `Target` out of it.
+///
+/// The source must contain every field `Target` names. A leftover field is unreachable:
+/// the remainder is a [`Void`](crate::core::field::types::Void) (or `Infallible`) and is discarded.
 pub trait CanUpcast<Target> {
+    /// Moves the fields `Target` needs out of `self`.
     fn upcast(self, _tag: PhantomData<Target>) -> Target;
 }
 
+/// Converts this value into `Target`, returning what was not consumed.
+///
+/// Succeeds when every field of `Target` can be extracted. `Remainder` is the source with
+/// those fields removed, so the caller can keep using it.
 pub trait CanDowncast<Target> {
+    /// The source after `Target`'s fields have been removed.
     type Remainder;
 
+    /// Extracts `Target`, or returns `self` reshaped as [`Remainder`](Self::Remainder).
     fn downcast(self, _tag: PhantomData<Target>) -> Result<Target, Self::Remainder>;
 }
 
+/// [`CanDowncast`] for a value that is already an extractor, not a struct that converts into one.
 pub trait CanDowncastFields<Target> {
+    /// What remains after `Target`'s fields have been removed.
     type Remainder;
 
+    /// Extracts `Target` from this extractor.
     fn downcast_fields(self, _tag: PhantomData<Target>) -> Result<Target, Self::Remainder>;
 }
 
@@ -57,9 +71,16 @@ where
     }
 }
 
+/// Pulls `Target` out of `Source` by walking a type-level field list.
+///
+/// Implemented for the `Either` chain of `Target`'s fields. Each step
+/// [`ExtractField`](crate::core::field::traits::ExtractField)s one tag and wraps it with
+/// [`FromVariant`](crate::core::field::traits::FromVariant).
 pub trait FieldsExtractor<Source, Target> {
+    /// `Source` after every field of `Target` has been taken.
     type Remainder;
 
+    /// Builds `Target` from `source`, or returns the unconsumed remainder.
     fn extract_from(source: Source) -> Result<Target, Self::Remainder>;
 }
 

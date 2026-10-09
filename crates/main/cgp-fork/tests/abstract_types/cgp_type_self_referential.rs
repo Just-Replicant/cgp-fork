@@ -50,6 +50,7 @@ snapshot_cgp_type! {
                 ScalarTypeProviderComponent,
             >>::Delegate as ScalarTypeProvider<__Context__>>::Scalar;
         }
+        /// Component name for [`HasScalarType`]. Choose its provider in `delegate_components!`.
         pub struct ScalarTypeProviderComponent;
         impl<__Context__> ScalarTypeProvider<__Context__> for UseContext
         where

@@ -11,6 +11,10 @@ keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "CGP procedural macros for defining and wiring components."
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [lib]
 proc-macro = true
 

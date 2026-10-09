@@ -8,6 +8,9 @@ use crate::extra::handler::{
     TryComputerRefComponent,
 };
 
+/// Calls a `*Ref` provider with `input.deref()`, so an owned input can use a borrowed handler.
+///
+/// `Input` must implement `Deref`. The target of that deref is what `Provider` borrows.
 pub struct PromoteRef<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

@@ -1,3 +1,5 @@
+//! Handlers, matchers, and the macros that turn a function into a provider.
+
 pub use cgp_fork_macro::{cgp_auto_dispatch, cgp_auto_log, cgp_computer, cgp_producer};
 
 pub use crate::extra::dispatch::{

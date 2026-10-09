@@ -3,8 +3,13 @@ use core::marker::PhantomData;
 use crate::core::component::WithProvider;
 use crate::core::field::traits::{FieldGetter, HasField, HasFieldMut, MutFieldGetter};
 
+/// Reads the `Tag` field and returns it as `&Value` or `&mut Value` through `AsRef` and `AsMut`.
+///
+/// The stored field type only has to implement `AsRef<Value>`. A `String` field can therefore
+/// answer a getter that returns `&str`.
 pub struct UseFieldRef<Tag, Value>(pub PhantomData<(Tag, Value)>);
 
+/// [`WithProvider`]`<`[`UseFieldRef`]`<Tag, Value>>`.
 pub type WithFieldRef<Tag, Value> = WithProvider<UseFieldRef<Tag, Value>>;
 
 impl<Context, OutTag, Tag, Value> FieldGetter<Context, OutTag> for UseFieldRef<Tag, Value>

@@ -55,6 +55,7 @@ snapshot_cgp_component! {
                 >>::Delegate::calculate_area(__context__, shape)
             }
         }
+        /// Component name for [`CanCalculateArea`]. Choose its provider in `delegate_components!`.
         pub struct AreaCalculatorComponent;
         impl<__Context__, Shape> AreaCalculator<__Context__, Shape> for UseContext
         where

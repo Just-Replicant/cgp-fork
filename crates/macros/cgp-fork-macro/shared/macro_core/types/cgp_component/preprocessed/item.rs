@@ -17,10 +17,15 @@ impl PreprocessedCgpComponent {
     /// Build the zero-sized `{Provider}Component` marker struct.
     pub fn to_component_struct(&self) -> EmptyStruct {
         let component_name = &self.args.component_name;
-        EmptyStruct {
-            ident: component_name.ident.clone(),
-            generics: component_name.type_generics.to_generics(),
-        }
+        let trait_name = self.item_trait.ident.to_string();
+        let doc = format!(
+            " Component name for [`{trait_name}`]. Choose its provider in `delegate_components!`."
+        );
+        EmptyStruct::new(
+            component_name.ident.clone(),
+            component_name.type_generics.to_generics(),
+        )
+        .with_doc(doc)
     }
 
     /// Derive the marker struct, provider trait, and both blanket impls, yielding

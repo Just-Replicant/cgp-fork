@@ -2,7 +2,12 @@ use core::fmt::{self, Formatter};
 
 use crate::core::base_types::types::{Chars, Nil};
 
+/// Formats a type-level string without a value.
+///
+/// [`Symbol`](crate::core::base_types::types::Symbol) and [`Chars`](crate::core::base_types::types::Chars)
+/// implement this so a type-level string can be written with `{}`.
 pub trait StaticFormat {
+    /// Writes the type-level characters into `f`.
     fn fmt(f: &mut Formatter<'_>) -> Result<(), fmt::Error>;
 }
 

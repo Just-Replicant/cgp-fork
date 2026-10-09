@@ -7,6 +7,9 @@ use crate::core::error::{
 };
 use crate::core::prelude::*;
 
+/// Raises and wraps by formatting with `{}`, then raising the resulting `String`.
+///
+/// The original value is not kept. The context must be able to raise and wrap a `String`.
 pub struct DisplayError;
 
 #[cgp_provider]

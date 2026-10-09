@@ -58,6 +58,7 @@ snapshot_cgp_component! {
                 >>::Delegate::get_reference(__context__)
             }
         }
+        /// Component name for [`HasReference`]. Choose its provider in `delegate_components!`.
         pub struct ReferenceGetterComponent;
         impl<'a, __Context__, T: 'a + ?Sized> ReferenceGetter<'a, __Context__, T> for UseContext
         where

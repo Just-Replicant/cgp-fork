@@ -9,9 +9,12 @@ use crate::extra::handler::UseInputDelegate;
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Async form of [`CanCompute`](crate::extra::handler::CanCompute): an owned `Input` in, a future out.
 pub trait CanComputeAsync<Code, Input> {
+    /// The value the future resolves to.
     type Output;
 
+    /// Runs the async computation on an owned `input`.
     async fn compute_async(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
 }
 
@@ -20,9 +23,12 @@ pub trait CanComputeAsync<Code, Input> {
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Async form of [`CanComputeRef`](crate::extra::handler::CanComputeRef).
 pub trait CanComputeAsyncRef<Code, Input> {
+    /// The value the future resolves to.
     type Output;
 
+    /// Runs the async computation on a borrowed `input`.
     async fn compute_async_ref(&self, _code: PhantomData<Code>, input: &Input) -> Self::Output;
 }
 

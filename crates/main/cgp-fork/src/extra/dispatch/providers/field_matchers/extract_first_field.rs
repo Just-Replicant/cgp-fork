@@ -1,6 +1,11 @@
 use crate::core::prelude::*;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// Extracts the `Tag` field and runs `Provider` on it, for the first-match form of dispatch.
+///
+/// Unlike [`ExtractFieldAndHandle`](super::extract_field::ExtractFieldAndHandle), a miss does not
+/// keep looking through the rest of a handler list by itself. [`MatchFirstWithHandlers`](crate::extra::dispatch::MatchFirstWithHandlers)
+/// does that around it.
 pub struct ExtractFirstFieldAndHandle<Tag, Provider = UseContext>(pub PhantomData<(Tag, Provider)>);
 
 #[cgp_provider]

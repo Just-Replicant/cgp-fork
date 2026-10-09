@@ -51,6 +51,7 @@ snapshot_cgp_getter! {
                 >>::Delegate::items(__context__)
             }
         }
+        /// Component name for [`HasItems`]. Choose its provider in `delegate_components!`.
         pub struct ItemsGetterComponent;
         impl<__Context__> ItemsGetter<__Context__> for UseContext
         where

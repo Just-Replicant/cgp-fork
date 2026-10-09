@@ -55,6 +55,7 @@ snapshot_cgp_component! {
                 >>::Delegate::show(__context__, value)
             }
         }
+        /// Component name for [`Show`]. Choose its provider in `delegate_components!`.
         pub struct ShowImplComponent;
         impl<__Context__, T> ShowImpl<__Context__, T> for UseContext
         where

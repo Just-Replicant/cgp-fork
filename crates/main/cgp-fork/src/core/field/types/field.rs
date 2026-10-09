@@ -35,7 +35,9 @@ use core::marker::PhantomData;
    ```
 */
 pub struct Field<Tag, Value> {
+    /// The field's value.
     pub value: Value,
+    /// Remembers `Tag` without storing it.
     pub phantom: PhantomData<Tag>,
 }
 

@@ -44,14 +44,19 @@ use crate::core::component::UseContext;
     ```
 */
 pub trait HasField<Tag> {
+    /// The type stored under `Tag`.
     type Value;
 
+    /// Borrows the value stored under `Tag`.
     fn get_field(&self, _tag: PhantomData<Tag>) -> &Self::Value;
 }
 
+/// Provider form of [`HasField`]: `Self` is the getter, and the context is a parameter.
 pub trait FieldGetter<Context, Tag> {
+    /// The type stored under `Tag`.
     type Value;
 
+    /// Borrows `Tag` from `context`.
     fn get_field(context: &Context, _tag: PhantomData<Tag>) -> &Self::Value;
 }
 

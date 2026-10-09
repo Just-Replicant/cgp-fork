@@ -2,6 +2,9 @@ use crate::core::field::impls::CanDowncastFields;
 use crate::core::prelude::*;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// Downcasts the input to `Input` and runs `Provider` on that inner value.
+///
+/// The output is `Result`. `Err` is the remainder when the input is a different variant.
 pub struct DowncastAndHandle<Input, Provider = UseContext>(pub PhantomData<(Input, Provider)>);
 
 #[cgp_provider]
