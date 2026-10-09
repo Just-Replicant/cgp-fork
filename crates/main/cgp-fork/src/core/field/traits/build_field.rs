@@ -9,6 +9,7 @@ use crate::core::field::traits::{PartialData, UpdateField};
 /// to present ([`IsPresent`](crate::core::field::impls::IsPresent)). `Output` is the builder with
 /// that one field filled.
 pub trait BuildField<Tag> {
+    /// The type stored under `Tag`.
     type Value;
 
     type Output;
