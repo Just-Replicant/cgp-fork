@@ -29,6 +29,7 @@ pub trait HasExtractorRef {
     fn extractor_ref(&self) -> Self::ExtractorRef<'_>;
 }
 
+/// [`HasExtractor`] for a mutable borrow.
 pub trait HasExtractorMut {
     type ExtractorMut<'a>
     where
