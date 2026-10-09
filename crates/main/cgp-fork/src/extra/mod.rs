@@ -15,4 +15,5 @@ pub mod log;
 pub mod monad;
 /// Running a context to completion.
 pub mod run;
+/// An abstract runtime value stored on the context.
 pub mod runtime;
