@@ -3,6 +3,7 @@ use crate::core::field::traits::{HasBuilder, TransformMap, TransformMapFields};
 
 /// A builder whose fields are `Option`s, so each one may be left unset.
 pub trait HasOptionalBuilder {
+    /// The builder with every field wrapped in `Option`.
     type Builder;
 
     fn optional_builder() -> Self::Builder;
