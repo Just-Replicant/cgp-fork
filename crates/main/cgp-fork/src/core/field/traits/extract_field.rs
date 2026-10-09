@@ -80,6 +80,7 @@ pub trait FinalizeExtractResult {
     /// The `Ok` type.
     type Output;
 
+    /// Returns the success value. The error branch diverges.
     fn finalize_extract_result(self) -> Self::Output;
 }
 
