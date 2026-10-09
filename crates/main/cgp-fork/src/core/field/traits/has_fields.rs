@@ -4,6 +4,7 @@
 /// `#[derive(HasFields)]` and `#[derive(CgpData)]` generate this. Named fields are keyed by
 /// `Symbol!`, positional fields by `Index<N>`.
 pub trait HasFields {
+    /// The product or sum that lists every field.
     type Fields;
 }
 
