@@ -27,6 +27,7 @@ pub trait ToOptional {
     /// This builder with each field mapped to `Option`.
     type Output;
 
+    /// Rewraps each field as an `Option`.
     fn to_optional(self) -> Self::Output;
 }
 
