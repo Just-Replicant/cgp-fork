@@ -42,6 +42,9 @@ where
     }
 }
 
+/// [`TransformMap`](crate::core::field::traits::TransformMap) from present or absent fields into `Option`.
+///
+/// A present value becomes `Some`. An absent value becomes `None`.
 pub struct TransformOptional;
 
 impl<T> TransformMap<IsPresent, IsOptional, T> for TransformOptional {
