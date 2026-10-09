@@ -15,6 +15,7 @@ pub trait TransformMap<M1: MapType, M2: MapType, T> {
 
 /// Applies a [`TransformMap`] to every field, retargeting the builder at `TargetMap`.
 pub trait TransformMapFields<Transform, TargetMap> {
+    /// This builder after every field has been rewrapped.
     type Output;
 
     fn transform_map_fields(self) -> Self::Output;
