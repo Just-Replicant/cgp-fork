@@ -1,6 +1,7 @@
 use crate::core::field::traits::MapType;
 use crate::core::field::types::Void;
 
+/// [`MapType`](crate::core::field::traits::MapType) that keeps the value: `Map<T> = T`.
 pub struct IsPresent;
 
 impl MapType for IsPresent {
