@@ -7,6 +7,7 @@ use core::ops::Deref;
 pub enum MRef<'a, T> {
     /// A shared borrow.
     Ref(&'a T),
+    /// An owned value.
     Owned(T),
 }
 
