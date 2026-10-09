@@ -3,6 +3,11 @@ use core::marker::PhantomData;
 use crate::core::field::impls::{IsNothing, IsPresent};
 use crate::core::field::traits::{PartialData, UpdateField};
 
+/// Sets the `Tag` field of a partial builder.
+///
+/// The builder's map for that field changes from absent ([`IsNothing`](crate::core::field::impls::IsNothing))
+/// to present ([`IsPresent`](crate::core::field::impls::IsPresent)). `Output` is the builder with
+/// that one field filled.
 pub trait BuildField<Tag> {
     type Value;
 
