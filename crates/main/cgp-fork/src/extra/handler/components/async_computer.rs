@@ -23,6 +23,7 @@ pub trait CanComputeAsync<Code, Input> {
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Async form of [`CanComputeRef`](crate::extra::handler::CanComputeRef).
 pub trait CanComputeAsyncRef<Code, Input> {
     type Output;
 
