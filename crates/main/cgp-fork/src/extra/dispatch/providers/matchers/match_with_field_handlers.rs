@@ -88,9 +88,12 @@ delegate_components! {
     }
 }
 
+/// Inner table that sends an owned input to [`MatchWithHandlers`](crate::extra::dispatch::MatchWithHandlers) of that input's field handlers.
+pub struct MatchWithFieldHandlersInputs<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Input: HasFieldHandlers<MapExtractFieldAndHandle<Provider>>, Provider>
-    new MatchWithFieldHandlersInputs<Provider> {
+    MatchWithFieldHandlersInputs<Provider> {
         Input: MatchWithHandlers<Input::Handlers>
     }
 }
