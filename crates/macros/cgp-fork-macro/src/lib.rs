@@ -767,6 +767,22 @@ pub fn derive_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `cgp_namespace!` defines a namespace table: a type-level map from paths to providers.
+
+    The body uses the same entries as [`delegate_components!`](macro@delegate_components).
+    `new Name` declares the table type. `Name: Parent` inherits the parent's entries, and an
+    entry in the child overrides the parent. `#[prefix]` and `open` look providers up in
+    these tables through `RedirectLookup`.
+
+    ```rust,ignore
+    cgp_namespace! {
+        new AppNamespace {
+            @app.error.ErrorRaiserComponent: RaiseFrom,
+        }
+    }
+    ```
+*/
 #[proc_macro]
 pub fn cgp_namespace(body: TokenStream) -> TokenStream {
     crate::macro_lib::cgp_namespace(body.into())
