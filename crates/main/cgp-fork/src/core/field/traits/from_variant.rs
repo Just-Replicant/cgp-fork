@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+/// Builds an enum from the payload of the `Tag` variant.
 pub trait FromVariant<Tag> {
     type Value;
 
