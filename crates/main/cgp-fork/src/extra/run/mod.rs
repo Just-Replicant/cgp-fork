@@ -11,6 +11,7 @@ use crate::core::prelude::*;
 ///
 /// `Code` selects which run this is. Failure is the context's abstract error.
 pub trait CanRun<Code> {
+    /// Runs until completion, or returns the context error.
     async fn run(&self, _code: PhantomData<Code>) -> Result<(), Error>;
 }
 
