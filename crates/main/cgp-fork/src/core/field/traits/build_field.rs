@@ -34,5 +34,6 @@ where
 
 /// Turns a partial builder into the finished value once every field is present.
 pub trait FinalizeBuild: PartialData {
+    /// Builds [`PartialData::Target`](crate::core::field::traits::PartialData::Target).
     fn finalize_build(self) -> Self::Target;
 }
