@@ -36,6 +36,7 @@ use crate::core::types::traits::TypeProvider;
 */
 pub struct UseType<Type>(pub PhantomData<Type>);
 
+/// [`WithProvider`]`<`[`UseType`]`<Type>>`, for a consumer trait that should use `Type` directly.
 pub type WithType<Type> = WithProvider<UseType<Type>>;
 
 #[cgp_provider(TypeProviderComponent)]
