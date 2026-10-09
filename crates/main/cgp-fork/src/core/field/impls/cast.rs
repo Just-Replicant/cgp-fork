@@ -80,6 +80,7 @@ pub trait FieldsExtractor<Source, Target> {
     /// `Source` after every field of `Target` has been taken.
     type Remainder;
 
+    /// Builds `Target` from `source`, or returns the unconsumed remainder.
     fn extract_from(source: Source) -> Result<Target, Self::Remainder>;
 }
 
