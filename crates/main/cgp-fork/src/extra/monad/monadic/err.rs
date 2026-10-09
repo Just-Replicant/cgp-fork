@@ -30,6 +30,7 @@ where
 impl<Provider> MonadicBind<Provider> for ErrMonadic {
     type Provider = BindErr<IdentMonadic, Provider>;
 }
+/// Runs `Cont` on the `Ok` of a `Result`, in the inner monad `M`.
 pub struct BindErr<M, Cont>(pub PhantomData<(M, Cont)>);
 
 impl<T, E> ContainsValue<Result<T, E>> for ErrMonadic {
