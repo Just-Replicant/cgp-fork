@@ -12,6 +12,7 @@ use crate::core::types::traits::TypeProvider;
 /// `delegate_components!` table.
 pub struct UseDelegatedType<Components>(pub PhantomData<Components>);
 
+/// [`WithProvider`]`<`[`UseDelegatedType`]`<Components>>`.
 pub type WithDelegatedType<Components> = WithProvider<UseDelegatedType<Components>>;
 
 #[cgp_provider(TypeProviderComponent)]
