@@ -1,6 +1,10 @@
 use crate::core::prelude::*;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// Extracts the `Tag` field and runs `Provider` on it.
+///
+/// The output is `Result`: `Ok` is the provider's output, `Err` is the remainder when this value
+/// is a different variant.
 pub struct ExtractFieldAndHandle<Tag, Provider = UseContext>(pub PhantomData<(Tag, Provider)>);
 
 #[cgp_provider]
