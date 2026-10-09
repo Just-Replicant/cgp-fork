@@ -1,3 +1,4 @@
+/// Names re-exported from [`crate::prelude`].
 pub mod prelude;
 
 /// Names the macro expansion refers to. A superset of [`prelude`]: the error
