@@ -239,6 +239,7 @@ snapshot_cgp_getter! {
                 >>::Delegate::foo_at(__context__, _tag)
             }
         }
+        /// Component name for [`HasFooAt`]. Choose its provider in `delegate_components!`.
         pub struct FooGetterAtComponent;
         impl<__Context__, I, J> FooGetterAt<__Context__, I, J> for UseContext
         where
