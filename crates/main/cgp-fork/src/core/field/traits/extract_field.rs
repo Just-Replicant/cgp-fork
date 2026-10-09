@@ -8,6 +8,7 @@ use crate::core::field::types::Void;
 /// The extractor is an [`Either`](crate::core::field::types::Either) chain of fields. Owned
 /// extraction consumes `self`; the ref and mut traits borrow it instead.
 pub trait HasExtractor {
+    /// The sum of `Self`'s fields.
     type Extractor;
 
     fn to_extractor(self) -> Self::Extractor;
