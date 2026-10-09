@@ -5,6 +5,10 @@ use crate::core::field::traits::{
 };
 use crate::core::field::types::{Either, Field, Void};
 
+/// Converts this value into `Target` by moving every field of `Target` out of it.
+///
+/// The source must contain every field `Target` names. A leftover field is unreachable:
+/// the remainder is a [`Void`](crate::core::field::types::Void) (or `Infallible`) and is discarded.
 pub trait CanUpcast<Target> {
     fn upcast(self, _tag: PhantomData<Target>) -> Target;
 }
