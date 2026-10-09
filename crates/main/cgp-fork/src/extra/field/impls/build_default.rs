@@ -39,6 +39,8 @@ where
     }
 }
 
+/// [`TransformMap`](crate::core::field::traits::TransformMap) that keeps a present value and
+/// replaces an absent one with `Default::default`.
 pub struct TransformMapDefault;
 
 impl<T> TransformMap<IsPresent, IsPresent, T> for TransformMapDefault {
