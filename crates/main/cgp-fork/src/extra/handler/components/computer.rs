@@ -31,6 +31,7 @@ pub trait CanComputeRef<Code, Input> {
     /// The value `compute_ref` returns.
     type Output;
 
+    /// Runs the computation on a borrowed `input`.
     fn compute_ref(&self, _code: PhantomData<Code>, input: &Input) -> Self::Output;
 }
 
