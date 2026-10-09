@@ -28,6 +28,7 @@ pub type MatchFirstWithValueHandlersRef<Provider = UseContext> =
 pub type MatchFirstWithFieldHandlersMut<Provider = UseContext> =
     UseInputDelegate<MatchFirstWithFieldHandlersInputsMut<Provider>>;
 
+/// [`MatchFirstWithValueHandlers`] for a mutable borrow of the enum.
 pub type MatchFirstWithValueHandlersMut<Provider = UseContext> =
     UseInputDelegate<MatchFirstWithFieldHandlersInputsMut<HandleFirstFieldValue<Provider>>>;
 
