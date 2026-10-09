@@ -13,6 +13,7 @@ pub trait HasBuilder {
 
 /// Turns an existing value into a builder that already holds its fields.
 pub trait IntoBuilder {
+    /// The partial value populated from `self`.
     type Builder;
 
     fn into_builder(self) -> Self::Builder;
