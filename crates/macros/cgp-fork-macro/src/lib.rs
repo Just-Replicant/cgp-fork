@@ -1174,6 +1174,9 @@ pub fn Path(body: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives `HasField` for each field.
+///
+/// Named fields are keyed by `Symbol!("field")`. Positional fields are keyed by `Index<N>`.
 #[proc_macro_derive(HasField)]
 pub fn derive_fields(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_has_field(item.into())
