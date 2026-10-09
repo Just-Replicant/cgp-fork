@@ -30,4 +30,5 @@ pub trait HasErrorType {
     type Error: Debug;
 }
 
+/// [`HasErrorType::Error`](crate::core::error::HasErrorType::Error) of `Context`.
 pub type ErrorOf<Context> = <Context as HasErrorType>::Error;
