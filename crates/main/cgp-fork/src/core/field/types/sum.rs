@@ -27,6 +27,7 @@
 pub enum Either<Head, Tail> {
     /// The value is the head of the sum.
     Left(Head),
+    /// The value is somewhere in the rest of the sum.
     Right(Tail),
 }
 
