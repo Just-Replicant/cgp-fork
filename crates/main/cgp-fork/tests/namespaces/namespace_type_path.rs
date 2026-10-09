@@ -86,6 +86,7 @@ snapshot_cgp_component! {
                 >>::Delegate::bar(__context__)
             }
         }
+        /// Component name for [`Bar`]. Choose its provider in `delegate_components!`.
         pub struct BarProviderComponent;
         impl<__Context__> BarProvider<__Context__> for UseContext
         where
