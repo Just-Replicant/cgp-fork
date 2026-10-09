@@ -9,6 +9,7 @@ use crate::core::field::traits::{FieldGetter, HasField};
     `context.get_field().get_field()`.
 */
 pub trait MapField<Tag>: HasField<Tag> {
+    /// Applies `mapper` to the borrowed `Tag` field and returns that borrow.
     fn map_field<T>(
         &self,
         _tag: PhantomData<Tag>,
