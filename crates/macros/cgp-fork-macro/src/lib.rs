@@ -1,6 +1,7 @@
 /*!
    This crate provides the proc macros used for defining CGP components.
 */
+#![deny(missing_docs)]
 
 use proc_macro::TokenStream;
 
