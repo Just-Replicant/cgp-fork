@@ -7,6 +7,9 @@ use crate::core::prelude::*;
 #[async_trait]
 #[derive_delegate(UseDelegate<Code>)]
 #[use_type(HasErrorType.Error)]
+/// Runs `self` to completion, asynchronously.
+///
+/// `Code` selects which run this is. Failure is the context's abstract error.
 pub trait CanRun<Code> {
     async fn run(&self, _code: PhantomData<Code>) -> Result<(), Error>;
 }
