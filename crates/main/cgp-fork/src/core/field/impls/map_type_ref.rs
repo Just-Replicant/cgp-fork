@@ -1,5 +1,6 @@
 use crate::core::field::traits::MapTypeRef;
 
+/// [`MapTypeRef`](crate::core::field::traits::MapTypeRef) for a shared borrow: `Map<'a, T> = &'a T`.
 pub struct IsRef;
 
 impl MapTypeRef for IsRef {
