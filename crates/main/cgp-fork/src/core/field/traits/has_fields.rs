@@ -10,6 +10,7 @@ pub trait HasFields {
 
 /// [`HasFields`] for a shared borrow, so the field list can name references.
 pub trait HasFieldsRef {
+    /// The field list of `&Self`, with each value borrowed for `'a`.
     type FieldsRef<'a>
     where
         Self: 'a;
