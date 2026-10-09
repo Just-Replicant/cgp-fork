@@ -42,6 +42,7 @@ delegate_components! {
     }
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that wraps each provider in [`TryPromote`](crate::extra::handler::TryPromote).
 pub struct TryPromoteProviders;
 
 impl MapType for TryPromoteProviders {
