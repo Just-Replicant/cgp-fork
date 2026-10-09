@@ -19,6 +19,7 @@ pub type MatchWithFieldHandlers<Provider = UseContext> =
 pub type MatchWithValueHandlers<Provider = UseContext> =
     UseInputDelegate<MatchWithFieldHandlersInputs<HandleFieldValue<Provider>>>;
 
+/// [`MatchWithFieldHandlers`] for a shared borrow of the enum.
 pub struct MatchWithFieldHandlersRef<Provider = UseContext>(pub PhantomData<Provider>);
 
 pub struct MatchWithValueHandlersRef<Provider = UseContext>(pub PhantomData<Provider>);
