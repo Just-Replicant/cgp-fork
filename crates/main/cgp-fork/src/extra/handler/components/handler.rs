@@ -33,6 +33,7 @@ pub trait CanHandleRef<Code, Input> {
     /// The success value.
     type Output;
 
+    /// Handles a borrowed `input`, returning the context error on failure.
     async fn handle_ref(
         &self,
         _tag: PhantomData<Code>,
