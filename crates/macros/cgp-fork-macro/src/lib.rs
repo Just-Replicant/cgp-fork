@@ -1039,6 +1039,16 @@ pub fn Product(body: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `product!` builds a value-level `Cons` list from expressions.
+
+    The type of the value is the [`Product!`](macro@Product) of the expression types. An empty
+    `product![]` is `Nil`.
+
+    ```rust,ignore
+    let row: Product![u32, String, bool] = product![2 + 3, "hi".to_owned(), true];
+    ```
+*/
 #[proc_macro]
 pub fn product(body: TokenStream) -> TokenStream {
     crate::macro_lib::product(body.into())
