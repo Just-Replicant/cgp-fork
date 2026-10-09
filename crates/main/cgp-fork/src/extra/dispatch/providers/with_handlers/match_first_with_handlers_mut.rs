@@ -4,6 +4,7 @@ use crate::core::prelude::*;
 use crate::extra::dispatch::DispatchMatchers;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// [`MatchFirstWithHandlers`](super::match_first_with_handlers::MatchFirstWithHandlers) for a mutable borrow.
 pub struct MatchFirstWithHandlersMut<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]
