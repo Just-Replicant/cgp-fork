@@ -13,5 +13,6 @@ pub trait CanProduce<Code> {
     /// The value `produce` returns.
     type Output;
 
+    /// Builds the value from `self`.
     fn produce(&self, _code: PhantomData<Code>) -> Self::Output;
 }
