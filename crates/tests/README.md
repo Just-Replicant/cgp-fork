@@ -61,5 +61,5 @@ Many tests assert the exact code a macro generates, through the `snapshot_*!`
 macros on `cgp-fork-macro` (feature `snapshot`): each emits the real generated code into the
 module *and* generates a `#[test]` asserting a pretty-printed inline `insta`
 snapshot of it. So a failing snapshot prints a diff of the generated code — accept
-it with `cargo insta` only after confirming the change is intended. Which target
-owns a given macro's snapshot is a convention AGENTS.md sets out.
+it with `cargo insta` only after confirming the change is intended. Snapshot a
+macro in the concept target that owns that macro's feature.
