@@ -31,6 +31,7 @@ pub trait HasExtractorRef {
 
 /// [`HasExtractor`] for a mutable borrow.
 pub trait HasExtractorMut {
+    /// The sum of `Self`'s fields, mutably borrowed for `'a`.
     type ExtractorMut<'a>
     where
         Self: 'a;
