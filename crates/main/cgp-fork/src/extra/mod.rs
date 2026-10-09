@@ -1,6 +1,7 @@
 /// Handler matchers, computers, and the producers programs usually import.
 pub mod prelude;
 
+/// Match an extensible enum or build an extensible record with a handler per field.
 pub mod dispatch;
 pub mod error;
 pub mod field;
