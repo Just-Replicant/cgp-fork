@@ -43,6 +43,7 @@ snapshot_cgp_getter! {
                 <__Provider__ as DelegateComponent<GetStringComp>>::Delegate::foo(__context__)
             }
         }
+        /// Component name for [`HasFoo`]. Choose its provider in `delegate_components!`.
         pub struct GetStringComp;
         impl<__Context__> GetString<__Context__> for UseContext
         where
