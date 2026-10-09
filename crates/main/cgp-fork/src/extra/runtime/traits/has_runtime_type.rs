@@ -9,4 +9,5 @@ pub trait HasRuntimeType {
     type Runtime;
 }
 
+/// [`HasRuntimeType::Runtime`](crate::extra::runtime::HasRuntimeType::Runtime) of `Context`.
 pub type RuntimeOf<Context> = <Context as HasRuntimeType>::Runtime;
