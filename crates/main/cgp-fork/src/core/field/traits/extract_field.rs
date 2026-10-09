@@ -73,6 +73,9 @@ impl FinalizeExtract for Infallible {
     }
 }
 
+/// Unwraps a `Result` whose error implements [`FinalizeExtract`].
+///
+/// `Ok` is returned as-is. `Err` cannot exist, so it is discarded.
 pub trait FinalizeExtractResult {
     type Output;
 
