@@ -7,6 +7,7 @@ pub mod dispatch;
 pub mod error;
 /// Builders that fill missing fields from `Default` or from `Option`.
 pub mod field;
+/// The handler family: produce, compute, try, and handle.
 pub mod handler;
 pub mod log;
 pub mod monad;
