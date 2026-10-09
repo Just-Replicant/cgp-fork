@@ -11,6 +11,7 @@ use crate::extra::handler::UseInputDelegate;
 #[derive_delegate(UseInputDelegate<Input>)]
 /// Async form of [`CanCompute`](crate::extra::handler::CanCompute): an owned `Input` in, a future out.
 pub trait CanComputeAsync<Code, Input> {
+    /// The value the future resolves to.
     type Output;
 
     async fn compute_async(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
