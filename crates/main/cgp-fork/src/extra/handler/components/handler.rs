@@ -10,6 +10,10 @@ use crate::extra::handler::UseInputDelegate;
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
+/// Async computation that returns the context's abstract error on failure.
+///
+/// `Error` comes from [`HasErrorType`](crate::core::error::HasErrorType). This is the fallible
+/// async member of the handler family.
 pub trait CanHandle<Code, Input> {
     type Output;
 
