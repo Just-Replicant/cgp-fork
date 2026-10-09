@@ -7,6 +7,7 @@ pub trait HasBuilder {
     /// The partial value, one slot per field.
     type Builder;
 
+    /// An empty builder, with every field absent.
     fn builder() -> Self::Builder;
 }
 
