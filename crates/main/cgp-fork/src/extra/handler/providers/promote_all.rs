@@ -5,9 +5,12 @@ use crate::extra::handler::{
     TryComputerRefComponent, TryPromote,
 };
 
+/// Promotes a `Computer` provider to the ref, try, async, and handler components.
+pub struct PromoteComputer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteComputer<Provider> {
+    PromoteComputer<Provider> {
         ComputerRefComponent: PromoteRef<Provider>,
         TryComputerComponent: Promote<Provider>,
         TryComputerRefComponent: PromoteRef<Provider>,
