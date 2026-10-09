@@ -1216,6 +1216,7 @@ pub fn derive_from_variant(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the extensible-variant spine: fields, extraction, and `FromVariant` for an enum.
 #[proc_macro_derive(CgpVariant)]
 pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_cgp_variant(item.into())
