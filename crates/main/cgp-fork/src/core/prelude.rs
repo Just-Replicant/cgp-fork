@@ -1,3 +1,5 @@
+//! Components, fields, abstract types, and the macros that define them.
+
 pub use core::marker::PhantomData;
 
 pub use cgp_fork_macro::{
