@@ -10,6 +10,7 @@ use crate::core::prelude::*;
 ///
 /// `#[cgp_producer]` defines a provider for this. `Code` selects which value to produce.
 pub trait CanProduce<Code> {
+    /// The value `produce` returns.
     type Output;
 
     fn produce(&self, _code: PhantomData<Code>) -> Self::Output;
