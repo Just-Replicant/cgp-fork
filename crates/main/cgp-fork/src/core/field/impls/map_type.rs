@@ -8,6 +8,7 @@ impl MapType for IsPresent {
     type Map<T> = T;
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that drops the value: `Map<T> = ()`.
 pub struct IsNothing;
 
 impl MapType for IsNothing {
