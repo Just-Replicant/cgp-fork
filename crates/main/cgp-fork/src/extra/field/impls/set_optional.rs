@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use crate::core::field::impls::IsOptional;
 use crate::core::field::traits::UpdateField;
 
+/// Sets an optional `Tag` field, returning the previous `Option` when asked.
 pub trait SetOptional<Tag> {
     type Value;
 
