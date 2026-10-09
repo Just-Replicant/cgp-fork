@@ -71,6 +71,11 @@ where
     }
 }
 
+/// Pulls `Target` out of `Source` by walking a type-level field list.
+///
+/// Implemented for the `Either` chain of `Target`'s fields. Each step
+/// [`ExtractField`](crate::core::field::traits::ExtractField)s one tag and wraps it with
+/// [`FromVariant`](crate::core::field::traits::FromVariant).
 pub trait FieldsExtractor<Source, Target> {
     type Remainder;
 
