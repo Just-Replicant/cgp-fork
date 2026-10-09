@@ -28,6 +28,7 @@ pub trait CanCompute<Code, Input> {
 ///
 /// The borrowed mirror of [`CanCompute`]. The same `Code` selects the computation.
 pub trait CanComputeRef<Code, Input> {
+    /// The value `compute_ref` returns.
     type Output;
 
     fn compute_ref(&self, _code: PhantomData<Code>, input: &Input) -> Self::Output;
