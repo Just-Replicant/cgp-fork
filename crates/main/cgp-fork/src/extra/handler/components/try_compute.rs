@@ -13,6 +13,7 @@ use crate::extra::handler::UseInputDelegate;
 ///
 /// Failure is the context's abstract error from [`HasErrorType`](crate::core::error::HasErrorType).
 pub trait CanTryCompute<Code, Input> {
+    /// The success value.
     type Output;
 
     fn try_compute(&self, _code: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
