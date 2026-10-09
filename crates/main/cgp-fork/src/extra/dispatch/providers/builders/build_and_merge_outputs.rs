@@ -6,9 +6,12 @@ use crate::extra::handler::{
     TryComputerComponent, TryComputerRefComponent,
 };
 
+/// Builds `Output` by merging the result of each handler in `Handlers`.
+pub struct BuildAndMergeOutputs<Output, Handlers>(pub PhantomData<(Output, Handlers)>);
+
 delegate_components! {
     <Output, Handlers: MapFields<ToBuildAndMergeHandler>>
-    new BuildAndMergeOutputs<Output, Handlers> {
+    BuildAndMergeOutputs<Output, Handlers> {
         [
             ComputerComponent,
             ComputerRefComponent,
