@@ -42,6 +42,7 @@ pub trait HasExtractorMut {
 
 /// Removes the `Tag` field from a product or sum, leaving the rest.
 pub trait ExtractField<Tag> {
+    /// The value stored under `Tag`.
     type Value;
 
     type Remainder;
