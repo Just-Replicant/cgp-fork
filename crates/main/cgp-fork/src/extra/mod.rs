@@ -13,5 +13,6 @@ pub mod handler;
 pub mod log;
 /// Piping providers through `Result` and the identity monad.
 pub mod monad;
+/// Running a context to completion.
 pub mod run;
 pub mod runtime;
