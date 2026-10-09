@@ -27,6 +27,7 @@ pub trait CanTryCompute<Code, Input> {
 #[use_type(HasErrorType.Error)]
 /// [`CanTryCompute`] for a shared borrow of `Input`.
 pub trait CanTryComputeRef<Code, Input> {
+    /// The success value.
     type Output;
 
     fn try_compute_ref(
