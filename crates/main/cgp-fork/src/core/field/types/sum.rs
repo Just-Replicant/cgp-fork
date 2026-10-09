@@ -35,7 +35,7 @@ pub enum Either<Head, Tail> {
     The `Void` type is used to represent the end of an _anonymous sum type_,
     or an _empty_ sum type.
 
-    `Void` is commonly used as the `Tail` of a [`Either`] type, to terminate the list.
+    `Void` is commonly used as the `Tail` of an [`Either`](crate::core::field::types::Either) type, to terminate the list.
     When used on its own, it represents an empty sum type, which can _never be constructed_.
 
     `Void` is functionally the same as the
