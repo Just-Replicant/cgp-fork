@@ -12,6 +12,7 @@ use crate::std_error::Error;
 pub struct WrapError {
     /// The message added in front of [`source`](Self::source).
     pub detail: String,
+    /// The error this detail was attached to.
     pub source: Error,
 }
 
