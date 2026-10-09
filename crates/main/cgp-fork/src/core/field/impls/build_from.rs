@@ -11,6 +11,7 @@ pub trait CanBuildFrom<Source> {
     /// The builder after every field from `Source` has been copied in.
     type Output;
 
+    /// Copies each field of `source` into this builder.
     fn build_from(self, source: Source) -> Self::Output;
 }
 
