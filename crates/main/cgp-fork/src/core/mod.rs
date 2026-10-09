@@ -21,6 +21,7 @@ pub mod component;
 pub mod error;
 /// Field access, builders, and the product and sum types behind extensible data.
 pub mod field;
+/// Abstract types, keyed by a tag and filled in by a provider.
 pub mod types;
 
 pub use cgp_fork_macro as macros;
