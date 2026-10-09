@@ -12,6 +12,7 @@ pub trait DefaultNamespace<Components> {
 /// `#[default_impl(Key in DefaultImpls1<Component>)]` registers `Key`. A `for <T, Provider> in
 /// DefaultImpls1<Component>` loop reads `Delegate` back.
 pub trait DefaultImpls1<T, Components> {
+    /// The provider registered for `T`.
     type Delegate;
 }
 
