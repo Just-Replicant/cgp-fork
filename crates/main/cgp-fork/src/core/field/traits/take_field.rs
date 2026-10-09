@@ -11,6 +11,7 @@ pub trait TakeField<Tag> {
     /// The type stored under `Tag`.
     type Value;
 
+    /// This builder after `Tag` has been cleared.
     type Remainder;
 
     fn take_field(self, _tag: PhantomData<Tag>) -> (Self::Value, Self::Remainder);
