@@ -1,3 +1,7 @@
+/// Records which namespace entry a component redirects to.
+///
+/// `#[prefix(path in DefaultNamespace)]` implements this for the component. `Delegate` is a
+/// [`RedirectLookup`](crate::core::component::RedirectLookup) along `path`.
 pub trait DefaultNamespace<Components> {
     type Delegate;
 }
