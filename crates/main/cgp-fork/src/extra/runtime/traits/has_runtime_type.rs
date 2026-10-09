@@ -5,6 +5,7 @@ use crate::core::prelude::*;
 ///
 /// Wire `RuntimeTypeProviderComponent` to `UseType<YourRuntime>` to choose it.
 pub trait HasRuntimeType {
+    /// The runtime type. Tokio, async-std, or a test runtime are typical choices.
     type Runtime;
 }
 
