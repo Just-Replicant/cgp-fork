@@ -31,6 +31,7 @@ pub trait CanDowncastFields<Target> {
     /// What remains after `Target`'s fields have been removed.
     type Remainder;
 
+    /// Extracts `Target` from this extractor.
     fn downcast_fields(self, _tag: PhantomData<Target>) -> Result<Target, Self::Remainder>;
 }
 
