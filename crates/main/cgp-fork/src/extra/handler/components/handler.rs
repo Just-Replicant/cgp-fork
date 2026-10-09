@@ -28,6 +28,7 @@ pub trait CanHandle<Code, Input> {
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
+/// [`CanHandle`] for a shared borrow of `Input`.
 pub trait CanHandleRef<Code, Input> {
     type Output;
 
