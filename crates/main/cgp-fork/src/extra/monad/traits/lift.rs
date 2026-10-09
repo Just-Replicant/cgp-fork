@@ -6,5 +6,6 @@ pub trait LiftValue<Value, Output> {
     /// Wraps `value` as the monadic context (the `Err` of `Ok`, the `Ok` of `Err`).
     fn lift_value(value: Value) -> Self::Output;
 
+    /// Returns `output` unchanged when it is already monadic.
     fn lift_output(output: Output) -> Self::Output;
 }
