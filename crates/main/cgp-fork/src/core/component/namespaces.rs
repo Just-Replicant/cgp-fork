@@ -16,6 +16,9 @@ pub trait DefaultImpls1<T, Components> {
     type Delegate;
 }
 
+/// Per-type default providers for a component with two extra type parameters.
+///
+/// Same registration and lookup as [`DefaultImpls1`], with a second type in the key.
 pub trait DefaultImpls2<T1, T2, Components> {
     type Delegate;
 }
