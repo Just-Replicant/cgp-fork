@@ -7,6 +7,7 @@ extern crate self as cgp_fork;
 
 /// Components, providers, and the type-level lists they are wired through.
 pub mod core;
+/// Handlers, dispatch, logging, and the other providers built on [`core`].
 pub mod extra;
 
 pub mod prelude;
