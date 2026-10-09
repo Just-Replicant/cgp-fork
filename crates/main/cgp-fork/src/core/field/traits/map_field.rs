@@ -35,6 +35,7 @@ where
     The provider trait equivalent of [`MapField`].
 */
 pub trait FieldMapper<Context, Tag>: FieldGetter<Context, Tag> {
+    /// Applies `mapper` to the borrowed `Tag` field of `context`.
     fn map_field<T>(
         context: &Context,
         _tag: PhantomData<Tag>,
