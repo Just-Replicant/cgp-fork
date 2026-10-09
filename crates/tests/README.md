@@ -23,8 +23,9 @@ emits.
 A third category lives in another repository: the cases where a macro *accepts*
 input whose *expansion* then fails to compile are UI fixtures in
 [`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp/blob/main/tests/README.md),
-so each is pinned as the readable error the tool renders for it. AGENTS.md's
-"Adding a failure case" says which of the three a new case belongs in.
+so each is pinned as the readable error the tool renders for it. A new case
+belongs in one of these three places: the main suite, a macro rejection
+target, or a `cargo-cgp` UI fixture.
 
 ## How the tests are laid out
 
