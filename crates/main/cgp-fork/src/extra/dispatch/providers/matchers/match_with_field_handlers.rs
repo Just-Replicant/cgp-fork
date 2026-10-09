@@ -98,9 +98,12 @@ delegate_components! {
     }
 }
 
+/// [`MatchWithFieldHandlersInputs`] for a shared borrow.
+pub struct MatchWithFieldHandlersInputsRef<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Input: HasFieldHandlers<MapExtractFieldAndHandle<Provider>>, Provider>
-    new MatchWithFieldHandlersInputsRef<Provider> {
+    MatchWithFieldHandlersInputsRef<Provider> {
         <'a> &'a Input:
             MatchWithHandlersRef<Input::Handlers>,
     }
