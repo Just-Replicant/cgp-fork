@@ -1,6 +1,7 @@
 use crate::core::error::{ErrorRaiser, ErrorRaiserComponent, HasErrorType};
 use crate::core::prelude::*;
 
+/// Raises `E` with `From::from` into the context's abstract error.
 #[cgp_new_provider]
 impl<Context, E> ErrorRaiser<Context, E> for RaiseFrom
 where
