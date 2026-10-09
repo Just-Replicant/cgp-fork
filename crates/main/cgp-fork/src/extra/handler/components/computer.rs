@@ -8,6 +8,10 @@ use crate::extra::handler::UseInputDelegate;
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Computes an owned `Input` into `Output`.
+///
+/// `Code` selects which computation this is when one context runs several. Wire
+/// `ComputerComponent` to a provider, or derive one with `#[cgp_computer]`.
 pub trait CanCompute<Code, Input> {
     type Output;
 
