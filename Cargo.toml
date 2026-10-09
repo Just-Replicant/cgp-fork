@@ -8,7 +8,7 @@ members = [
 ]
 
 [workspace.package]
-version         = "0.9.1"
+version         = "0.9.2"
 rust-version    = "1.89"
 edition         = "2024"
 license         = "Apache-2.0"
@@ -19,5 +19,5 @@ keywords        = ["cgp-fork", "traits", "dsl", "dependency-injection", "macros"
 categories      = ["rust-patterns", "no-std"]
 
 [workspace.dependencies]
-cgp-fork       = { version = "0.9.1", path = "./crates/main/cgp-fork" }
-cgp-fork-macro = { version = "0.9.1", path = "./crates/macros/cgp-fork-macro" }
+cgp-fork       = { version = "0.9.2", path = "./crates/main/cgp-fork" }
+cgp-fork-macro = { version = "0.9.2", path = "./crates/macros/cgp-fork-macro" }

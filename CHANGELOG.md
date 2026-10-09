@@ -1,5 +1,388 @@
 # Changelog
 
+## [0.9.2](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.1...v0.9.2) - 2026-10-09
+
+### Added
+
+- *(cgp-provider)* copy rustdoc onto the generated provider struct
+- *(cgp-component)* document the generated component marker
+
+### Changed
+
+- *(empty-struct)* build generated markers with EmptyStruct::new
+
+### Documentation
+
+- *(cgp-fork)* point readers at the knowledge base
+- *(wrap)* document WrapError::source
+- *(wrap)* document WrapError::detail
+- *(string)* document StringError::message
+- *(src-prelude)* document the module
+- *(cgp-fork)* document prelude
+- *(cgp-fork)* document extra
+- *(cgp-fork)* document core
+- *(has-runtime-type)* document RuntimeOf
+- *(has-runtime-type)* document HasRuntimeType::Runtime
+- *(has-runtime-type)* document HasRuntimeType
+- *(has-runtime)* document HasRuntime::runtime
+- *(has-runtime)* document HasRuntime
+- *(run)* document CanSendRun::send_run
+- *(run)* document CanSendRun
+- *(run)* document CanRun::run
+- *(run)* document CanRun
+- *(extra-prelude)* document the module
+- *(value)* document ContainsValue::Value
+- *(value)* document ContainsValue
+- *(monadic-trans)* document MonadicTrans::M
+- *(monadic-trans)* document MonadicTrans
+- *(lift)* document LiftValue::lift_output
+- *(lift)* document LiftValue::lift_value
+- *(lift)* document LiftValue::Output
+- *(lift)* document LiftValue
+- *(bind)* document MonadicBind::Provider
+- *(bind)* document MonadicBind
+- *(pipe-monadic)* document TryPromoteProviders
+- *(pipe-monadic)* document PipeMonadic
+- *(ok)* document BindOk
+- *(ok)* document OkMonadicTrans
+- *(ok)* document OkMonadic
+- *(monadic)* document ok
+- *(monadic)* document ident
+- *(monadic)* document err
+- *(ident)* document IdentMonadic
+- *(err)* document BindErr
+- *(err)* document ErrMonadicTrans
+- *(err)* document ErrMonadic
+- *(monad)* document traits
+- *(monad)* document providers
+- *(monad)* document monadic
+- *(extra)* document runtime
+- *(extra)* document run
+- *(extra)* document monad
+- *(extra)* document log
+- *(extra)* document handler
+- *(extra)* document field
+- *(extra)* document error
+- *(extra)* document dispatch
+- *(extra)* document prelude
+- *(can-log)* document CanLog::log
+- *(types)* document UseInputDelegate
+- *(types)* document NoCode
+- *(try-promote)* document TryPromote
+- *(return-input)* document ReturnInput
+- *(promote-ref)* document PromoteRef
+- *(promote-async)* document PromoteAsync
+- *(promote-all)* document PromoteHandler
+- *(promote-all)* document PromoteAsyncComputer
+- *(promote-all)* document PromoteProducer
+- *(promote-all)* document PromoteTryComputer
+- *(promote-all)* document PromoteComputer
+- *(promote)* document Promote
+- *(pipe)* document PipeHandlers
+- *(compose)* document ComposeHandlers
+- *(try-compute)* document CanTryComputeRef::try_compute_ref
+- *(try-compute)* document CanTryComputeRef::Output
+- *(try-compute)* document CanTryComputeRef
+- *(try-compute)* document CanTryCompute::try_compute
+- *(try-compute)* document CanTryCompute::Output
+- *(try-compute)* document CanTryCompute
+- *(produce)* document CanProduce::produce
+- *(produce)* document CanProduce::Output
+- *(produce)* document CanProduce
+- *(handler)* document CanHandleRef::handle_ref
+- *(handler)* document CanHandleRef::Output
+- *(handler)* document CanHandleRef
+- *(handler)* document CanHandle::handle
+- *(handler)* document CanHandle::Output
+- *(handler)* document CanHandle
+- *(computer)* document CanComputeRef::compute_ref
+- *(computer)* document CanComputeRef::Output
+- *(computer)* document CanComputeRef
+- *(computer)* document CanCompute::compute
+- *(computer)* document CanCompute::Output
+- *(computer)* document CanCompute
+- *(async-computer)* document CanComputeAsyncRef::compute_async_ref
+- *(async-computer)* document CanComputeAsyncRef::Output
+- *(async-computer)* document CanComputeAsyncRef
+- *(async-computer)* document CanComputeAsync::compute_async
+- *(async-computer)* document CanComputeAsync::Output
+- *(async-computer)* document CanComputeAsync
+- *(extra-field)* document impls
+- *(to-optional)* document TransformOptional
+- *(to-optional)* document ToOptional::to_optional
+- *(to-optional)* document ToOptional::Output
+- *(to-optional)* document ToOptional
+- *(to-optional)* document HasOptionalBuilder::optional_builder
+- *(to-optional)* document HasOptionalBuilder::Builder
+- *(to-optional)* document HasOptionalBuilder
+- *(set-optional)* document SetOptional::set_optional
+- *(set-optional)* document SetOptional::set
+- *(set-optional)* document SetOptional::Value
+- *(set-optional)* document SetOptional
+- *(finalize-optional)* document FinalizeOptional::finalize_optional
+- *(finalize-optional)* document FinalizeOptional
+- *(build-default)* document TransformMapDefault
+- *(build-default)* document CanFinalizeWithDefault::finalize_with_default
+- *(build-default)* document CanFinalizeWithDefault::Output
+- *(build-default)* document CanFinalizeWithDefault
+- *(build-default)* document CanBuildWithDefault::build_with_default
+- *(build-default)* document CanBuildWithDefault
+- *(return-error)* document ReturnError
+- *(raise-from)* document RaiseFrom
+- *(panic-error)* document PanicOnError
+- *(infallible)* document RaiseInfallible
+- *(discard-detail)* document DiscardDetail
+- *(display-error)* document DisplayError
+- *(debug-error)* document DebugError
+- *(match-with-handlers-ref)* document MatchWithHandlersRef
+- *(match-with-handlers-mut)* document MatchWithHandlersMut
+- *(match-with-handlers)* document MatchWithHandlers
+- *(match-first-with-handlers-ref)* document MatchFirstWithHandlersRef
+- *(match-first-with-handlers-mut)* document MatchFirstWithHandlersMut
+- *(match-first-with-handlers)* document MatchFirstWithHandlers
+- *(build-with-handlers)* document BuildWithHandlers
+- *(match-with-field-handlers)* document MatchWithFieldHandlersInputsMut
+- *(match-with-field-handlers)* document MatchWithFieldHandlersInputsRef
+- *(match-with-field-handlers)* document MatchWithFieldHandlersInputs
+- *(match-with-field-handlers)* document MatchWithValueHandlersMut
+- *(match-with-field-handlers)* document MatchWithValueHandlersRef
+- *(match-with-field-handlers)* document MatchWithFieldHandlersRef
+- *(match-with-field-handlers)* document MatchWithValueHandlers
+- *(match-with-field-handlers)* document MatchWithFieldHandlers
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersInputsMut
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersInputsRef
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersInputs
+- *(match-first-with-field-handlers)* document MatchFirstWithValueHandlersMut
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersMut
+- *(match-first-with-field-handlers)* document MatchFirstWithValueHandlersRef
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersRef
+- *(match-first-with-field-handlers)* document MatchFirstWithValueHandlers
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlers
+- *(first-field-value)* document HandleFirstFieldValue
+- *(field-value)* document HandleFieldValue
+- *(extract-handle)* document DowncastAndHandle
+- *(extract-first-field)* document ExtractFirstFieldAndHandle
+- *(extract-field)* document ExtractFieldAndHandle
+- *(build-and-set-field)* document BuildAndSetField
+- *(build-and-merge)* document BuildAndMerge
+- *(dispatch-matchers)* document DispatchMatchers
+- *(build-and-merge-outputs)* document ToBuildAndMergeHandler
+- *(build-and-merge-outputs)* document BuildAndMergeOutputs
+- *(has-type)* document TypeOf
+- *(has-type)* document HasType::Type
+- *(has-type)* document HasType
+- *(use-type)* document WithType
+- *(use-delegated-type)* document WithDelegatedType
+- *(use-delegated-type)* document UseDelegatedType
+- *(core-prelude)* document the module
+- *(core)* document types
+- *(core)* document field
+- *(core)* document error
+- *(core)* document base
+- *(core)* document prelude
+- *(sum)* link Either to crate::core::field::types::Either in Read more about sum types in
+- *(sum)* link Either to crate::core::field::types::Either in Void is commonly used as the
+- *(sum)* document Either::Right
+- *(sum)* document Either::Left
+- *(sum)* link Void to crate::core::field::types::Void in by combining a chain of Either
+- *(mref)* document MRef::get_or_clone
+- *(mref)* document MRef::Owned
+- *(mref)* document MRef::Ref
+- *(mref)* document MRef
+- *(life)* document Life
+- *(field)* document Field::phantom
+- *(field)* document Field::value
+- *(update-field)* document UpdateField::update_field
+- *(update-field)* document UpdateField::Output
+- *(update-field)* document UpdateField::Mapper
+- *(update-field)* document UpdateField::Value
+- *(update-field)* document UpdateField
+- *(transform-map)* document TransformMapFields::transform_map_fields
+- *(transform-map)* document TransformMapFields::Output
+- *(transform-map)* document TransformMapFields
+- *(transform-map)* document TransformMap::transform_mapped
+- *(transform-map)* clarify TransformMap
+- *(to-fields)* document ToFieldsRef::to_fields_ref
+- *(to-fields)* document ToFieldsRef
+- *(to-fields)* document ToFields::to_fields
+- *(to-fields)* document ToFields
+- *(take-field)* document TakeField::take_field
+- *(take-field)* document TakeField::Remainder
+- *(take-field)* document TakeField::Value
+- *(take-field)* document TakeField
+- *(static-string)* document StaticString::VALUE
+- *(static-string)* document StaticString
+- *(partial-data)* document PartialData::Target
+- *(partial-data)* document PartialData
+- *(map-type-ref)* document MapTypeRef::Map
+- *(map-type-ref)* document MapTypeRef
+- *(map-type)* document MapType::Map
+- *(map-type)* document MapType
+- *(map-fields)* document MapFields::Mapped
+- *(map-fields)* document MapFields
+- *(map-field)* document FieldMapper::map_field
+- *(map-field)* document MapField::map_field
+- *(has-fields)* document HasFieldsRef::FieldsRef
+- *(has-fields)* document HasFieldsRef
+- *(has-fields)* document HasFields::Fields
+- *(has-fields)* document HasFields
+- *(has-field-mut)* document MutFieldGetter::get_field_mut
+- *(has-field-mut)* document MutFieldGetter
+- *(has-field-mut)* document HasFieldMut::get_field_mut
+- *(has-field-mut)* document HasFieldMut
+- *(has-field)* document FieldGetter::get_field
+- *(has-field)* document FieldGetter::Value
+- *(has-field)* document FieldGetter
+- *(has-field)* document HasField::get_field
+- *(has-field)* document HasField::Value
+- *(has-builder)* document IntoBuilder::into_builder
+- *(has-builder)* document IntoBuilder::Builder
+- *(has-builder)* document IntoBuilder
+- *(has-builder)* document HasBuilder::builder
+- *(has-builder)* document HasBuilder::Builder
+- *(has-builder)* document HasBuilder
+- *(from-variant)* document FromVariant::from_variant
+- *(from-variant)* document FromVariant::Value
+- *(from-variant)* document FromVariant
+- *(from-fields)* document FromFields::from_fields
+- *(from-fields)* document FromFields
+- *(extract-field)* document FinalizeExtractResult::finalize_extract_result
+- *(extract-field)* document FinalizeExtractResult::Output
+- *(extract-field)* document FinalizeExtractResult
+- *(extract-field)* document FinalizeExtract::finalize_extract
+- *(extract-field)* document FinalizeExtract
+- *(extract-field)* document ExtractField::extract_field
+- *(extract-field)* document ExtractField::Remainder
+- *(extract-field)* document ExtractField::Value
+- *(extract-field)* document ExtractField
+- *(extract-field)* document HasExtractorMut::extractor_mut
+- *(extract-field)* document HasExtractorMut::ExtractorMut
+- *(extract-field)* document HasExtractorMut
+- *(extract-field)* document HasExtractorRef::extractor_ref
+- *(extract-field)* document HasExtractorRef::ExtractorRef
+- *(extract-field)* document HasExtractorRef
+- *(extract-field)* document HasExtractor::from_extractor
+- *(extract-field)* document HasExtractor::to_extractor
+- *(extract-field)* document HasExtractor::Extractor
+- *(extract-field)* document HasExtractor
+- *(concat-product)* document ConcatProduct::Output
+- *(concat-product)* document ConcatProduct
+- *(build-field)* document FinalizeBuild::finalize_build
+- *(build-field)* document FinalizeBuild
+- *(build-field)* document BuildField::build_field
+- *(build-field)* document BuildField::Output
+- *(build-field)* document BuildField::Value
+- *(build-field)* document BuildField
+- *(append-product)* document AppendProduct::Output
+- *(append-product)* document AppendProduct
+- *(field)* document types
+- *(field)* document traits
+- *(core-field)* document impls
+- *(use-ref)* document WithFieldRef
+- *(use-ref)* document UseFieldRef
+- *(use-field)* document WithField
+- *(map-type-ref)* document IsOwned
+- *(map-type-ref)* document IsMut
+- *(map-type-ref)* document IsRef
+- *(map-type)* document IsOptional
+- *(map-type)* document IsVoid
+- *(map-type)* document IsNothing
+- *(map-type)* document IsPresent
+- *(chain)* document ChainGetters
+- *(cast)* document FieldsExtractor::extract_from
+- *(cast)* document FieldsExtractor::Remainder
+- *(cast)* document FieldsExtractor
+- *(cast)* document CanDowncastFields::downcast_fields
+- *(cast)* document CanDowncastFields::Remainder
+- *(cast)* document CanDowncastFields
+- *(cast)* document CanDowncast::downcast
+- *(cast)* document CanDowncast::Remainder
+- *(cast)* document CanDowncast
+- *(cast)* document CanUpcast::upcast
+- *(cast)* document CanUpcast
+- *(build-from)* document CanBuildFrom::build_from
+- *(build-from)* document CanBuildFrom::Output
+- *(build-from)* document CanBuildFrom
+- *(has-error-type)* document ErrorOf
+- *(has-error-type)* document HasErrorType::Error
+- *(error-only)* document ErrorOnly
+- *(delegate-component)* document DelegateComponent::Delegate
+- *(with-provider)* document WithProvider
+- *(use-fields)* document UseFields
+- *(use-default)* document UseDefault
+- *(use-context)* document WithContext
+- *(redirect-lookup)* document RedirectLookup
+- *(namespaces)* document DefaultImpls2::Delegate
+- *(namespaces)* document DefaultImpls2
+- *(namespaces)* document DefaultImpls1::Delegate
+- *(namespaces)* document DefaultImpls1
+- *(namespaces)* document DefaultNamespace::Delegate
+- *(namespaces)* document DefaultNamespace
+- *(component)* document macro_prelude
+- *(symbol)* document Symbol
+- *(path)* document PathCons
+- *(nil)* link Cons to super::Cons in Read more about type-level lists, a.k.a
+- *(nil)* link Cons to super::Cons in Nil is commonly used as the
+- *(cons)* link Nil to super::Nil in Cons is used together with Nil
+- *(static-format)* document StaticFormat::fmt
+- *(static-format)* document StaticFormat
+- *(concat-path)* document ConcatPath::Output
+- *(concat-path)* document ConcatPath
+- *(base-types)* document types
+- *(base-types)* document traits
+- *(base-types)* document macro_prelude
+- *(base)* document macro_prelude
+- *(redirect-lookup)* expect the CanDoFoo marker doc
+- *(prefix-default-namespace)* expect the Foo marker doc
+- *(namespace-type-path)* expect the Bar marker doc
+- *(namespace-symbol-path)* expect the Bar marker doc
+- *(namespace-multi)* expect the Bar marker doc
+- *(namespace-basic)* expect the Bar marker doc
+- *(default-impls)* expect the Show marker doc
+- *(string-custom-spec)* expect the HasFoo marker doc
+- *(string-custom-name)* expect the HasFoo marker doc
+- *(string)* expect the HasFoo marker doc
+- *(slice)* expect the HasFoo marker doc
+- *(option)* expect the HasFoo marker doc
+- *(non-self)* expect the HasFooBar marker doc
+- *(mut-slice)* expect the HasItems marker doc
+- *(mut-getter)* expect the HasCount marker doc
+- *(mref)* expect the HasFoo marker doc
+- *(clone)* expect the HasName marker doc
+- *(assoc-type-self-referential)* expect the HasName marker doc
+- *(assoc-type-getter)* expect the HasScalar marker doc
+- *(abstract-type-use-type)* expect the HasRectangleFields marker doc
+- *(abstract-type-extend)* expect the HasRectangleFields marker doc
+- *(component-type-param)* expect the CanCalculateArea marker doc
+- *(component-lifetime)* expect the HasReference marker doc
+- *(use-delegate-getter)* expect the HasFooAt marker doc
+- *(use-delegate-getter)* expect the HasFooTypeAt marker doc
+- *(derive-promote)* expect the HasArea marker doc
+- *(default-methods)* expect the CanGreet marker doc
+- *(component-macro)* expect the CanDoFoo marker doc
+- *(component-assoc-const)* expect the HasLimit marker doc
+- *(component-async)* expect the CanFetch marker doc
+- *(cgp-type-unsized)* expect the HasFooType marker doc
+- *(cgp-type-self-referential)* expect the HasScalarType marker doc
+- *(cgp-type-macro)* expect the HasScalarType marker doc
+- *(cgp-type-bounded)* expect the HasTypes marker doc
+- *(parser-rejections)* drop the agent guide pointer
+- *(macro-core)* remove the agent guide
+- *(extra-macro-core)* remove the agent guide
+- *(cgp-fork-macro)* clarify async_trait
+- *(cgp-fork-macro)* document derive_cgp_data
+- *(cgp-fork-macro)* document derive_cgp_record
+- *(cgp-fork-macro)* document derive_cgp_variant
+- *(cgp-fork-macro)* document derive_from_variant
+- *(cgp-fork-macro)* document derive_extractor
+- *(cgp-fork-macro)* document derive_builder
+- *(cgp-fork-macro)* document derive_has_fields
+- *(cgp-fork-macro)* document derive_fields
+- *(cgp-fork-macro)* document Path
+- *(cgp-fork-macro)* document product
+- *(cgp-fork-macro)* document cgp_namespace
+- *(cgp-fork-macro)* document cgp_fn
+
 ## [0.9.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.0...v0.9.1) - 2026-10-08
 
 ### Changed
