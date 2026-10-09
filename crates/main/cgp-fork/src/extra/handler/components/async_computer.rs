@@ -28,6 +28,7 @@ pub trait CanComputeAsyncRef<Code, Input> {
     /// The value the future resolves to.
     type Output;
 
+    /// Runs the async computation on a borrowed `input`.
     async fn compute_async_ref(&self, _code: PhantomData<Code>, input: &Input) -> Self::Output;
 }
 
