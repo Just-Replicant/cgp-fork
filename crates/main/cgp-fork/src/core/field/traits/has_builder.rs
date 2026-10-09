@@ -16,5 +16,6 @@ pub trait IntoBuilder {
     /// The partial value populated from `self`.
     type Builder;
 
+    /// Moves `self` into a builder without clearing its fields.
     fn into_builder(self) -> Self::Builder;
 }
