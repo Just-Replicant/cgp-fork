@@ -3,6 +3,7 @@ use crate::core::field::traits::{FinalizeBuild, HasBuilder, TransformMap, Transf
 
 /// Builds `Self` from `Source`, filling any field `Source` does not have with `Default::default`.
 pub trait CanBuildWithDefault<Source> {
+    /// Copies `source`'s fields in and defaults the rest.
     fn build_with_default(source: Source) -> Self;
 }
 
