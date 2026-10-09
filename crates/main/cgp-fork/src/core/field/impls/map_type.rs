@@ -15,6 +15,7 @@ impl MapType for IsNothing {
     type Map<T> = ();
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that erases the value: `Map<T> = Void`.
 pub struct IsVoid;
 
 impl MapType for IsVoid {
