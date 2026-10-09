@@ -9,6 +9,7 @@ use crate::extra::handler::UseInputDelegate;
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Async form of [`CanCompute`](crate::extra::handler::CanCompute): an owned `Input` in, a future out.
 pub trait CanComputeAsync<Code, Input> {
     type Output;
 
