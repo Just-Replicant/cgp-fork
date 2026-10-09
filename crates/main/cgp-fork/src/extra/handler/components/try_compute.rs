@@ -30,6 +30,7 @@ pub trait CanTryComputeRef<Code, Input> {
     /// The success value.
     type Output;
 
+    /// Runs the computation on a borrowed `input`.
     fn try_compute_ref(
         &self,
         _code: PhantomData<Code>,
