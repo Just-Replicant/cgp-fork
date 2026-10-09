@@ -57,6 +57,7 @@ pub trait ExtractField<Tag> {
 /// Implemented for [`Void`](crate::core::field::types::Void) and `Infallible`. Calling it means
 /// every variant was consumed, so the remainder cannot exist.
 pub trait FinalizeExtract {
+    /// Diverges. `self` is uninhabited.
     fn finalize_extract<T>(self) -> T;
 }
 
