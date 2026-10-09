@@ -26,6 +26,7 @@ pub trait CanDowncast<Target> {
     fn downcast(self, _tag: PhantomData<Target>) -> Result<Target, Self::Remainder>;
 }
 
+/// [`CanDowncast`] for a value that is already an extractor, not a struct that converts into one.
 pub trait CanDowncastFields<Target> {
     type Remainder;
 
