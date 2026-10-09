@@ -20,6 +20,7 @@ pub trait HasExtractor {
 
 /// [`HasExtractor`] for a shared borrow.
 pub trait HasExtractorRef {
+    /// The sum of `Self`'s fields, borrowed for `'a`.
     type ExtractorRef<'a>
     where
         Self: 'a;
