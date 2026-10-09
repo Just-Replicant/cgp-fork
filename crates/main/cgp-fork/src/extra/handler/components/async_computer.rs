@@ -14,6 +14,7 @@ pub trait CanComputeAsync<Code, Input> {
     /// The value the future resolves to.
     type Output;
 
+    /// Runs the async computation on an owned `input`.
     async fn compute_async(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
 }
 
