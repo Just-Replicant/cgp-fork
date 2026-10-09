@@ -1,5 +1,6 @@
 use crate::core::field::types::{Cons, Nil};
 
+/// Concatenates `Items` onto the end of a type-level [`Cons`](crate::core::field::types::Cons) list.
 pub trait ConcatProduct<Items> {
     type Output;
 }
