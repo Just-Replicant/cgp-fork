@@ -16,6 +16,7 @@ pub trait CanCompute<Code, Input> {
     /// The value `compute` returns.
     type Output;
 
+    /// Runs the computation on an owned `input`.
     fn compute(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
 }
 
