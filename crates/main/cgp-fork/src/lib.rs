@@ -1,6 +1,7 @@
 #![no_std]
 #![doc = include_str!("../README.md")]
 #![allow(mixed_script_confusables)]
+#![deny(missing_docs)]
 
 extern crate alloc;
 extern crate self as cgp_fork;
