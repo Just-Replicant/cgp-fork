@@ -1200,6 +1200,7 @@ pub fn derive_builder(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the extractor that pulls one field out of a struct or one variant out of an enum.
 #[proc_macro_derive(ExtractField)]
 pub fn derive_extractor(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_extract_field(item.into())
