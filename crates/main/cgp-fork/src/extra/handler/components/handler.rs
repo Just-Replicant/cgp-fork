@@ -30,6 +30,7 @@ pub trait CanHandle<Code, Input> {
 #[use_type(HasErrorType.Error)]
 /// [`CanHandle`] for a shared borrow of `Input`.
 pub trait CanHandleRef<Code, Input> {
+    /// The success value.
     type Output;
 
     async fn handle_ref(
