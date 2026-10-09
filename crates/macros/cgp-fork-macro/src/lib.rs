@@ -1208,6 +1208,7 @@ pub fn derive_extractor(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives `FromVariant` for each variant, wrapping a payload in that variant.
 #[proc_macro_derive(FromVariant)]
 pub fn derive_from_variant(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_from_variant(item.into())
