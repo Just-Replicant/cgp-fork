@@ -25,6 +25,7 @@
 */
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub enum Either<Head, Tail> {
+    /// The value is the head of the sum.
     Left(Head),
     Right(Tail),
 }
