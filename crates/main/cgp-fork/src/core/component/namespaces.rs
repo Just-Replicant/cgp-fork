@@ -7,6 +7,10 @@ pub trait DefaultNamespace<Components> {
     type Delegate;
 }
 
+/// Per-type default providers for a component with one extra type parameter.
+///
+/// `#[default_impl(Key in DefaultImpls1<Component>)]` registers `Key`. A `for <T, Provider> in
+/// DefaultImpls1<Component>` loop reads `Delegate` back.
 pub trait DefaultImpls1<T, Components> {
     type Delegate;
 }
