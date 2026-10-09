@@ -44,6 +44,7 @@ impl<T> MRef<'_, T>
 where
     T: Clone,
 {
+    /// Returns the owned value, cloning it when this is a [`Ref`](Self::Ref).
     pub fn get_or_clone(self) -> T {
         match self {
             Self::Ref(value) => value.clone(),
