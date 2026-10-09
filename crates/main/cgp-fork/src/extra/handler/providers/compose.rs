@@ -4,6 +4,10 @@ use crate::extra::handler::{
     TryComputer, TryComputerComponent,
 };
 
+/// Runs `ProviderA`, then feeds its output to `ProviderB`.
+///
+/// Implemented for `Computer`, `TryComputer`, `AsyncComputer`, and `Handler`. A failure in
+/// either provider stops the chain.
 pub struct ComposeHandlers<ProviderA, ProviderB>(pub PhantomData<(ProviderA, ProviderB)>);
 
 #[cgp_provider]
