@@ -3,6 +3,10 @@ use core::marker::PhantomData;
 use crate::core::field::traits::{BuildField, HasFields, IntoBuilder, TakeField};
 use crate::core::field::types::{Cons, Field, Nil};
 
+/// Fills this builder by taking each field from `Source`.
+///
+/// `Source` must expose the same field tags. Each value is taken from the source and
+/// [`BuildField::build_field`](crate::core::field::traits::BuildField::build_field) writes it here.
 pub trait CanBuildFrom<Source> {
     type Output;
 
