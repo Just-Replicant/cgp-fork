@@ -60,9 +60,12 @@ delegate_components! {
     }
 }
 
+/// Promotes an `AsyncComputer` to the ref and handler components.
+pub struct PromoteAsyncComputer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteAsyncComputer<Provider> {
+    PromoteAsyncComputer<Provider> {
         AsyncComputerRefComponent: PromoteRef<Provider>,
         HandlerComponent: Promote<Provider>,
         HandlerRefComponent: PromoteRef<Provider>,
