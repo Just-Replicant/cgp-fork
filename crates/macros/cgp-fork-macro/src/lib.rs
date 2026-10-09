@@ -1359,7 +1359,10 @@ pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
         .into()
 }
 
-/// Desugar `async fn` in a trait to `-> impl Future`.
+/// Rewrites `async fn` in a trait to a method that returns `impl Future`.
+///
+/// The desugared method is what `#[cgp_component]` forwards. The future is not automatically
+/// `Send`; `CanSendRun` is the component that asks for a `Send` future.
 #[proc_macro_attribute]
 pub fn async_trait(_attr: TokenStream, stream: TokenStream) -> TokenStream {
     async_impl::impl_async(stream.into()).into()
