@@ -18,6 +18,7 @@ pub trait HasExtractor {
     fn from_extractor(extractor: Self::Extractor) -> Self;
 }
 
+/// [`HasExtractor`] for a shared borrow.
 pub trait HasExtractorRef {
     type ExtractorRef<'a>
     where
