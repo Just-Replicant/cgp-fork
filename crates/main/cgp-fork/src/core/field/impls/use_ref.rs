@@ -9,6 +9,7 @@ use crate::core::field::traits::{FieldGetter, HasField, HasFieldMut, MutFieldGet
 /// answer a getter that returns `&str`.
 pub struct UseFieldRef<Tag, Value>(pub PhantomData<(Tag, Value)>);
 
+/// [`WithProvider`]`<`[`UseFieldRef`]`<Tag, Value>>`.
 pub type WithFieldRef<Tag, Value> = WithProvider<UseFieldRef<Tag, Value>>;
 
 impl<Context, OutTag, Tag, Value> FieldGetter<Context, OutTag> for UseFieldRef<Tag, Value>
