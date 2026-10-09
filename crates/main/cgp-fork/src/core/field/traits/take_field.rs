@@ -3,6 +3,10 @@ use core::marker::PhantomData;
 use crate::core::field::impls::{IsNothing, IsPresent};
 use crate::core::field::traits::UpdateField;
 
+/// Removes a present `Tag` field from a builder, leaving that slot empty.
+///
+/// The inverse of [`BuildField`](crate::core::field::traits::BuildField): the map changes from
+/// [`IsPresent`](crate::core::field::impls::IsPresent) to [`IsNothing`](crate::core::field::impls::IsNothing).
 pub trait TakeField<Tag> {
     type Value;
 
