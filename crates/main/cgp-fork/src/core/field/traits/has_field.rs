@@ -44,6 +44,7 @@ use crate::core::component::UseContext;
     ```
 */
 pub trait HasField<Tag> {
+    /// The type stored under `Tag`.
     type Value;
 
     fn get_field(&self, _tag: PhantomData<Tag>) -> &Self::Value;
