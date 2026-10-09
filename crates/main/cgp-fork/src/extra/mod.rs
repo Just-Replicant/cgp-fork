@@ -5,6 +5,7 @@ pub mod prelude;
 pub mod dispatch;
 /// Providers that raise or wrap the abstract error.
 pub mod error;
+/// Builders that fill missing fields from `Default` or from `Option`.
 pub mod field;
 pub mod handler;
 pub mod log;
