@@ -4,9 +4,7 @@ This directory holds the test suite for Context-Generic Programming, organized *
 CGP concept** — basic delegation, abstract types, implicit arguments, namespaces,
 and so on — rather than by the macro that implements each concept, because a single
 macro such as `delegate_components!` serves many concepts at once. This README is
-the map of what is here and how to run it; [AGENTS.md](AGENTS.md) is the
-authoritative guide to the conventions, and you should read it before adding,
-moving, or refactoring a test.
+the map of what is here and how to run it.
 
 ## The two trees
 
