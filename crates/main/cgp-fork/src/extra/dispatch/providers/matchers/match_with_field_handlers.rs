@@ -22,6 +22,7 @@ pub type MatchWithValueHandlers<Provider = UseContext> =
 /// [`MatchWithFieldHandlers`] for a shared borrow of the enum.
 pub struct MatchWithFieldHandlersRef<Provider = UseContext>(pub PhantomData<Provider>);
 
+/// [`MatchWithValueHandlers`] for a shared borrow of the enum.
 pub struct MatchWithValueHandlersRef<Provider = UseContext>(pub PhantomData<Provider>);
 
 pub struct MatchWithValueHandlersMut<Provider = UseContext>(pub PhantomData<Provider>);
