@@ -47,6 +47,7 @@ pub trait HasField<Tag> {
     /// The type stored under `Tag`.
     type Value;
 
+    /// Borrows the value stored under `Tag`.
     fn get_field(&self, _tag: PhantomData<Tag>) -> &Self::Value;
 }
 
