@@ -4,6 +4,7 @@ use crate::core::field::types::{Cons, Either, Nil, Void};
 /// Applies `Mapper` to every element of a [`Cons`](crate::core::field::types::Cons) or
 /// [`Either`](crate::core::field::types::Either) chain.
 pub trait MapFields<Mapper> {
+    /// The chain with [`MapType::Map`](crate::core::field::traits::MapType::Map) applied to each element.
     type Mapped;
 }
 
