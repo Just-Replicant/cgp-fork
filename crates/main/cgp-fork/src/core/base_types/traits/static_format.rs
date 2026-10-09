@@ -7,6 +7,7 @@ use crate::core::base_types::types::{Chars, Nil};
 /// [`Symbol`](crate::core::base_types::types::Symbol) and [`Chars`](crate::core::base_types::types::Chars)
 /// implement this so a type-level string can be written with `{}`.
 pub trait StaticFormat {
+    /// Writes the type-level characters into `f`.
     fn fmt(f: &mut Formatter<'_>) -> Result<(), fmt::Error>;
 }
 
