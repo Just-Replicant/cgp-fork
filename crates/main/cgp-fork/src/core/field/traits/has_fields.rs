@@ -8,6 +8,7 @@ pub trait HasFields {
     type Fields;
 }
 
+/// [`HasFields`] for a shared borrow, so the field list can name references.
 pub trait HasFieldsRef {
     type FieldsRef<'a>
     where
