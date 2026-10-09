@@ -1,5 +1,6 @@
 use crate::core::field::types::{Chars, Nil, Symbol};
 
+/// The `&str` held by a type-level [`Symbol`](crate::core::field::types::Symbol).
 pub trait StaticString {
     const VALUE: &'static str;
 }
