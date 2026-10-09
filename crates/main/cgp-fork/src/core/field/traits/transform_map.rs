@@ -9,6 +9,7 @@ use crate::core::field::types::{Cons, Field, Nil};
 /// A partial builder uses this to turn an absent field into a present one, or a present field
 /// into an `Option`.
 pub trait TransformMap<M1: MapType, M2: MapType, T> {
+    /// Rewraps `value` from `M1` into `M2`.
     fn transform_mapped(value: M1::Map<T>) -> M2::Map<T>;
 }
 
