@@ -19,6 +19,7 @@ pub(crate) mod base_types;
 pub mod component;
 /// The abstract error type, and raising or wrapping one.
 pub mod error;
+/// Field access, builders, and the product and sum types behind extensible data.
 pub mod field;
 pub mod types;
 
