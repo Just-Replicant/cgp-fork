@@ -1232,6 +1232,7 @@ pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives [`CgpRecord`](derive@CgpRecord) for a struct and [`CgpVariant`](derive@CgpVariant) for an enum.
 #[proc_macro_derive(CgpData)]
 pub fn derive_cgp_data(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_cgp_data(item.into())
