@@ -5,6 +5,7 @@
 extern crate alloc;
 extern crate self as cgp_fork;
 
+/// Components, providers, and the type-level lists they are wired through.
 pub mod core;
 pub mod extra;
 
