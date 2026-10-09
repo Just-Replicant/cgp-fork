@@ -25,6 +25,7 @@ pub trait HasExtractorRef {
     where
         Self: 'a;
 
+    /// Borrows `self`'s fields as a sum.
     fn extractor_ref(&self) -> Self::ExtractorRef<'_>;
 }
 
