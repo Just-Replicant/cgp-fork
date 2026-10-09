@@ -24,6 +24,9 @@ pub trait CanCompute<Code, Input> {
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
+/// Computes a shared borrow of `Input`.
+///
+/// The borrowed mirror of [`CanCompute`]. The same `Code` selects the computation.
 pub trait CanComputeRef<Code, Input> {
     type Output;
 
