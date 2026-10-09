@@ -22,6 +22,7 @@ pub trait CanDowncast<Target> {
     /// The source after `Target`'s fields have been removed.
     type Remainder;
 
+    /// Extracts `Target`, or returns `self` reshaped as [`Remainder`](Self::Remainder).
     fn downcast(self, _tag: PhantomData<Target>) -> Result<Target, Self::Remainder>;
 }
 
