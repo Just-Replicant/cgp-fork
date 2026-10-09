@@ -11,6 +11,7 @@ use crate::extra::handler::{
     TryComputerRefComponent, UseInputDelegate,
 };
 
+/// Dispatches an owned enum by running `Provider` on the matching field.
 pub type MatchWithFieldHandlers<Provider = UseContext> =
     UseInputDelegate<MatchWithFieldHandlersInputs<Provider>>;
 
