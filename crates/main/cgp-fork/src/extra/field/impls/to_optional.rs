@@ -6,6 +6,7 @@ pub trait HasOptionalBuilder {
     /// The builder with every field wrapped in `Option`.
     type Builder;
 
+    /// An empty optional builder. Every field starts as `None`.
     fn optional_builder() -> Self::Builder;
 }
 
