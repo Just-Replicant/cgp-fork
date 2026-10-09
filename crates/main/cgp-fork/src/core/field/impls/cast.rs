@@ -77,6 +77,7 @@ where
 /// [`ExtractField`](crate::core::field::traits::ExtractField)s one tag and wraps it with
 /// [`FromVariant`](crate::core::field::traits::FromVariant).
 pub trait FieldsExtractor<Source, Target> {
+    /// `Source` after every field of `Target` has been taken.
     type Remainder;
 
     fn extract_from(source: Source) -> Result<Target, Self::Remainder>;
