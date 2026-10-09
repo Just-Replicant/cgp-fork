@@ -3,6 +3,7 @@ pub mod prelude;
 
 /// Match an extensible enum or build an extensible record with a handler per field.
 pub mod dispatch;
+/// Providers that raise or wrap the abstract error.
 pub mod error;
 pub mod field;
 pub mod handler;
