@@ -5,6 +5,7 @@ use crate::core::prelude::*;
 use crate::extra::dispatch::DispatchMatchers;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
+/// [`MatchWithHandlers`](super::match_with_handlers::MatchWithHandlers) for a shared borrow of the enum.
 pub struct MatchWithHandlersRef<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]
