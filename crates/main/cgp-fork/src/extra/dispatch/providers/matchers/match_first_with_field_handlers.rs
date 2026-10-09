@@ -32,9 +32,12 @@ pub type MatchFirstWithFieldHandlersMut<Provider = UseContext> =
 pub type MatchFirstWithValueHandlersMut<Provider = UseContext> =
     UseInputDelegate<MatchFirstWithFieldHandlersInputsMut<HandleFirstFieldValue<Provider>>>;
 
+/// Inner table for an owned `(input, args)` pair.
+pub struct MatchFirstWithFieldHandlersInputs<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Input: HasFieldHandlers<MapExtractFirstFieldAndHandle<Provider>>, Args, Provider>
-    new MatchFirstWithFieldHandlersInputs<Provider> {
+    MatchFirstWithFieldHandlersInputs<Provider> {
         (Input, Args): MatchFirstWithHandlers<Input::Handlers>
     }
 }
