@@ -5,6 +5,7 @@ use crate::core::field::traits::UpdateField;
 
 /// Sets an optional `Tag` field, returning the previous `Option` when asked.
 pub trait SetOptional<Tag> {
+    /// The type stored under `Tag`, inside the `Option`.
     type Value;
 
     fn set(self, _tag: PhantomData<Tag>, value: Self::Value) -> Self;
