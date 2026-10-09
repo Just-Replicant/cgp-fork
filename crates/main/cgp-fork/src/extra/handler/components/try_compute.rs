@@ -9,6 +9,9 @@ use crate::extra::handler::UseInputDelegate;
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
+/// Fallible form of [`CanCompute`](crate::extra::handler::CanCompute).
+///
+/// Failure is the context's abstract error from [`HasErrorType`](crate::core::error::HasErrorType).
 pub trait CanTryCompute<Code, Input> {
     type Output;
 
