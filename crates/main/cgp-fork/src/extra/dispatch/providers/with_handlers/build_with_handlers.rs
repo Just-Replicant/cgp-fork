@@ -4,6 +4,9 @@ use crate::extra::handler::{
     TryComputerComponent,
 };
 
+/// Builds an `Output` by starting from `Output::builder()` and piping `Handlers` over that builder.
+///
+/// The pipe's result must implement [`FinalizeBuild`](crate::core::field::traits::FinalizeBuild).
 pub struct BuildWithHandlers<Output, Handlers>(pub PhantomData<(Output, Handlers)>);
 
 #[cgp_provider]
