@@ -1224,6 +1224,7 @@ pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the extensible-record spine: field access, the field list, conversions, and the partial builder.
 #[proc_macro_derive(CgpRecord)]
 pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_cgp_record(item.into())
