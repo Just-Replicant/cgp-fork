@@ -8,6 +8,7 @@ use crate::core::field::traits::UpdateField;
 /// The inverse of [`BuildField`](crate::core::field::traits::BuildField): the map changes from
 /// [`IsPresent`](crate::core::field::impls::IsPresent) to [`IsNothing`](crate::core::field::impls::IsNothing).
 pub trait TakeField<Tag> {
+    /// The type stored under `Tag`.
     type Value;
 
     type Remainder;
