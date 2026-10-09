@@ -11,6 +11,7 @@ pub mod field;
 pub mod handler;
 /// Logging one detail value.
 pub mod log;
+/// Piping providers through `Result` and the identity monad.
 pub mod monad;
 pub mod run;
 pub mod runtime;
