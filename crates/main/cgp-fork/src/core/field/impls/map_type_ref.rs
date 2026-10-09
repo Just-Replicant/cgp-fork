@@ -14,6 +14,7 @@ impl MapTypeRef for IsMut {
     type Map<'a, T: 'a> = &'a mut T;
 }
 
+/// [`MapTypeRef`](crate::core::field::traits::MapTypeRef) that returns the owned value: `Map<'a, T> = T`.
 pub struct IsOwned;
 
 impl MapTypeRef for IsOwned {
