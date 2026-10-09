@@ -3,6 +3,10 @@ use core::marker::PhantomData;
 
 use crate::core::error::HasErrorType;
 
+/// A context whose only job is to name the abstract error type `E`.
+///
+/// Useful as a stand-in context when a provider needs [`HasErrorType`](crate::core::error::HasErrorType)
+/// and nothing else.
 pub struct ErrorOnly<E>(pub PhantomData<E>);
 
 impl<E> Default for ErrorOnly<E> {
