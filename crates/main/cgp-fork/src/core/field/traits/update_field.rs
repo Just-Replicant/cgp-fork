@@ -10,6 +10,7 @@ pub trait UpdateField<Tag, M: MapType> {
     /// The type stored under `Tag`.
     type Value;
 
+    /// The map the field uses before this update. The returned value is wrapped by it.
     type Mapper: MapType;
 
     type Output;
