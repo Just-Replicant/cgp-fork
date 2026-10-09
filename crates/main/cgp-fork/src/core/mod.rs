@@ -13,6 +13,7 @@ pub mod macro_prelude {
     pub use crate::core::prelude::*;
 }
 
+/// Type-level paths and the component traits every provider is built on.
 pub mod base;
 pub(crate) mod base_types;
 pub mod component;
