@@ -14,6 +14,7 @@ pub trait HasExtractor {
     /// Consumes `self` and returns its fields as a sum.
     fn to_extractor(self) -> Self::Extractor;
 
+    /// Rebuilds `Self` from that sum.
     fn from_extractor(extractor: Self::Extractor) -> Self;
 }
 
