@@ -56,6 +56,7 @@ pub trait FieldGetter<Context, Tag> {
     /// The type stored under `Tag`.
     type Value;
 
+    /// Borrows `Tag` from `context`.
     fn get_field(context: &Context, _tag: PhantomData<Tag>) -> &Self::Value;
 }
 
