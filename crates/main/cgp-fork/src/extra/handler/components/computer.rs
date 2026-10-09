@@ -13,6 +13,7 @@ use crate::extra::handler::UseInputDelegate;
 /// `Code` selects which computation this is when one context runs several. Wire
 /// `ComputerComponent` to a provider, or derive one with `#[cgp_computer]`.
 pub trait CanCompute<Code, Input> {
+    /// The value `compute` returns.
     type Output;
 
     fn compute(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
