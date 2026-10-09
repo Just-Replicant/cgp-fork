@@ -48,6 +48,7 @@ pub trait ExtractField<Tag> {
     /// What remains after `Tag` is removed.
     type Remainder;
 
+    /// Takes the `Tag` field, or returns the untouched remainder when this is a different variant.
     fn extract_field(self, _tag: PhantomData<Tag>) -> Result<Self::Value, Self::Remainder>;
 }
 
