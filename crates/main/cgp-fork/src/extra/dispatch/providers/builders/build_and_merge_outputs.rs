@@ -24,6 +24,7 @@ delegate_components! {
     }
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that wraps each handler in [`BuildAndMerge`](crate::extra::dispatch::BuildAndMerge).
 pub struct ToBuildAndMergeHandler;
 
 impl MapType for ToBuildAndMergeHandler {
