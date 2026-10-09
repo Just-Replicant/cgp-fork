@@ -9,6 +9,7 @@ pub mod error;
 pub mod field;
 /// The handler family: produce, compute, try, and handle.
 pub mod handler;
+/// Logging one detail value.
 pub mod log;
 pub mod monad;
 pub mod run;
