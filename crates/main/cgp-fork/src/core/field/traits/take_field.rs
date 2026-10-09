@@ -14,6 +14,7 @@ pub trait TakeField<Tag> {
     /// This builder after `Tag` has been cleared.
     type Remainder;
 
+    /// Takes the `Tag` field and returns the builder with that slot empty.
     fn take_field(self, _tag: PhantomData<Tag>) -> (Self::Value, Self::Remainder);
 }
 
