@@ -12,6 +12,7 @@ use crate::extra::handler::UseInputDelegate;
 pub type MatchFirstWithFieldHandlers<Provider = UseContext> =
     UseInputDelegate<MatchFirstWithFieldHandlersInputs<Provider>>;
 
+/// [`MatchFirstWithFieldHandlers`] that unwraps the field and passes `(value, args)` to `Provider`.
 pub type MatchFirstWithValueHandlers<Provider = UseContext> =
     UseInputDelegate<MatchFirstWithFieldHandlersInputs<HandleFirstFieldValue<Provider>>>;
 
