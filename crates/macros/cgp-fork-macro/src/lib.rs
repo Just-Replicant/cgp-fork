@@ -1192,6 +1192,7 @@ pub fn derive_has_fields(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives the partial builder: `HasBuilder`, `BuildField`, and `FinalizeBuild`.
 #[proc_macro_derive(BuildField)]
 pub fn derive_builder(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_build_field(item.into())
