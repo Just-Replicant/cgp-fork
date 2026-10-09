@@ -12,6 +12,7 @@ pub trait CanFinalizeWithDefault {
     /// The finished value.
     type Output;
 
+    /// Turns absent fields into their default and finalizes the builder.
     fn finalize_with_default(self) -> Self::Output;
 }
 
