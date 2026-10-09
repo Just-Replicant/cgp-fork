@@ -45,7 +45,7 @@ pub enum Either<Head, Tail> {
     However, we define a separate `Void` type, to make it more clear that it is
     specifically used for terminating a sum type.
 
-    Read more about sum types in [`Either`].
+    Read more about sum types in [`Either`](crate::core::field::types::Either).
 */
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub enum Void {}
