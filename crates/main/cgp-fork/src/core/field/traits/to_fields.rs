@@ -6,6 +6,7 @@ pub trait ToFields: HasFields {
     fn to_fields(self) -> Self::Fields;
 }
 
+/// Borrows `self`'s fields as the [`HasFieldsRef`] list.
 pub trait ToFieldsRef: HasFieldsRef {
     fn to_fields_ref<'a>(&'a self) -> Self::FieldsRef<'a>
     where
