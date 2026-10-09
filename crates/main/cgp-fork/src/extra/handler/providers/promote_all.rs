@@ -40,9 +40,12 @@ delegate_components! {
     }
 }
 
+/// Promotes a `Producer` to `Computer`, then through [`PromoteComputer`].
+pub struct PromoteProducer<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Provider>
-    new PromoteProducer<Provider> {
+    PromoteProducer<Provider> {
         ComputerComponent: Promote<Provider>,
         [
             ComputerRefComponent,
