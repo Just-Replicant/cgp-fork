@@ -3,6 +3,7 @@ use crate::extra::handler::{
     Computer, ComputerComponent, Handler, HandlerComponent, TryComputer, TryComputerComponent,
 };
 
+/// Runs `Provider` on a builder and writes the result into the `Tag` field.
 pub struct BuildAndSetField<Tag, Provider = UseContext>(pub PhantomData<(Tag, Provider)>);
 
 #[cgp_provider]
