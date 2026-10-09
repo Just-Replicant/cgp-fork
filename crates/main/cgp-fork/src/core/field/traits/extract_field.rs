@@ -77,6 +77,7 @@ impl FinalizeExtract for Infallible {
 ///
 /// `Ok` is returned as-is. `Err` cannot exist, so it is discarded.
 pub trait FinalizeExtractResult {
+    /// The `Ok` type.
     type Output;
 
     fn finalize_extract_result(self) -> Self::Output;
