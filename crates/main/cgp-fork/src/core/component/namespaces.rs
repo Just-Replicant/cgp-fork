@@ -3,6 +3,7 @@
 /// `#[prefix(path in DefaultNamespace)]` implements this for the component. `Delegate` is a
 /// [`RedirectLookup`](crate::core::component::RedirectLookup) along `path`.
 pub trait DefaultNamespace<Components> {
+    /// The provider a namespace table yields for this component.
     type Delegate;
 }
 
