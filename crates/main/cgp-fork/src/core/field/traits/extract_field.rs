@@ -36,6 +36,7 @@ pub trait HasExtractorMut {
     where
         Self: 'a;
 
+    /// Mutably borrows `self`'s fields as a sum.
     fn extractor_mut(&mut self) -> Self::ExtractorMut<'_>;
 }
 
