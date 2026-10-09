@@ -8,6 +8,7 @@ pub trait ToFields: HasFields {
 
 /// Borrows `self`'s fields as the [`HasFieldsRef`] list.
 pub trait ToFieldsRef: HasFieldsRef {
+    /// Borrows every field into the product or sum.
     fn to_fields_ref<'a>(&'a self) -> Self::FieldsRef<'a>
     where
         Self: 'a;
