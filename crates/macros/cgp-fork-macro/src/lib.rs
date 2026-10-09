@@ -1184,6 +1184,7 @@ pub fn derive_fields(item: TokenStream) -> TokenStream {
         .into()
 }
 
+/// Derives `HasFields`: the type-level [`Struct!`](macro@Struct) or [`Enum!`](macro@Enum) shape.
 #[proc_macro_derive(HasFields)]
 pub fn derive_has_fields(item: TokenStream) -> TokenStream {
     crate::macro_lib::derive_has_fields(item.into())
