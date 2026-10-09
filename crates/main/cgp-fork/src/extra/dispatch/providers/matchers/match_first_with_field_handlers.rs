@@ -8,6 +8,7 @@ use crate::extra::dispatch::{
 };
 use crate::extra::handler::UseInputDelegate;
 
+/// Dispatches `(enum, args)` by running `Provider` on the first matching field, keeping `args`.
 pub type MatchFirstWithFieldHandlers<Provider = UseContext> =
     UseInputDelegate<MatchFirstWithFieldHandlersInputs<Provider>>;
 
