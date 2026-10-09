@@ -6,6 +6,7 @@ use crate::extra::monad::traits::{ContainsValue, LiftValue, MonadicBind, Monadic
 /// Pipes the `Err` side of `Result`. A successful step's `Ok` value is left in place.
 pub struct OkMonadic;
 
+/// [`OkMonadic`] stacked on the inner monad `M`.
 pub struct OkMonadicTrans<M>(pub PhantomData<M>);
 
 pub struct BindOk<M, Cont>(pub PhantomData<(M, Cont)>);
