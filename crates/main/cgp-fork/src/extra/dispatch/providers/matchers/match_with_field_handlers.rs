@@ -109,9 +109,12 @@ delegate_components! {
     }
 }
 
+/// [`MatchWithFieldHandlersInputs`] for a mutable borrow.
+pub struct MatchWithFieldHandlersInputsMut<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Input: HasFieldHandlers<MapExtractFieldAndHandle<Provider>>, Provider>
-    new MatchWithFieldHandlersInputsMut<Provider> {
+    MatchWithFieldHandlersInputsMut<Provider> {
         <'a> &'a mut Input:
             MatchWithHandlersMut<Input::Handlers>
     }
