@@ -18,6 +18,7 @@ pub trait TransformMapFields<Transform, TargetMap> {
     /// This builder after every field has been rewrapped.
     type Output;
 
+    /// Rewraps each field.
     fn transform_map_fields(self) -> Self::Output;
 }
 
