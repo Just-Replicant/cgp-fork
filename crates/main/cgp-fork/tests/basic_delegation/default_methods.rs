@@ -67,6 +67,7 @@ snapshot_cgp_component! {
                 >>::Delegate::greet(__context__)
             }
         }
+        /// Component name for [`CanGreet`]. Choose its provider in `delegate_components!`.
         pub struct GreeterComponent;
         impl<__Context__> Greeter<__Context__> for UseContext
         where
