@@ -3,6 +3,7 @@
    CGP component implementation.
 */
 
+/// Provider markers and traits that generated impls name by path.
 pub mod macro_prelude;
 
 mod namespaces;
