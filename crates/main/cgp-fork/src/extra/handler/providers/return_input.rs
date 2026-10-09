@@ -4,6 +4,9 @@ use crate::extra::handler::{
     TryComputer, TryComputerComponent,
 };
 
+/// A handler that returns its input unchanged.
+///
+/// Implemented for `Computer`, `TryComputer` (`Ok(input)`), `AsyncComputer`, and `Handler`.
 pub struct ReturnInput;
 
 #[cgp_provider]
