@@ -1,5 +1,9 @@
 use core::ops::Deref;
 
+/// A value that is either borrowed for `'a` or owned.
+///
+/// Deref returns `&T` in both cases. [`get_or_clone`](Self::get_or_clone) produces an owned `T`
+/// when `T: Clone`.
 pub enum MRef<'a, T> {
     Ref(&'a T),
     Owned(T),
