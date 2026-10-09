@@ -18,6 +18,7 @@ pub trait CanHandle<Code, Input> {
     /// The success value.
     type Output;
 
+    /// Handles an owned `input`, returning the context error on failure.
     async fn handle(&self, _tag: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
 }
 
