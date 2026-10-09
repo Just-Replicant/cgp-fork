@@ -1,6 +1,7 @@
 use crate::core::field::impls::{CanBuildFrom, IsNothing, IsOptional, IsPresent};
 use crate::core::field::traits::{FinalizeBuild, HasBuilder, TransformMap, TransformMapFields};
 
+/// Builds `Self` from `Source`, filling any field `Source` does not have with `Default::default`.
 pub trait CanBuildWithDefault<Source> {
     fn build_with_default(source: Source) -> Self;
 }
