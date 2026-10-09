@@ -32,6 +32,7 @@ where
     }
 }
 
+/// Turns a partial builder into the finished value once every field is present.
 pub trait FinalizeBuild: PartialData {
     fn finalize_build(self) -> Self::Target;
 }
