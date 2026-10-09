@@ -17,6 +17,7 @@ pub mod macro_prelude {
 pub mod base;
 pub(crate) mod base_types;
 pub mod component;
+/// The abstract error type, and raising or wrapping one.
 pub mod error;
 pub mod field;
 pub mod types;
