@@ -8,6 +8,7 @@ use crate::core::field::types::{Cons, Field, Nil};
 /// `Source` must expose the same field tags. Each value is taken from the source and
 /// [`BuildField::build_field`](crate::core::field::traits::BuildField::build_field) writes it here.
 pub trait CanBuildFrom<Source> {
+    /// The builder after every field from `Source` has been copied in.
     type Output;
 
     fn build_from(self, source: Source) -> Self::Output;
