@@ -25,6 +25,7 @@ pub trait CanComputeAsync<Code, Input> {
 #[derive_delegate(UseInputDelegate<Input>)]
 /// Async form of [`CanComputeRef`](crate::extra::handler::CanComputeRef).
 pub trait CanComputeAsyncRef<Code, Input> {
+    /// The value the future resolves to.
     type Output;
 
     async fn compute_async_ref(&self, _code: PhantomData<Code>, input: &Input) -> Self::Output;
