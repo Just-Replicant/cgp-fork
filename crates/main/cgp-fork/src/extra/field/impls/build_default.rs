@@ -7,6 +7,7 @@ pub trait CanBuildWithDefault<Source> {
     fn build_with_default(source: Source) -> Self;
 }
 
+/// Finishes a builder whose missing fields can be replaced with `Default`.
 pub trait CanFinalizeWithDefault {
     type Output;
 
