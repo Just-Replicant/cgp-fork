@@ -7,6 +7,7 @@ impl MapTypeRef for IsRef {
     type Map<'a, T: 'a> = &'a T;
 }
 
+/// [`MapTypeRef`](crate::core::field::traits::MapTypeRef) for a mutable borrow: `Map<'a, T> = &'a mut T`.
 pub struct IsMut;
 
 impl MapTypeRef for IsMut {
