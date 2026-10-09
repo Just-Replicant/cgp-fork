@@ -11,6 +11,7 @@ pub trait HasBuilder {
     fn builder() -> Self::Builder;
 }
 
+/// Turns an existing value into a builder that already holds its fields.
 pub trait IntoBuilder {
     type Builder;
 
