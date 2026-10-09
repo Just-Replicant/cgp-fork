@@ -1,5 +1,6 @@
 use crate::extra::monad::traits::{ContainsValue, LiftValue, MonadicBind, MonadicTrans};
 
+/// The identity monad. Binding a provider leaves it unchanged, and lifting a value returns it.
 pub struct IdentMonadic;
 
 impl<M> MonadicTrans<M> for IdentMonadic {
