@@ -8,5 +8,6 @@ use crate::core::prelude::*;
 #[cgp_component(Logger)]
 #[prefix(@cgp.extra.log in DefaultNamespace)]
 pub trait CanLog<Detail> {
+    /// Records `detail`.
     fn log(&self, detail: Detail);
 }
