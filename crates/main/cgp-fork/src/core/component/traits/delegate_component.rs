@@ -40,5 +40,6 @@
    ```
 */
 pub trait DelegateComponent<Key: ?Sized> {
+    /// The provider (or nested table) stored at `Key`.
     type Delegate;
 }
