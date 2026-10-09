@@ -26,6 +26,7 @@ use crate::core::component::DefaultNamespace;
 #[cgp_type]
 #[prefix(@cgp.core.error in DefaultNamespace)]
 pub trait HasErrorType {
+    /// The context's abstract error. Providers raise and wrap this type.
     type Error: Debug;
 }
 
