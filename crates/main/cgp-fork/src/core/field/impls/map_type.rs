@@ -22,6 +22,7 @@ impl MapType for IsVoid {
     type Map<T> = Void;
 }
 
+/// [`MapType`](crate::core::field::traits::MapType) that wraps the value: `Map<T> = Option<T>`.
 pub struct IsOptional;
 
 impl MapType for IsOptional {
