@@ -4,6 +4,10 @@ use crate::extra::handler::{
     TryComputerComponent,
 };
 
+/// Lifts `Provider` one step up the handler family.
+///
+/// A [`Producer`](crate::extra::handler::Producer) becomes a `Computer` that ignores its input.
+/// A `Computer` becomes a `TryComputer` that always returns `Ok`. A `TryComputer` becomes a `Handler`.
 pub struct Promote<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]
