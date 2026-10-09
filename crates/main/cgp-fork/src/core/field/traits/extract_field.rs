@@ -3,6 +3,10 @@ use core::marker::PhantomData;
 
 use crate::core::field::types::Void;
 
+/// Converts `Self` to and from the sum type that dispatch and downcast walk.
+///
+/// The extractor is an [`Either`](crate::core::field::types::Either) chain of fields. Owned
+/// extraction consumes `self`; the ref and mut traits borrow it instead.
 pub trait HasExtractor {
     type Extractor;
 
