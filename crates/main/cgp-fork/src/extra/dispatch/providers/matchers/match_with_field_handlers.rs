@@ -15,6 +15,7 @@ use crate::extra::handler::{
 pub type MatchWithFieldHandlers<Provider = UseContext> =
     UseInputDelegate<MatchWithFieldHandlersInputs<Provider>>;
 
+/// [`MatchWithFieldHandlers`] that first unwraps the [`Field`](crate::core::field::types::Field) and passes the value to `Provider`.
 pub type MatchWithValueHandlers<Provider = UseContext> =
     UseInputDelegate<MatchWithFieldHandlersInputs<HandleFieldValue<Provider>>>;
 
