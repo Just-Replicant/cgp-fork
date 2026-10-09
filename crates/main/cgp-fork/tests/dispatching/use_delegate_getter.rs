@@ -60,6 +60,7 @@ snapshot_cgp_type! {
                 FooTypeProviderAtComponent,
             >>::Delegate as FooTypeProviderAt<__Context__, I, J>>::Foo;
         }
+        /// Component name for [`HasFooTypeAt`]. Choose its provider in `delegate_components!`.
         pub struct FooTypeProviderAtComponent;
         impl<__Context__, I, J> FooTypeProviderAt<__Context__, I, J> for UseContext
         where
