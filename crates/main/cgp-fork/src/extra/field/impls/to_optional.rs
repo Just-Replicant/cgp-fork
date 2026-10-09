@@ -22,6 +22,7 @@ where
     }
 }
 
+/// Wraps every present field in `Some` and every absent field in `None`.
 pub trait ToOptional {
     type Output;
 
