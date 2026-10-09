@@ -15,6 +15,7 @@ use crate::extra::handler::UseInputDelegate;
 /// `Error` comes from [`HasErrorType`](crate::core::error::HasErrorType). This is the fallible
 /// async member of the handler family.
 pub trait CanHandle<Code, Input> {
+    /// The success value.
     type Output;
 
     async fn handle(&self, _tag: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
