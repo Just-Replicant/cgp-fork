@@ -14,6 +14,10 @@ pub trait CanUpcast<Target> {
     fn upcast(self, _tag: PhantomData<Target>) -> Target;
 }
 
+/// Converts this value into `Target`, returning what was not consumed.
+///
+/// Succeeds when every field of `Target` can be extracted. `Remainder` is the source with
+/// those fields removed, so the caller can keep using it.
 pub trait CanDowncast<Target> {
     type Remainder;
 
