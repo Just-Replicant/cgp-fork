@@ -5,6 +5,7 @@ use core::ops::Deref;
 /// Deref returns `&T` in both cases. [`get_or_clone`](Self::get_or_clone) produces an owned `T`
 /// when `T: Clone`.
 pub enum MRef<'a, T> {
+    /// A shared borrow.
     Ref(&'a T),
     Owned(T),
 }
