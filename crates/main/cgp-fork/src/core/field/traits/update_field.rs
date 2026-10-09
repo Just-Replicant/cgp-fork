@@ -13,6 +13,7 @@ pub trait UpdateField<Tag, M: MapType> {
     /// The map the field uses before this update. The returned value is wrapped by it.
     type Mapper: MapType;
 
+    /// This builder after the field has been replaced.
     type Output;
 
     fn update_field(
