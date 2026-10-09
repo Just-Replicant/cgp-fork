@@ -13,4 +13,5 @@ pub trait HasType<Tag> {
     type Type;
 }
 
+/// [`HasType::Type`](crate::core::types::HasType::Type) of `Context` at `Tag`.
 pub type TypeOf<Context, Tag> = <Context as HasType<Tag>>::Type;
