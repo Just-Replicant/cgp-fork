@@ -53,9 +53,12 @@ delegate_components! {
     }
 }
 
+/// Inner table for a mutable borrow of the input beside `args`.
+pub struct MatchFirstWithFieldHandlersInputsMut<Provider>(pub PhantomData<Provider>);
+
 delegate_components! {
     <Input: HasFieldHandlers<MapExtractFirstFieldAndHandle<Provider>>, Args, Provider>
-    new MatchFirstWithFieldHandlersInputsMut<Provider> {
+    MatchFirstWithFieldHandlersInputsMut<Provider> {
         <'a> (&'a mut Input, Args):
             MatchFirstWithHandlersMut<Input::Handlers>
     }
