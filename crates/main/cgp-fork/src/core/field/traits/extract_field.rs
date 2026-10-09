@@ -40,6 +40,7 @@ pub trait HasExtractorMut {
     fn extractor_mut(&mut self) -> Self::ExtractorMut<'_>;
 }
 
+/// Removes the `Tag` field from a product or sum, leaving the rest.
 pub trait ExtractField<Tag> {
     type Value;
 
