@@ -25,6 +25,7 @@ pub struct MatchWithFieldHandlersRef<Provider = UseContext>(pub PhantomData<Prov
 /// [`MatchWithValueHandlers`] for a shared borrow of the enum.
 pub struct MatchWithValueHandlersRef<Provider = UseContext>(pub PhantomData<Provider>);
 
+/// [`MatchWithValueHandlers`] for a mutable borrow of the enum.
 pub struct MatchWithValueHandlersMut<Provider = UseContext>(pub PhantomData<Provider>);
 
 delegate_components! {
