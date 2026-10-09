@@ -1156,6 +1156,16 @@ pub fn Enum(body: TokenStream) -> TokenStream {
         .into()
 }
 
+/**
+    `Path!` builds a type-level path from a dotted `@` path.
+
+    Each segment becomes a step in a `PathCons` chain. Namespace wiring uses the same paths
+    to name a component inside a table.
+
+    ```rust,ignore
+    type ErrorRaiser = Path!(@app.error.ErrorRaiserComponent);
+    ```
+*/
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Path(body: TokenStream) -> TokenStream {
