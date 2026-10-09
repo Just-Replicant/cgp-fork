@@ -4,5 +4,6 @@
 /// `Value` is `E`: the pipe threads the error, not the success. [`ErrMonadic`](crate::extra::monad::monadic::err::ErrMonadic)
 /// threads `T` instead.
 pub trait ContainsValue<Output> {
+    /// The type being piped through `Output`.
     type Value;
 }
