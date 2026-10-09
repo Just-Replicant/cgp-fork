@@ -15,6 +15,7 @@ pub trait BuildField<Tag> {
     /// This builder after `Tag` has been set.
     type Output;
 
+    /// Writes `value` into the `Tag` field.
     fn build_field(self, _tag: PhantomData<Tag>, value: Self::Value) -> Self::Output;
 }
 
