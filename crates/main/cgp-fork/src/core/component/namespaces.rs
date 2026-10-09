@@ -20,5 +20,6 @@ pub trait DefaultImpls1<T, Components> {
 ///
 /// Same registration and lookup as [`DefaultImpls1`], with a second type in the key.
 pub trait DefaultImpls2<T1, T2, Components> {
+    /// The provider registered for the pair `(T1, T2)`.
     type Delegate;
 }
