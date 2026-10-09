@@ -56,6 +56,7 @@ use crate::core::types::{TypeProvider, TypeProviderComponent};
 */
 pub struct UseField<Tag>(pub PhantomData<Tag>);
 
+/// [`WithProvider`]`<`[`UseField`]`<Tag>>`, so a getter consumer can be filled from the `Tag` field.
 pub type WithField<Tag> = WithProvider<UseField<Tag>>;
 
 impl<Context, TypeTag, FieldTag, Field> TypeProvider<Context, TypeTag> for UseField<FieldTag>
