@@ -27,10 +27,7 @@ impl DerivePromoteAttribute {
         // `<__Provider__>` is a fixed token sequence.
         let generics: Generics = syn::parse_quote!(<__Provider__>);
 
-        EmptyStruct {
-            ident: self.provider.clone(),
-            generics,
-        }
+        EmptyStruct::new(self.provider.clone(), generics)
     }
 
     /// The provider impl, plus the `IsProviderFor` impl the caller derives from it.

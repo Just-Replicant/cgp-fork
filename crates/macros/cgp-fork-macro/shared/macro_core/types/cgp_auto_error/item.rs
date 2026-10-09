@@ -163,10 +163,7 @@ impl ItemCgpAutoError {
     pub fn to_items(&self) -> syn::Result<Vec<Item>> {
         let context = Ident::new("__Context__", Span::call_site());
 
-        let provider_struct = EmptyStruct {
-            ident: self.provider_ident.clone(),
-            generics: Generics::default(),
-        };
+        let provider_struct = EmptyStruct::new(self.provider_ident.clone(), Generics::default());
 
         let mut items = vec![Item::Struct(provider_struct.to_item_struct())];
         items.extend(self.type_provider_items(&context)?);

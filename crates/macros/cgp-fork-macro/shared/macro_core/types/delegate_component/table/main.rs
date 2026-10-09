@@ -94,10 +94,7 @@ impl DelegateTable {
                 }
             }
 
-            item_structs.push(EmptyStruct {
-                ident: struct_type.ident,
-                generics,
-            });
+            item_structs.push(EmptyStruct::new(struct_type.ident, generics));
         }
 
         item_impls.extend(

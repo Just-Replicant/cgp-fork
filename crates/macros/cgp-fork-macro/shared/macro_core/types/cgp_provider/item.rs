@@ -80,10 +80,10 @@ impl ItemCgpProvider {
 
         let provider_type: IdentWithTypeGenerics = parse_internal!( #impl_self_type );
 
-        let provider_struct = EmptyStruct {
-            ident: provider_type.ident.clone(),
-            generics: provider_type.type_generics.to_generics(),
-        };
+        let provider_struct = EmptyStruct::new(
+            provider_type.ident.clone(),
+            provider_type.type_generics.to_generics(),
+        );
 
         Ok(Some(provider_struct))
     }
