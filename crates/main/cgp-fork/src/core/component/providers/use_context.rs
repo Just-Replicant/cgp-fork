@@ -45,4 +45,5 @@ use crate::core::component::WithProvider;
 */
 pub struct UseContext;
 
+/// [`WithProvider`]`<`[`UseContext`]`>`, so a consumer trait can be passed where a provider is expected.
 pub type WithContext = WithProvider<UseContext>;
