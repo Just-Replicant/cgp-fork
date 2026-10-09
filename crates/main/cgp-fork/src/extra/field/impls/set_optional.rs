@@ -8,6 +8,7 @@ pub trait SetOptional<Tag> {
     /// The type stored under `Tag`, inside the `Option`.
     type Value;
 
+    /// Writes `Some(value)` and drops the previous contents.
     fn set(self, _tag: PhantomData<Tag>, value: Self::Value) -> Self;
 
     fn set_optional(
