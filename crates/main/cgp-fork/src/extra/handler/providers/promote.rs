@@ -7,7 +7,9 @@ use crate::extra::handler::{
 /// Lifts `Provider` one step up the handler family.
 ///
 /// A [`Producer`](crate::extra::handler::Producer) becomes a `Computer` that ignores its input.
-/// A `Computer` becomes a `TryComputer` that always returns `Ok`. A `TryComputer` becomes a `Handler`.
+/// A `Computer` becomes a `TryComputer` that always returns `Ok`. An `AsyncComputer` becomes a
+/// `Handler` that always returns `Ok`. A `TryComputer` becomes a `Handler` through
+/// [`PromoteAsync`](crate::extra::handler::PromoteAsync).
 pub struct Promote<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]
