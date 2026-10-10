@@ -26,7 +26,7 @@ cargo add cgp-fork
 use cgp_fork::prelude::*;
 ```
 
-Rust **1.89+** on stable. Depend on this repository with the git line above.
+Rust **1.89+** on stable.
 
 For readable wiring errors, install [`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp) and run `cargo cgp check`.
 
