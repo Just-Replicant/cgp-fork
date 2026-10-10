@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+## [0.9.3](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.2...v0.9.3) - 2026-10-10
+
+### Added
+
+- *(runtime)* cover a mutable runtime field update
+- *(runtime)* register the has_runtime_mut module
+- *(runtime)* add the runtime concept entrypoint
+- *(runtime)* export HasRuntimeMut from runtime
+- *(runtime)* export HasRuntimeMut from traits
+- *(runtime)* add HasRuntimeMut
+
+### Changed
+
+- *(bind-ok)* name the async Ok arm ok
+- *(bind-ok)* name the Ok arm ok
+
+### Documentation
+
+- *(handlers)* describe Promote as a TryComputer step
+- *(promote)* document the AsyncComputer lift
+- *(error)* name HasErrorType in the abstract-error guide
+
 ### Added
 
 - *(runtime)* `HasRuntimeMut` mutably borrows the context runtime
