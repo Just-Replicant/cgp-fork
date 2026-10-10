@@ -104,7 +104,7 @@ where
     ) -> Self::Output {
         match input {
             Err(value) => M::lift_output(Cont::compute_async(context, code, value).await),
-            Ok(err) => M::lift_value(Ok(err)),
+            Ok(ok) => M::lift_value(Ok(ok)),
         }
     }
 }
