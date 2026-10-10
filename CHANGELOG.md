@@ -10,6 +10,7 @@
 
 - *(readme)* drop the crate version; it lives in `Cargo.toml`
 - *(docs)* name `HasErrorType` in the abstract-error guide
+- *(promote)* document that `Promote` lifts an `AsyncComputer` into a `Handler`
 
 ## [0.9.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.0...v0.9.1) - 2026-10-08
 
