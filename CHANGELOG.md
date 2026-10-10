@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- *(runtime)* `HasRuntimeMut` mutably borrows the context runtime
+
 ## [0.9.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.0...v0.9.1) - 2026-10-08
 
 ### Changed
