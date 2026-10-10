@@ -40,7 +40,7 @@ The concept targets currently cover: basic delegation, impl-side dependencies,
 implicit arguments, higher-order providers, generic components, abstract types,
 getters, field access, extensible records, extensible variants, checking,
 dispatching, namespaces, handlers, monadic handlers, async and Send bounds,
-blanket traits, and the standalone error backends (`error_backends`). The crate's build script
+blanket traits, runtime, and the standalone error backends (`error_backends`). The crate's build script
 turns the example in each error backend's README into a test module, which the `readme_*.rs` files
 in `error_backends` include, so those examples are tested without being copied. The set grows and subdivides over time. `cgp-fork-macro` `src/macro_tests` follows
 the same shape, with `ident_with_type_params` for parser corner cases and the
