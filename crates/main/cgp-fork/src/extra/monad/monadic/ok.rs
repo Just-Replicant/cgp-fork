@@ -83,7 +83,7 @@ where
     fn compute(context: &Context, code: PhantomData<Code>, input: Result<T, E1>) -> Self::Output {
         match input {
             Err(value) => M::lift_output(Cont::compute(context, code, value)),
-            Ok(err) => M::lift_value(Ok(err)),
+            Ok(ok) => M::lift_value(Ok(ok)),
         }
     }
 }
