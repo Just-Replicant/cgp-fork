@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- *(runtime)* `HasRuntimeMut` mutably borrows the context runtime
+
+### Fixed
+
+- *(readme)* drop the crate version; it lives in `Cargo.toml`
+- *(docs)* name `HasErrorType` in the abstract-error guide
+- *(promote)* document that `Promote` lifts an `AsyncComputer` into a `Handler`
+
 ## [0.9.2](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.1...v0.9.2) - 2026-10-09
 
 ### Added

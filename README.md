@@ -8,7 +8,7 @@
 
 This repository is **cgp-fork**, a fork of Context-Generic Programming (CGP). CGP lets one interface have many implementations, and lets each context — an application, a test, a deployment — choose the one it uses. The choice is written in one place and compiles down to a direct call.
 
-The crates in this tree are **v0.9.0**. The package name is `cgp-fork`. In Rust that crate is `cgp_fork`.
+The package name is `cgp-fork`. In Rust that crate is `cgp_fork`.
 
 This fork includes upstream [contextgeneric/cgp](https://github.com/contextgeneric/cgp) through commit [`69d2854`](https://github.com/contextgeneric/cgp/commit/69d285410fc2f7b40eceaafeef8536642a9390b1) (7 October 2026, pull request [#278](https://github.com/contextgeneric/cgp/pull/278)).
 
@@ -16,8 +16,8 @@ This fork includes upstream [contextgeneric/cgp](https://github.com/contextgener
 
 ## Install
 
-```toml
-cgp-fork = "0.9.0"
+```sh
+cargo add cgp-fork
 ```
 
 `anyhow`, `eyre`, and `std-error` are optional features of that one crate. They select `anyhow::Error`, `eyre::Report`, or a boxed `core::error::Error` as the context error.
@@ -26,7 +26,7 @@ cgp-fork = "0.9.0"
 use cgp_fork::prelude::*;
 ```
 
-Rust **1.89+** on stable. Depend on this repository with the git line above.
+Rust **1.89+** on stable.
 
 For readable wiring errors, install [`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp) and run `cargo cgp check`.
 

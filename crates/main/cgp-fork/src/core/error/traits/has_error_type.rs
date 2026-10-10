@@ -12,7 +12,7 @@ use crate::core::component::DefaultNamespace;
     `Error` type, doing so may result in having multiple ambiguous `Self::Error` types,
     if there are multiple associated types with the same name in different traits.
 
-    As a result, it is better for context traits to include `HasError` as their
+    As a result, it is better for context traits to include `HasErrorType` as their
     parent traits, so that multiple traits can all refer to the same abstract
     `Self::Error` type.
 
