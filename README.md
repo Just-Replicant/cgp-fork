@@ -16,8 +16,8 @@ This fork includes upstream [contextgeneric/cgp](https://github.com/contextgener
 
 ## Install
 
-```toml
-cgp-fork = "0.9.0"
+```sh
+cargo add cgp-fork
 ```
 
 `anyhow`, `eyre`, and `std-error` are optional features of that one crate. They select `anyhow::Error`, `eyre::Report`, or a boxed `core::error::Error` as the context error.
