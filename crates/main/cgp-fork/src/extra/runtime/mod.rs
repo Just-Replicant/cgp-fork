@@ -1,6 +1,7 @@
 mod traits;
 
 pub use traits::{
-    HasRuntime, HasRuntimeType, RuntimeGetter, RuntimeGetterComponent, RuntimeOf,
-    RuntimeTypeProvider, RuntimeTypeProviderComponent,
+    HasRuntime, HasRuntimeMut, HasRuntimeType, RuntimeGetter, RuntimeGetterComponent,
+    RuntimeMutGetter, RuntimeMutGetterComponent, RuntimeOf, RuntimeTypeProvider,
+    RuntimeTypeProviderComponent,
 };
