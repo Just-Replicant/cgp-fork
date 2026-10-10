@@ -3,10 +3,9 @@
 //!
 //! A pipeline built at the `HandlerComponent` level runs async, fallible stages
 //! in order. A middle stage here is a plain `Computer` (`Add`) that is lifted
-//! into the pipeline with `PromoteAsync<Promote<...>>`: `Promote` turns a
-//! `Computer` into a `TryComputer`/`Handler`-shaped step and `PromoteAsync`
-//! makes it async, so a simpler synchronous handler composes alongside async
-//! ones. The context uses `Infallible` as its error type since no stage fails.
+//! into the pipeline with `PromoteAsync<Promote<...>>`: `Promote` turns the
+//! `Computer` into a `TryComputer`, and `PromoteAsync` turns that into a
+//! `Handler`. The context uses `Infallible` as its error type since no stage fails.
 //!
 //! The providers here are incidental scaffolding written with the plain
 //! `#[cgp_new_provider]`, and the wiring / check use plain `delegate_components!`
