@@ -45,6 +45,7 @@ eyre = { version = "0.6", default-features = false, features = ["auto-install", 
 cgp-fork-macro = { workspace = true, features = ["snapshot"] }
 insta = { version = "1" }
 futures = { version = "0.3" }
+trybuild = { version = "1" }
 syn = { version = "3", features = ["full", "extra-traits"] }
 quote = { version = "1" }
 proc-macro2 = { version = "1" }

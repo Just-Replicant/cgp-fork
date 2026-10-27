@@ -1,0 +1,5 @@
+error: `#[async_trait]` takes no arguments; the desugared future is not `Send`. Use `CanSendRun` or a `Send` bound at the call site when a `Send` future is needed
+ --> tests/ui/async_trait_arguments.rs:4:15
+  |
+4 | #[async_trait(?Send)]
+  |               ^^^^^
