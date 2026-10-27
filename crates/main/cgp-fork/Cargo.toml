@@ -11,6 +11,8 @@ homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "A language extension for Rust, with pluggable trait implementations at compile-time."
+# The test suite and examples stay in the repository; the published crate is the library.
+exclude      = ["tests/", "examples/", "benches/"]
 
 [package.metadata.docs.rs]
 all-features = true
