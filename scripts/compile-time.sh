@@ -6,12 +6,15 @@
 # clean `cargo build` of just that crate (dependencies are built first and not
 # counted). Fails when the build exceeds the budget.
 #
-#   scripts/compile-time.sh                 # N=200, budget from scripts/compile-budget.txt
-#   N=500 BUDGET_SECS=60 scripts/compile-time.sh
+#   bash scripts/compile-time.sh                 # N=200, budget from scripts/compile-budget.txt
+#   N=500 BUDGET_SECS=60 bash scripts/compile-time.sh
 #
 # The budget is deliberately loose (CI machines vary); the goal is to catch a
 # macro-expansion blow-up, not a few percent of noise.
 set -euo pipefail
+# Decimal points and `date` must not depend on the locale (`awk` would treat
+# `1.5` as zero under a comma decimal and the budget check would never fire).
+export LC_ALL=C
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 n="${N:-200}"
@@ -91,6 +94,12 @@ cd "$work"
 cargo build --quiet --offline 2>/dev/null || cargo build --quiet
 touch src/main.rs
 start=$(date +%s.%N)
+case "$start" in
+  *N*)
+    echo "compile-time: this date(1) has no %N (nanoseconds); need GNU date" >&2
+    exit 1
+    ;;
+esac
 cargo build --quiet
 end=$(date +%s.%N)
 elapsed=$(awk -v s="$start" -v e="$end" 'BEGIN { printf "%.2f", e - s }')
