@@ -1,9 +1,9 @@
-# cgp-fork-error-std
+# The `std-error` error backend
 
-`cgp-fork-error-std` makes a boxed standard error, `Box<dyn core::error::Error + Send + Sync>`, the
+Enabled by the `std-error` feature. `cgp_fork::std_error` makes a boxed standard error, `Box<dyn core::error::Error + Send + Sync>`, the
 abstract error type of a [CGP](https://contextgeneric.dev) context, and supplies the providers that
-raise errors into it and add context to it. It depends only on `cgp-fork` and `alloc`, so it suits a
-`no_std` context that still wants an open-ended error type.
+raise errors into it and add context to it. It needs only `core` and `alloc` (the `std-error` feature
+enables `alloc`), so it suits a `no_std` context that still wants an open-ended error type.
 
 | Item | Wire it to | What it does |
 |---|---|---|
@@ -17,7 +17,7 @@ raise errors into it and add context to it. It depends only on `cgp-fork` and `a
 
 A context usually routes each source type to the provider that suits it:
 
-```rust,ignore
+```rust
 use cgp_fork::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp_fork::prelude::*;
 use cgp_fork::std_error::{DisplayBoxedStdError, RaiseBoxedStdError, UseBoxedStdError};

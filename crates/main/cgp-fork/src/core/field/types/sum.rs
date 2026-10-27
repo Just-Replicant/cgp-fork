@@ -13,14 +13,19 @@
 
     Given the following sum type definition:
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
     type MyUnion = Sum![u32, String, bool];
     ```
 
     The following type would be generated:
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # use cgp_fork::core::field::types::{Either, Void};
     type MyUnion = Either<u32, Either<String, Either<bool, Void>>>;
+    # let _: PhantomData<MyUnion> = PhantomData::<Sum![u32, String, bool]>;
     ```
 */
 #[derive(Eq, PartialEq, Debug, Clone)]

@@ -4,6 +4,10 @@ on:
   pull_request: {}
   push:
     branches: [main]
+  schedule:
+    # Weekly, so a new RustSec advisory or a toolchain change surfaces without a push.
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
 
 env:
   CARGO_INCREMENTAL: 0
@@ -11,6 +15,17 @@ env:
   RUST_BACKTRACE: short
   CARGO_NET_RETRY: 10
   RUSTUP_MAX_RETRIES: 10
+  # Pinned tool versions. Binaries are either checksum-verified downloads or
+  # `cargo install --locked` builds from crates.io (crates.io verifies the
+  # package checksum and `--locked` pins the tool's dependency graph).
+  NEXTEST_VERSION: "0.9.150"
+  NEXTEST_SHA256: "b0959bc64232974224cf9fb22c915845398c0e8668fa7831eb5b43fb1eef781f"
+  CARGO_HACK_VERSION: "0.6.45"
+  CARGO_DENY_VERSION: "0.20.2"
+  CARGO_AUDIT_VERSION: "0.22.2"
+  CARGO_SEMVER_CHECKS_VERSION: "0.51.0"
+  CARGO_LLVM_COV_VERSION: "0.9.1"
+  MSRV: "1.89"
 
 # Cancel in-progress runs when a new commit is pushed to the same PR, branch, or tag.
 concurrency:
@@ -21,14 +36,15 @@ permissions:
   contents: read
 
 # To minimize supply-chain exposure this workflow uses only GitHub's own
-# first-party checkout action; every toolchain and tool is installed with the
-# rustup/cargo already present on the runner.
+# first-party actions (checkout, cache, upload-artifact), each pinned to a full
+# commit SHA; Dependabot proposes updates. Every toolchain and tool is installed
+# with the rustup/cargo already present on the runner.
 jobs:
   fmt:
     name: Rustfmt (nightly)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install nightly rustfmt
         run: rustup toolchain install nightly --profile minimal --component rustfmt
       - run: cargo +nightly fmt --all -- --check
@@ -37,39 +53,250 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install pinned toolchain
         run: rustup toolchain install
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            target
+          key: clippy-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
       - name: Clippy (all features)
-        run: cargo clippy --all-features --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-features --all-targets -- -D warnings
       - name: Clippy (no default features)
-        run: cargo clippy --no-default-features --all-targets -- -D warnings
+        run: cargo clippy --workspace --no-default-features --all-targets -- -D warnings
 
   test:
-    name: Test (nextest)
+    name: Test (nextest, ${{ matrix.features }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        features: ["--all-features", "--no-default-features"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install pinned toolchain
         run: rustup toolchain install
-      # Prebuilt binary from the official nextest distribution.
-      - name: Install cargo-nextest
-        run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
-      # Runs the whole workspace. Post-codegen compile failures live in cargo-cgp.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            target
+          key: test-${{ runner.os }}-${{ matrix.features }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Install cargo-nextest (pinned, checksum-verified)
+        run: |
+          tmpdir=$(mktemp -d)
+          curl -fsSL -o "$tmpdir/nextest.tar.gz" "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-${NEXTEST_VERSION}/cargo-nextest-${NEXTEST_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+          echo "${NEXTEST_SHA256}  $tmpdir/nextest.tar.gz" | sha256sum -c -
+          tar -xzf "$tmpdir/nextest.tar.gz" -C "${CARGO_HOME:-$HOME/.cargo}/bin"
+          cargo nextest --version
+      # Runs the whole workspace, including the trybuild `ui` target (all features only).
+      # Post-codegen compile failures live in cargo-cgp.
       - name: Run tests
-        run: cargo nextest run --all-features --no-fail-fast --workspace
+        run: cargo nextest run --workspace ${{ matrix.features }} --no-fail-fast
+      # nextest does not run doctests.
+      - name: Run doctests
+        run: cargo test --workspace ${{ matrix.features }} --doc
+      - name: Build examples
+        if: matrix.features == '--all-features'
+        run: cargo build -p cgp-fork --all-features --examples
+
+  test-os:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - name: Run tests
+        run: cargo test --workspace --all-features --no-fail-fast
+
+  docs:
+    name: Rustdoc (-D warnings)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - name: Build docs as docs.rs does
+        env:
+          RUSTDOCFLAGS: "-D warnings --cfg docsrs"
+        run: cargo doc --workspace --all-features --no-deps
+
+  msrv:
+    name: MSRV (1.89)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install the MSRV toolchain
+        run: rustup toolchain install "$MSRV" --profile minimal
+      # `+toolchain` overrides rust-toolchain.toml. The lockfile is resolved
+      # MSRV-aware (resolver 3), so the locked versions build on the MSRV.
+      - name: Check every target and feature on the MSRV
+        run: cargo +"$MSRV" check --workspace --all-features --all-targets --locked
+      - name: Check without default features on the MSRV
+        run: cargo +"$MSRV" check --workspace --no-default-features --locked
 
   no-std:
     name: no_std target
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install pinned toolchain
         run: rustup toolchain install
       - name: Add a bare-metal target
         run: rustup target add thumbv7m-none-eabi
       # The facade is advertised as no_std. A dependency that omits `#![no_std]`
       # still links `std` and fails this check for every bare-metal target.
-      - name: Check the facade without std
+      - name: Check the facade without std (default features)
         run: cargo check -p cgp-fork --target thumbv7m-none-eabi
+      - name: Check the facade with only core
+        run: cargo check -p cgp-fork --target thumbv7m-none-eabi --no-default-features
+
+  features:
+    name: Feature powerset (cargo-hack)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install && rustup target add thumbv7m-none-eabi
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/cargo-hack
+          key: cargo-hack-${{ runner.os }}-${{ env.CARGO_HACK_VERSION }}
+      - name: Install cargo-hack
+        run: command -v cargo-hack || cargo install --locked "cargo-hack@${CARGO_HACK_VERSION}"
+      - name: Every feature combination (host)
+        run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps
+      - name: Every feature combination (no_std; eyre needs std)
+        run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps --exclude-features eyre --target thumbv7m-none-eabi
+
+  deny:
+    name: cargo-deny (advisories, licenses, bans, sources)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/cargo-deny
+          key: cargo-deny-${{ runner.os }}-${{ env.CARGO_DENY_VERSION }}
+      - name: Install cargo-deny
+        run: command -v cargo-deny || cargo install --locked "cargo-deny@${CARGO_DENY_VERSION}"
+      - run: cargo deny check
+
+  audit:
+    name: cargo-audit (RustSec)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/cargo-audit
+          key: cargo-audit-${{ runner.os }}-${{ env.CARGO_AUDIT_VERSION }}
+      - name: Install cargo-audit
+        run: command -v cargo-audit || cargo install --locked "cargo-audit@${CARGO_AUDIT_VERSION}"
+      - run: cargo audit --deny warnings
+
+  semver:
+    name: Semver (cargo-semver-checks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/cargo-semver-checks
+          key: cargo-semver-checks-${{ runner.os }}-${{ env.CARGO_SEMVER_CHECKS_VERSION }}
+      - name: Install cargo-semver-checks
+        run: command -v cargo-semver-checks || cargo install --locked "cargo-semver-checks@${CARGO_SEMVER_CHECKS_VERSION}"
+      # Compares the facade's public API with the latest release on crates.io and
+      # fails when the change needs a larger version bump than Cargo.toml has.
+      - run: cargo semver-checks -p cgp-fork
+
+  package:
+    name: Package (publish dry run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      # Packages and verifies both crates together, so the facade builds against
+      # the macro crate being released rather than the one on crates.io.
+      - name: Package the workspace
+        run: cargo package --workspace --locked
+      - name: No tests or build script in the facade package
+        run: |
+          if cargo package -p cgp-fork --list --allow-dirty | grep -E '^(tests/|build\.rs$)'; then
+            echo "unexpected files in the cgp-fork package" >&2
+            exit 1
+          fi
+
+  coverage:
+    name: Coverage (cargo-llvm-cov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install && rustup component add llvm-tools
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/cargo-llvm-cov
+          key: cargo-llvm-cov-${{ runner.os }}-${{ env.CARGO_LLVM_COV_VERSION }}
+      - name: Install cargo-llvm-cov
+        run: command -v cargo-llvm-cov || cargo install --locked "cargo-llvm-cov@${CARGO_LLVM_COV_VERSION}"
+      - name: Measure coverage
+        run: |
+          cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+          cargo llvm-cov report --summary-only | tee coverage-summary.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage
+          path: |
+            lcov.info
+            coverage-summary.txt
+
+  fuzz:
+    name: Macro fuzzing (deep)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      # A fresh seed per run explores new inputs; it is printed so a failure reproduces.
+      - name: Fuzz every macro entrypoint
+        run: |
+          seed=${{ github.run_id }}
+          echo "CGP_FUZZ_SEED=$seed"
+          CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro robustness
+
+  compile-time:
+    name: Compile-time budget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      # `bash` so the job does not depend on the executable bit. Windows checkouts
+      # with `core.filemode=true` drop it, and committing that mode change would
+      # make `./scripts/compile-time.sh` fail here.
+      - name: Time a 200-component wiring
+        run: bash scripts/compile-time.sh | tee compile-time.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: compile-time
+          path: compile-time.txt

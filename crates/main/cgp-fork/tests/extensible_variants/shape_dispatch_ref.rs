@@ -124,7 +124,7 @@ impl CanScale for Triangle {
 
 #[cgp_computer]
 pub fn scale<T: CanScale>(shape: &mut T, factor: f64) {
-    shape.scale(factor)
+    shape.scale(factor);
 }
 
 impl<Context> CanScale for Context

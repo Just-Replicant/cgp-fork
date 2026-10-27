@@ -1,6 +1,6 @@
-# cgp-fork-error-anyhow
+# The `anyhow` error backend
 
-`cgp-fork-error-anyhow` makes [`anyhow::Error`](https://docs.rs/anyhow) the abstract error type of a
+Enabled by the `anyhow` feature. `cgp_fork::anyhow` makes [`anyhow::Error`](https://docs.rs/anyhow) the abstract error type of a
 [CGP](https://contextgeneric.dev) context, and supplies the providers that raise errors into it and
 add context to it. Code written against `HasErrorType`, `CanRaiseError`, and `CanWrapError` stays
 generic; only the context's wiring names anyhow.
@@ -14,7 +14,7 @@ generic; only the context's wiring names anyhow.
 
 A context usually routes each source type to the provider that suits it:
 
-```rust,ignore
+```rust
 use cgp_fork::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp_fork::prelude::*;
 use cgp_fork::anyhow::{DisplayAnyhowError, RaiseAnyhowError, UseAnyhowError};
@@ -38,8 +38,8 @@ assert_eq!(format!("{error:#}"), "while saving: disk full");
 ```
 
 A `String` needs `DisplayAnyhowError` or `DebugAnyhowError`, because it is not a standard error.
-`DebugAnyhowError` prints it with quotes. The crate is `no_std` and builds anyhow without its `std`
-feature. Enabling that feature elsewhere in the dependency graph turns on the parts of anyhow that
+`DebugAnyhowError` prints it with quotes. This module is `no_std` (it needs `alloc`, which the `anyhow` feature
+enables) and builds anyhow without its `std` feature. Enabling that feature elsewhere in the dependency graph turns on the parts of anyhow that
 need `std`, such as backtrace capture.
 
 The `anyhow` feature re-exports `anyhow::Error` as `cgp_fork::anyhow::Error`.

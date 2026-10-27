@@ -10,6 +10,11 @@ homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "CGP procedural macros for defining and wiring components."
+# Macro unit and rejection tests stay in the repository.
+exclude      = ["src/macro_tests/"]
+
+[lints]
+workspace = true
 
 [package.metadata.docs.rs]
 all-features = true

@@ -102,3 +102,42 @@ fn rejects_non_impl_item() {
         )
     });
 }
+
+#[test]
+fn rejects_provider_trait_as_component() {
+    super::assert_macro_rejects_with(
+        "cgp_provider naming the provider trait",
+        "`#[cgp_provider]` takes the component type, not the provider trait; \
+         the component for `Greeter` is `GreeterComponent` unless `#[cgp_component]` named it",
+        || {
+            crate::macro_lib::cgp_provider(
+                quote::quote!(Greeter),
+                quote::quote!(
+                    impl<Context> Greeter<Context> for GreetHello {
+                        fn greet(_context: &Context) {}
+                    }
+                ),
+            )
+        },
+    );
+}
+
+#[test]
+fn accepts_component_type_with_trait_like_prefix() {
+    // Only the exact trait name is rejected; a qualified or differently named
+    // component type is the user's choice.
+    for component in [
+        quote::quote!(GreeterComponent),
+        quote::quote!(other::Greeter),
+    ] {
+        crate::macro_lib::cgp_provider(
+            component,
+            quote::quote!(
+                impl<Context> Greeter<Context> for GreetHello {
+                    fn greet(_context: &Context) {}
+                }
+            ),
+        )
+        .expect("a component type is accepted");
+    }
+}

@@ -1,0 +1,5 @@
+error: `#[cgp_provider]` takes the component type, not the provider trait; the component for `Greeter` is `GreeterComponent` unless `#[cgp_component]` named it
+  --> tests/ui/provider_names_trait.rs:11:16
+   |
+11 | #[cgp_provider(Greeter)]
+   |                ^^^^^^^

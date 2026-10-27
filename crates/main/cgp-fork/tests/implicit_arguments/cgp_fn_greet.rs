@@ -14,7 +14,7 @@ use cgp_fork_macro::snapshot_cgp_fn;
 snapshot_cgp_fn! {
     #[cgp_fn]
     pub fn greet(&self, #[implicit] name: &str) {
-        println!("Hello, {}!", name);
+        println!("Hello, {name}!");
     }
 
     expand_greet(output) {
@@ -37,7 +37,7 @@ snapshot_cgp_fn! {
                         >,
                     )
                     .as_str();
-                println!("Hello, {}!", name);
+                println!("Hello, {name}!");
             }
         }
         "#)

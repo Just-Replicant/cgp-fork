@@ -21,14 +21,29 @@
 
    ## Examples
 
-   As an example, given the following `delegate_component!` macro invocation:
+   As an example, given the following `delegate_components!` macro invocation:
 
-   ```rust,ignore
-   delegate_component! {
+   ```rust
+   # use cgp_fork::prelude::*;
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet {
+   #     fn greet(&self) -> String;
+   # }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter {
+   #     fn greet(&self) -> String {
+   #         "hello".to_owned()
+   #     }
+   # }
+   pub struct MyComponent;
+
+   delegate_components! {
        MyComponent {
            GreeterComponent: GreetHello,
        }
    }
+   # fn delegates_to_greet_hello<T: DelegateComponent<GreeterComponent, Delegate = GreetHello>>() {}
+   # delegates_to_greet_hello::<MyComponent>();
    ```
 
    would generate the following impl:

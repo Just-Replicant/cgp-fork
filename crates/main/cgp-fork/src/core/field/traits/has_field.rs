@@ -15,15 +15,21 @@ use crate::core::component::UseContext;
 
     Given the following struct:
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
     #[derive(HasField)]
     pub struct Person {
         pub name: String,
         pub age: u8,
     }
+
+    let person = Person { name: "Alice".to_owned(), age: 30 };
+    assert_eq!(person.get_field(PhantomData::<Symbol!("name")>), "Alice");
+    assert_eq!(*person.get_field(PhantomData::<Symbol!("age")>), 30);
     ```
 
-    The macro would generate the following implementation:
+    The macro would generate the following implementation (illustrative, not compiled):
 
     ```rust,ignore
     impl HasField<Symbol!("name")> for Person {

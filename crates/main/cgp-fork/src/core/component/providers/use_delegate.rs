@@ -31,6 +31,7 @@ use core::marker::PhantomData;
     Given the following component definition:
 
     ```rust,ignore
+    // Illustrative: this is how the crate's own `CanRaiseError` is declared.
     #[cgp_component(ErrorRaiser)]
     #[derive_delegate(UseDelegate<SourceError>)]
     pub trait CanRaiseError<SourceError>: HasErrorType {
@@ -38,7 +39,7 @@ use core::marker::PhantomData;
     }
     ```
 
-    The following `UseDelegate` implementation would be generated:
+    The following `UseDelegate` implementation would be generated (illustrative, not compiled):
 
     ```rust,ignore
     impl<Context, SourceError, Components, Delegate> ErrorRaiser<Context, SourceError>
@@ -52,6 +53,47 @@ use core::marker::PhantomData;
             Delegate::raise_error(error)
         }
     }
+    ```
+
+    ## Usage
+
+    A context dispatches each `Value` type to its own provider through a table:
+
+    ```rust
+    # use cgp_fork::prelude::*;
+    #[cgp_component(Formatter)]
+    #[derive_delegate(UseDelegate<Value>)]
+    pub trait CanFormat<Value> {
+        fn format(&self, value: &Value) -> String;
+    }
+
+    #[cgp_impl(new FormatDisplay)]
+    impl<Value: core::fmt::Display> Formatter<Value> {
+        fn format(&self, value: &Value) -> String {
+            format!("{value}")
+        }
+    }
+
+    #[cgp_impl(new FormatDebug)]
+    impl<Value: core::fmt::Debug> Formatter<Value> {
+        fn format(&self, value: &Value) -> String {
+            format!("{value:?}")
+        }
+    }
+
+    pub struct App;
+
+    delegate_components! {
+        App {
+            FormatterComponent: UseDelegate<new FormatterTable {
+                u32: FormatDisplay,
+                String: FormatDebug,
+            }>,
+        }
+    }
+
+    assert_eq!(App.format(&42u32), "42");
+    assert_eq!(App.format(&"hi".to_owned()), "\"hi\"");
     ```
 */
 pub struct UseDelegate<Components>(pub PhantomData<Components>);

@@ -5,25 +5,15 @@
 
 use proc_macro::TokenStream;
 
-// The same sources are private here. `macro_tests` calls the parsers directly.
-// `test_util_lib` and the `snapshot_*` macros compile for this crate's tests and
-// when the `snapshot` feature is on, which the behavior tests enable.
+// `macro_tests` calls the parsers directly. `test_util_lib` and the `snapshot_*`
+// macros compile for this crate's tests and when the `snapshot` feature is on,
+// which the behavior tests enable.
 mod async_impl;
-#[allow(dead_code, unused_imports)]
-#[path = "../shared/extra_macro_core/mod.rs"]
 mod extra_macro_core;
-#[allow(dead_code, unused_imports)]
-#[path = "../shared/extra_macro_lib/mod.rs"]
 mod extra_macro_lib;
-#[allow(dead_code, unused_imports)]
-#[path = "../shared/macro_core/mod.rs"]
 mod macro_core;
-#[allow(dead_code, unused_imports)]
-#[path = "../shared/macro_lib/mod.rs"]
 mod macro_lib;
 #[cfg(any(test, feature = "snapshot"))]
-#[allow(dead_code, unused_imports)]
-#[path = "../shared/test_util_lib/mod.rs"]
 mod test_util_lib;
 
 #[cfg(test)]
@@ -35,6 +25,9 @@ mod invalid_expansion_tests;
 #[cfg(test)]
 #[path = "macro_tests/parser_rejections_tests.rs"]
 mod parser_rejections_tests;
+#[cfg(test)]
+#[path = "macro_tests/robustness_tests.rs"]
+mod robustness_tests;
 #[cfg(test)]
 #[path = "macro_tests/shape_macro_parsing_tests.rs"]
 mod shape_macro_parsing_tests;
@@ -56,7 +49,7 @@ mod shape_macro_parsing_tests;
     - `provider` - the name of the provider trait.
 
     - `context` - the identifier used for the generic context type. If not provided,
-      the default identifier `Context` would be used.
+      the default identifier `__Context__` is used.
 
     ## Extension Macros
 
@@ -85,12 +78,60 @@ mod shape_macro_parsing_tests;
     #[cgp_component {
         name: GreeterComponent,
         provider: Greeter,
-        context: Context,
+        context: __Context__,
     }]
     pub trait CanGreet {
         fn greet(&self);
     }
     ```
+
+    ## Generated code
+
+    The definition above expands to (abridged; the full expansion is pinned by the
+    `basic_delegation::component_macro` snapshot test in `cgp-fork`):
+
+    ```rust,ignore
+    // The consumer trait, unchanged.
+    pub trait CanGreet {
+        fn greet(&self);
+    }
+
+    // Blanket impl: any context whose own provider implements `Greeter` can greet.
+    impl<__Context__> CanGreet for __Context__
+    where
+        __Context__: Greeter<__Context__>,
+    {
+        fn greet(&self) {
+            __Context__::greet(self)
+        }
+    }
+
+    // The provider trait, with `Self` moved to an explicit context parameter.
+    pub trait Greeter<__Context__>: IsProviderFor<GreeterComponent, __Context__, ()> {
+        fn greet(__context__: &__Context__);
+    }
+
+    // Blanket impl: a provider that delegates `GreeterComponent` (a wiring table, or a
+    // context wired with `delegate_components!`) forwards to its delegate.
+    impl<__Provider__, __Context__> Greeter<__Context__> for __Provider__
+    where
+        __Provider__: DelegateComponent<GreeterComponent>
+            + IsProviderFor<GreeterComponent, __Context__, ()>,
+        <__Provider__ as DelegateComponent<GreeterComponent>>::Delegate: Greeter<__Context__>,
+    {
+        fn greet(__context__: &__Context__) {
+            <__Provider__ as DelegateComponent<GreeterComponent>>::Delegate::greet(__context__)
+        }
+    }
+
+    // The component name used as the key in `delegate_components!`.
+    pub struct GreeterComponent;
+
+    // Plus `Greeter` and `IsProviderFor` impls for `UseContext` and `RedirectLookup`.
+    ```
+
+    A runnable version of this wiring is the `UseContext` example in `cgp-fork`
+    (`cgp_fork::core::component::UseContext`), which is compiled as a doctest.
 */
 #[proc_macro_attribute]
 pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -749,7 +790,7 @@ pub fn cgp_preset(body: TokenStream) -> TokenStream {
     component instead of writing it by hand.
 
     Place it outside [`#[cgp_component]`](macro@cgp_component). The `WithProvider`
-    struct already exists in `cgp-fork-component`; this macro only generates the impl.
+    struct already exists in `cgp_fork::core::component`; this macro only generates the impl.
     An abstract-type trait bridges through `TypeProvider`. A single-method getter
     bridges through `FieldGetter`.
 
@@ -1362,11 +1403,15 @@ pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
 
 /// Rewrites `async fn` in a trait to a method that returns `impl Future`.
 ///
-/// The desugared method is what `#[cgp_component]` forwards. The future is not automatically
-/// `Send`; `CanSendRun` is the component that asks for a `Send` future.
+/// The desugared method is what `#[cgp_component]` forwards. A provided (default) method body
+/// is wrapped in `async move { … }`. The future is not automatically `Send`; `CanSendRun` is
+/// the component that asks for a `Send` future. The attribute takes no arguments, so
+/// `#[async_trait(?Send)]` is rejected rather than silently ignored.
 #[proc_macro_attribute]
-pub fn async_trait(_attr: TokenStream, stream: TokenStream) -> TokenStream {
-    async_impl::impl_async(stream.into()).into()
+pub fn async_trait(attr: TokenStream, stream: TokenStream) -> TokenStream {
+    async_impl::impl_async(attr.into(), stream.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 #[cfg(any(test, feature = "snapshot"))]

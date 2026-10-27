@@ -1,6 +1,6 @@
 //! Failure cases: inputs the CGP macros must reject.
 //!
-//! A rejection test drives a `cgp-fork-macro-lib` entrypoint (or a `cgp-fork-macro-core`
+//! A rejection test drives a `macro_lib` entrypoint (or a `macro_core`
 //! parser) with an invalid input and asserts it returns `Err` rather than
 //! producing tokens. This is how we pin down which code CGP deliberately refuses,
 //! and catch regressions where a macro starts accepting something it should not.
@@ -45,6 +45,7 @@ pub fn assert_macro_rejects_with(
     }
 }
 
+pub mod async_trait;
 pub mod blanket_trait;
 pub mod cgp_auto_dispatch;
 pub mod cgp_auto_error;

@@ -275,7 +275,7 @@ pub fn describe_value<T: Describe>(value: &T) -> String {
 
 #[cgp_computer]
 pub fn bump_value<T: Describe>(value: &mut T) {
-    value.bump()
+    value.bump();
 }
 
 #[cgp_computer]

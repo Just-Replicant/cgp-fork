@@ -2,10 +2,64 @@
 
 ## Unreleased
 
+## [0.10.0](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.3...v0.10.0) - 2026-10-27
+
+### Breaking changes
+
+- *(async-trait)* `#[async_trait]` now rejects attribute arguments. `#[async_trait(?Send)]` and any
+  other argument used to be accepted and silently ignored; remove the argument (the desugared future
+  was never `Send`-bounded, and `CanSendRun` is the component that asks for a `Send` future).
+- *(features)* `extern crate alloc` is now behind the `alloc` feature. With
+  `default-features = false` and without `alloc`, `cgp-fork` needs only `core` and no longer links
+  `alloc` for you. Enable `alloc` (or any of `anyhow`, `eyre`, `std-error`, which now imply it) if
+  you relied on that.
+- *(features)* `anyhow`, `eyre`, and `std-error` now enable `alloc`. This changes nothing for builds
+  that already used the default features.
+
+### Fixed
+
+- *(async-trait)* a trait whose `async fn` has a default body failed to compile with
+  "`{integer}` is not a future"; the body is now wrapped in `async move { … }`
+- *(cgp-provider)* `#[cgp_provider(Greeter)]` (the provider trait instead of `GreeterComponent`)
+  now explains the mistake instead of rustc suggesting `dyn Greeter`
+- *(macro)* internal invariants (named-field idents, the last path segment, `#[use_type]`
+  grounding) are reported as compile errors instead of proc-macro panics
+- *(docs)* the `Symbol!` expansion includes the length (`Symbol<5, Chars<…>>`); `#[cgp_provider]`
+  examples take the component type; the `IsProviderFor` example declared no `Context` and returned
+  `&u64` as `u64`; `delegate_component!` is `delegate_components!`; `Index`'s example code block was
+  never closed; `#[cgp_component]`'s default context identifier is `__Context__`
+
+### Changed
+
+- *(build)* the facade no longer has a build script; the error-backend README examples are doctests
+- *(build)* the published packages no longer include the test suites (`tests/`, `src/macro_tests/`)
+  or examples
+- *(macro)* the macro implementation moved from `shared/` (included through `#[path]`) to ordinary
+  modules under `src/`, and dead code the blanket `allow(dead_code)` hid was removed
+- *(lints)* a curated `clippy::pedantic` subset is enforced across the workspace
+- *(deps)* `Cargo.lock` updated (syn 3.0.9 and other compatible releases)
+- *(release)* release-plz cuts a release for `feat`, `fix`, `perf`, and breaking commits only (no
+  longer for `refactor`)
+
+### Added
+
+- *(docs)* 23 compiled doctests in the facade (previously 0), including the README examples, a
+  feature table, a `UseDelegate` dispatch example, and the generated code of `#[cgp_component]`
+- *(examples)* `hello`, `swap_context`, `error_backends`, `async_component`
+- *(tests)* a trybuild `tests/ui` suite for common mistakes, `#[async_trait]` regression tests, and a
+  deterministic fuzzer asserting no macro entrypoint panics
+- *(ci)* SHA-pinned actions, checksum-verified nextest, and jobs for `--no-default-features`,
+  doctests, macOS/Windows, rustdoc, MSRV 1.89, `cargo hack`, `cargo deny`, `cargo audit`,
+  `cargo semver-checks`, `cargo package`, coverage, deep fuzzing, and a compile-time budget;
+  Dependabot for cargo and actions
+- *(repo)* `CONTRIBUTING.md`, `SECURITY.md`, issue and PR templates, `UPSTREAM_COMMIT`, and
+  `scripts/` for upstream sync, knowledge-base reference checks, and the compile-time budget
+
 ## [0.9.3](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.2...v0.9.3) - 2026-10-10
 
 ### Added
 
+- *(runtime)* `HasRuntimeMut` mutably borrows the context runtime
 - *(runtime)* cover a mutable runtime field update
 - *(runtime)* register the has_runtime_mut module
 - *(runtime)* add the runtime concept entrypoint
@@ -21,18 +75,9 @@
 ### Documentation
 
 - *(handlers)* describe Promote as a TryComputer step
-- *(promote)* document the AsyncComputer lift
-- *(error)* name HasErrorType in the abstract-error guide
-
-### Added
-
-- *(runtime)* `HasRuntimeMut` mutably borrows the context runtime
-
-### Fixed
-
+- *(promote)* document the AsyncComputer lift; `Promote` lifts an `AsyncComputer` into a `Handler`
+- *(error)* name `HasErrorType` in the abstract-error guide
 - *(readme)* drop the crate version; it lives in `Cargo.toml`
-- *(docs)* name `HasErrorType` in the abstract-error guide
-- *(promote)* document that `Promote` lifts an `AsyncComputer` into a `Handler`
 
 ## [0.9.2](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.1...v0.9.2) - 2026-10-09
 

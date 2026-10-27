@@ -12,3 +12,6 @@ pub mod spawn;
 // `#[cgp_fn]` macro snapshot (the `#[async_trait]` handling is the feature).
 pub mod cgp_fn_async;
 pub mod component_async;
+
+// Regression: `#[async_trait]` keeps provided `async fn` bodies working.
+pub mod async_trait_default_body;

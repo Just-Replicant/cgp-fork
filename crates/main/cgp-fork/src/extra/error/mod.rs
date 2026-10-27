@@ -1,6 +1,3 @@
-#[cfg(feature = "alloc")]
-extern crate alloc;
-
 mod impls;
 
 #[cfg(feature = "alloc")]

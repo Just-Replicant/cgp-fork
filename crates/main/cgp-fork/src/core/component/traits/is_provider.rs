@@ -40,14 +40,17 @@
 
    Given a CGP trait definition such as:
 
-   ```rust,ignore
+   ```rust
+   # use core::marker::PhantomData;
+   # use cgp_fork::prelude::*;
    #[cgp_component(FooGetterAt)]
    pub trait CanGetFooAt<I, J> {
        fn foo_at(&self, _phantom: PhantomData<(I, J)>) -> u64;
    }
    ```
 
-   The following provider trait would be generated with the `IsProviderFor` supertrait:
+   The following provider trait would be generated with the `IsProviderFor` supertrait
+   (illustrative, not compiled):
 
    ```rust,ignore
    pub trait FooGetterAt<Context, I, J>:
@@ -61,19 +64,27 @@
 
    Given a provider trait implementation such as:
 
-   ```rust,ignore
-   #[cgp_provider(FooGetterAt)]
-   impl<I, J> FooGetterAt<Context, I, J> for GetFooValue
+   ```rust
+   # use core::marker::PhantomData;
+   # use cgp_fork::prelude::*;
+   # #[cgp_component(FooGetterAt)]
+   # pub trait CanGetFooAt<I, J> {
+   #     fn foo_at(&self, _phantom: PhantomData<(I, J)>) -> u64;
+   # }
+   pub struct GetFooValue;
+
+   #[cgp_provider(FooGetterAtComponent)]
+   impl<Context, I, J> FooGetterAt<Context, I, J> for GetFooValue
    where
        Context: HasField<Symbol!("foo"), Value = u64>,
    {
        fn foo_at(context: &Context, _phantom: PhantomData<(I, J)>) -> u64 {
-           context.get_field(PhantomData)
+           *context.get_field(PhantomData)
        }
    }
    ```
 
-   The following implementation for `IsProviderFor` would be generated:
+   The following implementation for `IsProviderFor` would be generated (illustrative, not compiled):
 
    ```rust,ignore
    impl<Context, I, J>
@@ -89,15 +100,43 @@
 
    Given a component delegation such as:
 
-   ```rust,ignore
-   delegate_component! {
+   ```rust
+   # use core::marker::PhantomData;
+   # use cgp_fork::prelude::*;
+   # #[cgp_component(FooGetterAt)]
+   # pub trait CanGetFooAt<I, J> {
+   #     fn foo_at(&self, _phantom: PhantomData<(I, J)>) -> u64;
+   # }
+   # pub struct GetFooValue;
+   # #[cgp_provider(FooGetterAtComponent)]
+   # impl<Context, I, J> FooGetterAt<Context, I, J> for GetFooValue
+   # where
+   #     Context: HasField<Symbol!("foo"), Value = u64>,
+   # {
+   #     fn foo_at(context: &Context, _phantom: PhantomData<(I, J)>) -> u64 {
+   #         *context.get_field(PhantomData)
+   #     }
+   # }
+   pub struct MyAppComponents;
+
+   delegate_components! {
        MyAppComponents {
            FooGetterAtComponent: GetFooValue,
        }
    }
+
+   #[derive(HasField)]
+   pub struct App {
+       pub foo: u64,
+   }
+
+   // `MyAppComponents` now has `IsProviderFor<FooGetterAtComponent, App, (I, J)>`, so it is
+   // usable as a `FooGetterAt` provider for `App`:
+   let value = <MyAppComponents as FooGetterAt<App, u8, u16>>::foo_at(&App { foo: 3 }, PhantomData);
+   assert_eq!(value, 3);
    ```
 
-   The following `IsProviderFor` implementation would be generated:
+   The following `IsProviderFor` implementation would be generated (illustrative, not compiled):
 
    ```rust,ignore
    impl<Context, Params>

@@ -11,18 +11,27 @@ homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "A language extension for Rust, with pluggable trait implementations at compile-time."
+# The test suite and examples stay in the repository; the published crate is the library.
+exclude      = ["tests/", "examples/", "benches/"]
+
+[lints]
+workspace = true
 
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
+# `default`/`full` enable `alloc`. Without it the crate needs only `core`.
 default = ["full"]
 full = ["alloc"]
+# Links the `alloc` crate and enables the `String`-building error providers
+# (`DebugError`, `DisplayError`).
 alloc = []
-anyhow = ["dep:anyhow"]
-eyre = ["dep:eyre"]
-std-error = []
+# The error backends. `anyhow` and `std-error` are `no_std` + `alloc`; `eyre` requires `std`.
+anyhow = ["alloc", "dep:anyhow"]
+eyre = ["alloc", "dep:eyre"]
+std-error = ["alloc"]
 
 [dependencies]
 cgp-fork-macro = { workspace = true }
@@ -39,6 +48,11 @@ eyre = { version = "0.6", default-features = false, features = ["auto-install", 
 cgp-fork-macro = { workspace = true, features = ["snapshot"] }
 insta = { version = "1" }
 futures = { version = "0.3" }
+trybuild = { version = "1" }
 syn = { version = "3", features = ["full", "extra-traits"] }
 quote = { version = "1" }
 proc-macro2 = { version = "1" }
+
+[[example]]
+name              = "error_backends"
+required-features = ["anyhow", "std-error"]

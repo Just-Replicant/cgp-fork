@@ -18,9 +18,11 @@ name: Release-plz
 #   repository `Just-Replicant/cgp-fork`, workflow `release-plz.yml`. Trusted
 #   publishing cannot create a crate; publish each crate once by hand, then
 #   trust this workflow.
-# - Optional: a fine-grained `RELEASE_PLZ_TOKEN` with Contents and Pull requests
+# - Recommended: a fine-grained `RELEASE_PLZ_TOKEN` with Contents and Pull requests
 #   read/write. The default `GITHUB_TOKEN` cannot start the Tests workflow on
-#   the release pull request. With the PAT, that pull request runs Tests.
+#   the release pull request. With the PAT, that pull request runs Tests; without
+#   it the release-pr job warns, and the release job runs the test suite itself
+#   before publishing either way.
 #
 # The binary is pinned. This workflow does not use a third-party action.
 # The binary reads the forge token from `--git-token` (`GIT_TOKEN`). It does
@@ -47,7 +49,7 @@ jobs:
       id-token: write # crates.io trusted publishing (OIDC)
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
@@ -61,6 +63,12 @@ jobs:
           tar -xzf "$tmpdir/release-plz.tar.gz" -C "$tmpdir"
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
+      # Release PRs opened with the default GITHUB_TOKEN do not trigger the Tests
+      # workflow, so never publish a commit that has not passed the suite here.
+      - name: Test before publishing
+        run: |
+          cargo test --workspace --all-features --locked --no-fail-fast
+          cargo test --workspace --no-default-features --locked --no-fail-fast
       - name: Run release-plz release
         run: release-plz release --git-token "$GIT_TOKEN"
         env:
@@ -78,7 +86,7 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
@@ -92,6 +100,13 @@ jobs:
           tar -xzf "$tmpdir/release-plz.tar.gz" -C "$tmpdir"
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
+      - name: Warn when release PRs will not run Tests
+        env:
+          HAS_PAT: ${{ secrets.RELEASE_PLZ_TOKEN != '' }}
+        run: |
+          if [ "$HAS_PAT" != "true" ]; then
+            echo "::warning::RELEASE_PLZ_TOKEN is not set, so the release PR will not trigger the Tests workflow. The release job still runs the test suite before publishing."
+          fi
       - name: Run release-plz release-pr
         run: release-plz release-pr --git-token "$GIT_TOKEN"
         env:
