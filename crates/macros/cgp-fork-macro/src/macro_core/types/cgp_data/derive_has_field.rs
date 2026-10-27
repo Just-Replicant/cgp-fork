@@ -16,7 +16,10 @@ pub fn derive_has_field_impls_from_struct(item_struct: &ItemStruct) -> syn::Resu
     match &item_struct.fields {
         Fields::Named(fields) => {
             for field in fields.named.iter() {
-                let field_ident = field.ident.as_ref().unwrap();
+                // `Fields::Named` guarantees an ident; report rather than panic.
+                let Some(field_ident) = field.ident.as_ref() else {
+                    return Err(syn::Error::new_spanned(field, "expected a named field"));
+                };
 
                 // Aim a compiler error on either generated impl — a coherence
                 // conflict (`E0119`) with a hand-written `HasField` impl for the

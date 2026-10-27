@@ -83,10 +83,12 @@ impl ToTokens for EmptyStruct {
             // more. A single-element `PhantomData<(T)>` is a parenthesized type,
             // not a tuple, and now that the struct carries the user's span (above)
             // it would trip the `unused_parens` lint in the caller's crate.
-            let phantom_type: Type = if phantom_params.len() == 1 {
-                phantom_params.into_iter().next().unwrap()
-            } else {
-                parse_quote!( ( #phantom_params ) )
+            let phantom_type: Type = match phantom_params.len() {
+                1 => match phantom_params.into_iter().next() {
+                    Some(param) => param,
+                    None => parse_quote!(()),
+                },
+                _ => parse_quote!( ( #phantom_params ) ),
             };
 
             tokens.extend(quote_spanned! { span =>

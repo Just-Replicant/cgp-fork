@@ -82,7 +82,8 @@ impl Parse for PathWithTypeArgs {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut path: Path = input.parse()?;
 
-        let last_index = path.segments.len() - 1;
+        // `syn::Path` never parses empty, but don't rely on that for an index.
+        let last_index = path.segments.len().saturating_sub(1);
 
         // Generic arguments are only meaningful on the final segment for our
         // use cases. Reject them on intermediate segments.
@@ -95,7 +96,9 @@ impl Parse for PathWithTypeArgs {
             }
         }
 
-        let last_segment = path.segments.last_mut().unwrap();
+        let Some(last_segment) = path.segments.last_mut() else {
+            return Err(input.error("expected a path"));
+        };
 
         let type_args = match &last_segment.arguments {
             PathArguments::None => TypeArgs::default(),

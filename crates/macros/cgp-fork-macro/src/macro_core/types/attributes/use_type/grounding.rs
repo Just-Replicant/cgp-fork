@@ -72,11 +72,20 @@ pub fn ground_specs(specs: &[UseTypeAttribute]) -> syn::Result<Vec<UseTypeAttrib
         grounding.resolve(index)?;
     }
 
-    Ok(grounding
+    // Every spec is grounded once the walk above has visited all of them; an
+    // ungrounded one is an internal error, reported instead of panicking.
+    grounding
         .grounded
         .into_iter()
-        .map(|spec| spec.expect("every spec is grounded once the walk has visited all of them"))
-        .collect())
+        .map(|spec| {
+            spec.ok_or_else(|| {
+                syn::Error::new(
+                    proc_macro2::Span::call_site(),
+                    "internal error in `#[use_type]` grounding: a spec was left unresolved",
+                )
+            })
+        })
+        .collect()
 }
 
 #[derive(Clone, Copy, PartialEq)]
