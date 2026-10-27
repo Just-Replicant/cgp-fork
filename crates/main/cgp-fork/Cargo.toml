@@ -48,3 +48,7 @@ futures = { version = "0.3" }
 syn = { version = "3", features = ["full", "extra-traits"] }
 quote = { version = "1" }
 proc-macro2 = { version = "1" }
+
+[[example]]
+name              = "error_backends"
+required-features = ["anyhow", "std-error"]

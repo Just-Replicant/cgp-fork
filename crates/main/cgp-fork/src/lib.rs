@@ -36,3 +36,9 @@ pub mod eyre;
 #[cfg(feature = "std-error")]
 #[doc = include_str!("std_error/README.md")]
 pub mod std_error;
+
+/// Compiles the repository README's examples as doctests. Only present under
+/// `cfg(doctest)`, so the published crate never reads a file outside its package.
+#[cfg(doctest)]
+#[doc = include_str!("../../../../README.md")]
+pub struct RepositoryReadmeDoctests;
