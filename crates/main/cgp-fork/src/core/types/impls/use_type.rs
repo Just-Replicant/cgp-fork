@@ -19,14 +19,26 @@ use crate::core::types::traits::TypeProvider;
 
     Given the following type component definition:
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
     #[cgp_type]
     pub trait HasNameType {
         type Name;
     }
+
+    pub struct App;
+
+    delegate_components! {
+        App {
+            NameTypeProviderComponent: UseType<String>,
+        }
+    }
+
+    let name: <App as HasNameType>::Name = String::from("Alice");
+    assert_eq!(name, "Alice");
     ```
 
-    The following `UseType` implementation would be generated:
+    The following `UseType` implementation would be generated (illustrative, not compiled):
 
     ```rust,ignore
     impl<Context, Type> NameTypeProvider<Context> for UseType<Type> {

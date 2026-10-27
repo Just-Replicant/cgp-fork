@@ -12,8 +12,15 @@ use core::fmt::{Debug, Display};
 
     Given the following struct definition:
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # use cgp_fork::core::field::types::Index;
+    #[derive(HasField)]
     pub struct MyContext(pub u32);
+
+    let context = MyContext(7);
+    assert_eq!(*context.get_field(PhantomData::<Index<0>>), 7);
     ```
 
     The following `HasField` implementation would be generated, with use of
@@ -27,6 +34,7 @@ use core::fmt::{Debug, Display};
             &self.0
         }
     }
+    ```
 */
 #[derive(Eq, PartialEq, Clone, Copy, Default)]
 pub struct Index<const I: usize>;

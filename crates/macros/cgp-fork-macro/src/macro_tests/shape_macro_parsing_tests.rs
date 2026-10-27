@@ -1,5 +1,5 @@
 //! Entrypoint for parser tests of the `Struct!` and `Enum!` shape macros in
-//! `cgp-fork-macro-core`.
+//! `macro_core`.
 //!
 //! These call the `StructType` and `EnumType` parsers directly to pin which
 //! form each body is read as. A proc macro never sees the delimiter it was

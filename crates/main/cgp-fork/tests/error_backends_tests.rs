@@ -1,9 +1,10 @@
 //! Entrypoint for the `error_backends` concept.
 //!
-//! Covers the standalone error backends `cgp-fork-error-anyhow`, `cgp-fork-error-eyre`, and
-//! `cgp-fork-error-std`: wiring each as a context's abstract error type, raising standard and
-//! non-standard source errors through their providers, wrapping details, and the output each
-//! produces. These crates are documented as a project of their own in the knowledge base.
+//! Covers the error backends behind the `anyhow`, `eyre`, and `std-error` features
+//! (`cgp_fork::anyhow`, `cgp_fork::eyre`, `cgp_fork::std_error`): wiring each as a
+//! context's abstract error type, raising standard and non-standard source errors
+//! through their providers, wrapping details, and the output each produces. The
+//! knowledge base documents the backends as a project of their own.
 //!
 //! See cgp-knowledge-base-fork/projects/error/README.md and
 //! cgp-knowledge-base-fork/cgp/concepts/modular-error-handling.md.

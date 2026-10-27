@@ -4,7 +4,7 @@ use crate::macro_core::types::cgp_provider::ItemCgpProvider;
 use crate::macro_core::types::delegate_component::DelegateTable;
 
 /// The intermediate representation `#[cgp_computer]` and `#[cgp_producer]`
-/// evaluate a function into, built from `cgp-fork-macro-core` AST nodes rather than
+/// evaluate a function into, built from `macro_core` AST nodes rather than
 /// emitted as nested macro invocations.
 ///
 /// Each field is what the macro would otherwise write out for another macro to

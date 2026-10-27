@@ -7,8 +7,8 @@
 //! not.
 //!
 //! To add a case:
-//! 1. produce the expansion by calling the matching `cgp-fork-macro-lib` entrypoint,
-//!    pretty-printing it (see `cgp-fork-macro-test-util-lib`'s `pretty_format`), and
+//! 1. produce the expansion by calling the matching `macro_lib` entrypoint,
+//!    pretty-printing it (see `test_util_lib`'s `pretty_format`), and
 //!    asserting it against an inline `insta` snapshot;
 //! 2. add a code comment explaining **why** the output is wrong and **what the
 //!    correct output should be**;

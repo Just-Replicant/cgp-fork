@@ -11,7 +11,7 @@ use crate::macro_core::types::keywords::New;
 /// the provider struct is controlled by which macro is invoked, not by a keyword
 /// in the shared argument grammar. `#[cgp_provider]`'s argument is only the
 /// component type; the struct is emitted when `new` is set programmatically by
-/// [`#[cgp_new_provider]`](../../../cgp-fork-macro-lib/src/cgp_new_provider.rs) or
+/// [`#[cgp_new_provider]`](../../../macro_lib/cgp_new_provider.rs) or
 /// carried in from [`#[cgp_impl(new …)]`](../cgp_impl/lowered.rs).
 #[derive(Clone)]
 pub struct ProviderArgs {

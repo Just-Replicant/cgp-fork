@@ -1,7 +1,7 @@
 //! Entrypoint for parser corner-case tests of the `IdentWithTypeArgs` /
-//! `IdentWithTypeGenerics` / `PathWithTypeArgs` grammars in `cgp-fork-macro-core`.
+//! `IdentWithTypeGenerics` / `PathWithTypeArgs` grammars in `macro_core`.
 //!
-//! These call the `cgp-fork-macro-core` parsers directly to pin what they accept,
+//! These call the `macro_core` parsers directly to pin what they accept,
 //! reject, and round-trip.
 #![allow(dead_code)]
 

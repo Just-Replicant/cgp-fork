@@ -23,21 +23,40 @@ use crate::core::component::WithProvider;
 
     Given the following component definition:
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
     #[cgp_component(Greeter)]
     pub trait CanGreet {
-        fn greet(&self);
+        fn greet(&self) -> String;
     }
+
+    #[cgp_impl(new GreetHello)]
+    impl Greeter {
+        fn greet(&self) -> String {
+            "hello".to_owned()
+        }
+    }
+
+    pub struct App;
+
+    delegate_components! {
+        App {
+            GreeterComponent: GreetHello,
+        }
+    }
+
+    // `UseContext` forwards the provider call back to `App: CanGreet`.
+    assert_eq!(<UseContext as Greeter<App>>::greet(&App), "hello");
     ```
 
-    The following `UseContext` implementation would be generated:
+    The following `UseContext` implementation would be generated (illustrative, not compiled):
 
     ```rust,ignore
     impl<Context> Greeter<Context> for UseContext
     where
         Context: CanGreet,
     {
-        fn greet(context: &Context) {
+        fn greet(context: &Context) -> String {
             context.greet()
         }
     }

@@ -9,14 +9,18 @@
 
     Given the following product type definition:
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
     type MyTypes = Product![u32, String, bool];
     ```
 
     The following type would be generated:
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
     type MyTypes = Cons<u32, Cons<String, Cons<bool, Nil>>>;
+    # let _: PhantomData<MyTypes> = PhantomData::<Product![u32, String, bool]>;
     ```
 */
 #[derive(Eq, PartialEq, Clone, Default, Debug)]

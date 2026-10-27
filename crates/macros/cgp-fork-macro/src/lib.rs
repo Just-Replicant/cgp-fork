@@ -46,7 +46,7 @@ mod shape_macro_parsing_tests;
     - `provider` - the name of the provider trait.
 
     - `context` - the identifier used for the generic context type. If not provided,
-      the default identifier `Context` would be used.
+      the default identifier `__Context__` is used.
 
     ## Extension Macros
 
@@ -75,12 +75,60 @@ mod shape_macro_parsing_tests;
     #[cgp_component {
         name: GreeterComponent,
         provider: Greeter,
-        context: Context,
+        context: __Context__,
     }]
     pub trait CanGreet {
         fn greet(&self);
     }
     ```
+
+    ## Generated code
+
+    The definition above expands to (abridged; the full expansion is pinned by the
+    `basic_delegation::component_macro` snapshot test in `cgp-fork`):
+
+    ```rust,ignore
+    // The consumer trait, unchanged.
+    pub trait CanGreet {
+        fn greet(&self);
+    }
+
+    // Blanket impl: any context whose own provider implements `Greeter` can greet.
+    impl<__Context__> CanGreet for __Context__
+    where
+        __Context__: Greeter<__Context__>,
+    {
+        fn greet(&self) {
+            __Context__::greet(self)
+        }
+    }
+
+    // The provider trait, with `Self` moved to an explicit context parameter.
+    pub trait Greeter<__Context__>: IsProviderFor<GreeterComponent, __Context__, ()> {
+        fn greet(__context__: &__Context__);
+    }
+
+    // Blanket impl: a provider that delegates `GreeterComponent` (a wiring table, or a
+    // context wired with `delegate_components!`) forwards to its delegate.
+    impl<__Provider__, __Context__> Greeter<__Context__> for __Provider__
+    where
+        __Provider__: DelegateComponent<GreeterComponent>
+            + IsProviderFor<GreeterComponent, __Context__, ()>,
+        <__Provider__ as DelegateComponent<GreeterComponent>>::Delegate: Greeter<__Context__>,
+    {
+        fn greet(__context__: &__Context__) {
+            <__Provider__ as DelegateComponent<GreeterComponent>>::Delegate::greet(__context__)
+        }
+    }
+
+    // The component name used as the key in `delegate_components!`.
+    pub struct GreeterComponent;
+
+    // Plus `Greeter` and `IsProviderFor` impls for `UseContext` and `RedirectLookup`.
+    ```
+
+    A runnable version of this wiring is the `UseContext` example in `cgp-fork`
+    (`cgp_fork::core::component::UseContext`), which is compiled as a doctest.
 */
 #[proc_macro_attribute]
 pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -739,7 +787,7 @@ pub fn cgp_preset(body: TokenStream) -> TokenStream {
     component instead of writing it by hand.
 
     Place it outside [`#[cgp_component]`](macro@cgp_component). The `WithProvider`
-    struct already exists in `cgp-fork-component`; this macro only generates the impl.
+    struct already exists in `cgp_fork::core::component`; this macro only generates the impl.
     An abstract-type trait bridges through `TypeProvider`. A single-method getter
     bridges through `FieldGetter`.
 

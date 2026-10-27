@@ -16,7 +16,7 @@ use crate::macro_core::types::empty_struct::EmptyStruct;
 /// Generates a provider struct that implements the component by calling
 /// `Computer::compute` on an inner provider. Wire it as
 /// `PromoteAreaCalculator<SomeComputer>`. The same shape as the `Promote…`
-/// adapters in `cgp-fork-handler`, aimed at a component instead of another handler.
+/// adapters in `cgp_fork::extra::handler`, aimed at a component instead of another handler.
 #[derive(Clone)]
 pub struct DerivePromoteAttribute {
     pub provider: Ident,

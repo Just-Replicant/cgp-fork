@@ -9,7 +9,7 @@ use crate::macro_core::types::cgp_type::{ItemCgpType, extract_item_type_from_tra
 
 /// `#[derive_provider(WithProvider)]` emits the `WithProvider` impl for a
 /// `#[cgp_component]` trait. The `WithProvider` struct already lives in
-/// `cgp-fork-component`; this macro only generates the impl (and its `IsProviderFor`).
+/// `cgp_fork::core::component`; this macro only generates the impl (and its `IsProviderFor`).
 pub fn derive_provider(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream> {
     let kind: Ident = parse2(attr)?;
 

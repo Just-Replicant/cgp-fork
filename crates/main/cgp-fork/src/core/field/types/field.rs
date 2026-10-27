@@ -18,20 +18,23 @@ use core::marker::PhantomData;
 
    Given the following struct definition:
 
-   ```rust,ignore
+   ```rust
+   # use core::marker::PhantomData;
+   # use cgp_fork::prelude::*;
+   # use cgp_fork::core::field::types::Field;
    #[derive(HasFields)]
    pub struct MyContext {
        pub name: String,
        pub age: u8,
    }
-   ```
 
-   The following `HasFields` implementation would be generated:
-
-   ```rust,ignore
-   impl HasFields for MyContext {
-       type Fields = Product![Field<Symbol!("name"), String>, Field<Symbol!("age"), u8>];
-   }
+   // The derived `HasFields` implementation is equivalent to:
+   //
+   // impl HasFields for MyContext {
+   //     type Fields = Product![Field<Symbol!("name"), String>, Field<Symbol!("age"), u8>];
+   // }
+   let _: PhantomData<<MyContext as HasFields>::Fields> =
+       PhantomData::<Product![Field<Symbol!("name"), String>, Field<Symbol!("age"), u8>]>;
    ```
 */
 pub struct Field<Tag, Value> {

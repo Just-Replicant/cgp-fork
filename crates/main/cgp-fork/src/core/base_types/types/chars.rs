@@ -26,14 +26,19 @@ use crate::core::base_types::traits::StaticFormat;
 
     Given the following symbol definition:
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
     type Hello = Symbol!("hello");
     ```
 
-    The following type would be generated:
+    The following type would be generated (the length is carried alongside the characters):
 
-    ```rust,ignore
-    type Hello = Chars<'h', Chars<'e', Chars<'l', Chars<'l', Chars<'o', Nil>>>>>;
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    type Hello = Symbol<5, Chars<'h', Chars<'e', Chars<'l', Chars<'l', Chars<'o', Nil>>>>>>;
+    # let _: PhantomData<Hello> = PhantomData::<Symbol!("hello")>;
     ```
 */
 #[derive(Eq, PartialEq, Clone, Copy, Default)]

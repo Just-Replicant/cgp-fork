@@ -34,14 +34,29 @@ use crate::core::types::{TypeProvider, TypeProviderComponent};
 
     Given the following getter component definition:
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
     #[cgp_getter(NameGetter)]
     pub trait HasName {
         fn name(&self) -> &str;
     }
+
+    #[derive(HasField)]
+    pub struct Person {
+        pub full_name: String,
+    }
+
+    delegate_components! {
+        Person {
+            NameGetterComponent: UseField<Symbol!("full_name")>,
+        }
+    }
+
+    let person = Person { full_name: "Alice".to_owned() };
+    assert_eq!(person.name(), "Alice");
     ```
 
-    The following `UseField` implementation would be generated:
+    The following `UseField` implementation would be generated (illustrative, not compiled):
 
     ```rust,ignore
     impl<Context, Tag> NameGetter<Context> for UseField<Tag>
