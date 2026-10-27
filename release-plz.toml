@@ -12,10 +12,11 @@
 release_always = true
 repo_url = "https://github.com/Just-Replicant/cgp-fork"
 # A release PR is opened only when a commit since the last release matches.
-# `refactor` is included so a refactor of the crates bumps the patch version.
-# `test`, `docs`, `chore`, and `ci` stay on main until a matching commit
-# lands with them. A `!` on any type is breaking and also matches.
-release_commits = '^(feat|fix|perf|refactor)(\([^)]*\))?!?:|^\w+(\([^)]*\))?!:'
+# Only user-visible changes cut a release: `feat`, `fix`, and `perf`. A
+# `refactor`, `test`, `docs`, `chore`, `style`, or `ci` commit stays on main
+# until a matching commit lands with it (it is still listed in that release's
+# changelog). A `!` on any type is breaking and also matches.
+release_commits = '^(feat|fix|perf)(\([^)]*\))?!?:|^\w+(\([^)]*\))?!:'
 git_release_enable = false
 git_tag_enable = false
 changelog_update = false
