@@ -2,6 +2,7 @@
 #![doc = include_str!("../README.md")]
 #![deny(missing_docs)]
 
+#[cfg(feature = "alloc")]
 extern crate alloc;
 extern crate self as cgp_fork;
 

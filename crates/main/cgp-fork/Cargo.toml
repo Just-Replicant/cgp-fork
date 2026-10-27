@@ -17,12 +17,16 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
+# `default`/`full` enable `alloc`. Without it the crate needs only `core`.
 default = ["full"]
 full = ["alloc"]
+# Links the `alloc` crate and enables the `String`-building error providers
+# (`DebugError`, `DisplayError`).
 alloc = []
-anyhow = ["dep:anyhow"]
-eyre = ["dep:eyre"]
-std-error = []
+# The error backends. `anyhow` and `std-error` are `no_std` + `alloc`; `eyre` requires `std`.
+anyhow = ["alloc", "dep:anyhow"]
+eyre = ["alloc", "dep:eyre"]
+std-error = ["alloc"]
 
 [dependencies]
 cgp-fork-macro = { workspace = true }
