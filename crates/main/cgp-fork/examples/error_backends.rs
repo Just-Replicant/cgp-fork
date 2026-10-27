@@ -5,7 +5,9 @@
 //! Run with `cargo run -p cgp-fork --example error_backends --features anyhow,std-error`.
 
 use cgp_fork::anyhow::{DisplayAnyhowError, RaiseAnyhowError, UseAnyhowError};
-use cgp_fork::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
+use cgp_fork::core::error::{
+    ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent,
+};
 use cgp_fork::prelude::*;
 use cgp_fork::std_error::{DisplayBoxedStdError, RaiseBoxedStdError, UseBoxedStdError};
 
