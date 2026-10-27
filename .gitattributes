@@ -1,0 +1,4 @@
+# Bash and trybuild snapshots must stay LF. `core.autocrlf=true` would
+# otherwise check them out as CRLF and break both.
+*.sh text eol=lf
+*.stderr text eol=lf
