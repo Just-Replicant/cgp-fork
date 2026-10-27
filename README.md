@@ -10,7 +10,7 @@ This repository is **cgp-fork**, a fork of Context-Generic Programming (CGP). CG
 
 The package name is `cgp-fork`. In Rust that crate is `cgp_fork`.
 
-This fork includes upstream [contextgeneric/cgp](https://github.com/contextgeneric/cgp) through commit [`69d2854`](https://github.com/contextgeneric/cgp/commit/69d285410fc2f7b40eceaafeef8536642a9390b1) (7 October 2026, pull request [#278](https://github.com/contextgeneric/cgp/pull/278)). The merged commit is recorded in [`UPSTREAM_COMMIT`](UPSTREAM_COMMIT); `scripts/upstream-sync.sh` lists newer upstream commits.
+This fork includes upstream [contextgeneric/cgp](https://github.com/contextgeneric/cgp) through commit [`69d2854`](https://github.com/contextgeneric/cgp/commit/69d285410fc2f7b40eceaafeef8536642a9390b1) (7 October 2026, pull request [#278](https://github.com/contextgeneric/cgp/pull/278)). The merged commit is recorded in [`UPSTREAM_COMMIT`](UPSTREAM_COMMIT); `bash scripts/upstream-sync.sh` lists newer upstream commits.
 
 **[Website](https://contextgeneric.dev/) · [Changelog](CHANGELOG.md) · [Repository](https://github.com/Just-Replicant/cgp-fork)**
 
