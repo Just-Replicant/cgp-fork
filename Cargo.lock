@@ -28,7 +28,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "cgp-fork"
-version = "0.9.3"
+version = "0.10.0"
 dependencies = [
  "anyhow",
  "cgp-fork-macro",
@@ -43,7 +43,7 @@ dependencies = [
 
 [[package]]
 name = "cgp-fork-macro"
-version = "0.9.3"
+version = "0.10.0"
 dependencies = [
  "insta",
  "itertools",
