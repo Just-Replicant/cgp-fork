@@ -23,6 +23,9 @@ cgp-fork       = { version = "0.10.0", path = "./crates/main/cgp-fork" }
 cgp-fork-macro = { version = "0.10.0", path = "./crates/macros/cgp-fork-macro" }
 
 # A curated subset of `clippy::pedantic`, enforced by CI's `-D warnings`.
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(cgp_fork_repository_doctests)"] }
+
 [workspace.lints.clippy]
 explicit_iter_loop                  = "warn"
 match_wildcard_for_single_variants  = "warn"
