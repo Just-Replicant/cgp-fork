@@ -86,8 +86,8 @@ The fork tracks [contextgeneric/cgp](https://github.com/contextgeneric/cgp). `UP
 records the last upstream commit merged here, and the README repeats it.
 
 ```sh
-scripts/upstream-sync.sh          # fetch upstream and list the commits not merged yet
-scripts/upstream-sync.sh --merge  # merge them into a new upstream-sync-<sha> branch
+bash scripts/upstream-sync.sh          # fetch upstream and list the commits not merged yet
+bash scripts/upstream-sync.sh --merge  # merge them into a new upstream-sync-<sha> branch
 ```
 
 Upstream is split into many crates, while the fork has two, so a merge usually needs its paths
@@ -97,7 +97,8 @@ macro crates to `crates/macros/cgp-fork-macro/src/{macro_core,macro_lib,…}`. A
 
 ## Other scripts
 
-- `scripts/check-kb-refs.sh [kb-checkout]` checks that every `cgp-knowledge-base-fork/<path>`
+- `bash scripts/check-kb-refs.sh [kb-checkout]` checks that every `cgp-knowledge-base-fork/<path>`
   reference in comments and docs names a file that exists in the knowledge base.
-- `scripts/compile-time.sh` times a generated crate with `N` (default 200) components against the
-  budget in `scripts/compile-budget.txt`.
+- `bash scripts/compile-time.sh` times a generated crate with `N` (default 200) components against the
+  budget in `scripts/compile-budget.txt`. Invoke it with `bash` so a checkout that dropped the
+  executable bit still runs.
