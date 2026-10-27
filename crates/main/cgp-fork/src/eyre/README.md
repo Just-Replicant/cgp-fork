@@ -1,6 +1,6 @@
-# cgp-fork-error-eyre
+# The `eyre` error backend
 
-`cgp-fork-error-eyre` makes [`eyre::Report`](https://docs.rs/eyre) the abstract error type of a
+Enabled by the `eyre` feature. `cgp_fork::eyre` makes [`eyre::Report`](https://docs.rs/eyre) the abstract error type of a
 [CGP](https://contextgeneric.dev) context, and supplies the providers that raise errors into it and
 add context to it. Code written against `HasErrorType`, `CanRaiseError`, and `CanWrapError` stays
 generic; only the context's wiring names eyre.
@@ -14,7 +14,7 @@ generic; only the context's wiring names eyre.
 
 A context usually routes each source type to the provider that suits it:
 
-```rust,ignore
+```rust
 use cgp_fork::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp_fork::prelude::*;
 use cgp_fork::eyre::{DisplayEyreError, RaiseEyreError, UseEyreError};
@@ -40,11 +40,13 @@ assert_eq!(format!("{error:#}"), "while saving: disk full");
 A `String` needs `DisplayEyreError` or `DebugEyreError`, because it is not a standard error.
 `DebugEyreError` prints it with quotes.
 
-The crate enables eyre's `auto-install` feature, so eyre's default report handler is installed the
+The `eyre` feature enables eyre's `auto-install` feature, so eyre's default report handler is installed the
 first time a report is built. To use another handler, such as `color-eyre`, install it with
 `eyre::set_hook` before the first error is raised; once a report exists, `set_hook` returns an
-error. The crate also enables eyre's `track-caller` feature, and CGP's `raise_error` is
+error. It also enables eyre's `track-caller` feature, and CGP's `raise_error` is
 `#[track_caller]`, so a report's `Location:` names the line that called `raise_error`. eyre requires
-`std`, so this crate does too.
+`std`, so the `eyre` feature does too: it does not build for a `no_std` target such as
+`thumbv7m-none-eabi`. Because Cargo features are additive, `auto-install` cannot be switched off
+from a downstream crate; the only way to pick a different handler is `eyre::set_hook` as above.
 
 The `eyre` feature re-exports `eyre::Error`, eyre's alias for `Report`, as `cgp_fork::eyre::Error`.
