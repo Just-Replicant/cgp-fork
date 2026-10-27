@@ -67,7 +67,7 @@ pub fn derive_extractor_enum_ref(
 
     let generics = &mut extractor_enum.generics;
 
-    for param in generics.params.iter_mut() {
+    for param in &mut generics.params {
         match param {
             GenericParam::Type(param) => {
                 param.bounds.push(parse_internal! {
@@ -79,7 +79,7 @@ pub fn derive_extractor_enum_ref(
                     '__a__
                 });
             }
-            _ => {}
+            GenericParam::Const(_) => {}
         }
     }
 

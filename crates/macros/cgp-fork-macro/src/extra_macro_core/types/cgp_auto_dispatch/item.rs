@@ -16,7 +16,7 @@ impl ItemCgpAutoDispatch {
     pub fn preprocess(&self) -> syn::Result<PreprocessedCgpAutoDispatch> {
         let mut methods = Vec::new();
 
-        for item in self.item_trait.items.iter() {
+        for item in &self.item_trait.items {
             match item {
                 TraitItem::Fn(method) => {
                     methods.push(DispatchMethod::new(method)?);

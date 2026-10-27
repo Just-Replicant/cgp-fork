@@ -39,7 +39,7 @@ impl UseTypeAttributes {
 
         let self_type: Type = parse_internal! { Self };
 
-        for use_type in grounded.iter() {
+        for use_type in &grounded {
             let trait_path = &use_type.trait_path;
 
             if use_type.context_type == self_type {

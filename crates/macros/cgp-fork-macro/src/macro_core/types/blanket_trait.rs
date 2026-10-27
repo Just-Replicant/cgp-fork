@@ -29,7 +29,7 @@ impl ItemBlanketTrait {
         let mut assoc_idents: Vec<Ident> = Vec::new();
         let mut assoc_bounds: Vec<WherePredicate> = Vec::new();
 
-        for trait_item in item_trait.items.iter() {
+        for trait_item in &item_trait.items {
             if let TraitItem::Type(trait_item_type) = trait_item {
                 let item_type_ident = &trait_item_type.ident;
                 assoc_idents.push(item_type_ident.clone());
@@ -41,7 +41,7 @@ impl ItemBlanketTrait {
         }
         .visit_item_trait_mut(&mut item_trait);
 
-        for trait_item in item_trait.items.iter_mut() {
+        for trait_item in &mut item_trait.items {
             match trait_item {
                 TraitItem::Type(trait_item_type) => {
                     trait_item_type.default.take();
@@ -138,7 +138,7 @@ impl ItemBlanketTrait {
 
         impl_generics.params.push(parse_internal!(#context_type));
 
-        for assoc_ident in assoc_idents.iter() {
+        for assoc_ident in &assoc_idents {
             impl_generics.params.push(parse_internal!(#assoc_ident));
         }
 

@@ -42,7 +42,7 @@ impl PreprocessedCgpAutoDispatch {
 
         let mut impl_items = Vec::new();
 
-        for method in self.methods.iter() {
+        for method in &self.methods {
             let (impl_item, predicate) = method.to_blanket_impl_item()?;
 
             impl_items.push(impl_item);

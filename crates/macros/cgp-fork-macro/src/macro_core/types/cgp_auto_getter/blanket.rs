@@ -11,7 +11,7 @@ pub fn derive_blanket_impl(
     context_type: &Ident,
     consumer_trait: &ItemTrait,
     fields: &[GetterField],
-    field_assoc_type: &Option<TraitItemType>,
+    field_assoc_type: Option<&TraitItemType>,
 ) -> syn::Result<ItemImpl> {
     let consumer_name = &consumer_trait.ident;
 

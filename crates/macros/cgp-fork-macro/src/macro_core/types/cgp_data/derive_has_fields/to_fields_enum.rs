@@ -40,7 +40,7 @@ pub fn derive_to_fields_match_arms(
     let mut inject_prefix: Box<dyn Fn(TokenStream) -> TokenStream> =
         Box::new(|inner: TokenStream| quote! { #inner });
 
-    for variant in variants.iter() {
+    for variant in variants {
         let variant_ident = &variant.ident;
 
         let constructor = derive_to_fields_constructor(&variant.fields, |label| match label {

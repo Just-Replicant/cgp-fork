@@ -20,7 +20,7 @@ snapshot_cgp_fn! {
     where
         Name: Display,
     {
-        format!("Hello, {}!", name)
+        format!("Hello, {name}!")
     }
 
     expand_greet(output) {
@@ -43,7 +43,7 @@ snapshot_cgp_fn! {
                             Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
                         >,
                     );
-                format!("Hello, {}!", name)
+                format!("Hello, {name}!")
             }
         }
         "#)

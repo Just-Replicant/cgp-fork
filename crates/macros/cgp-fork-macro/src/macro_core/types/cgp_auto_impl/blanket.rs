@@ -37,7 +37,7 @@ pub fn derive_blanket_items(
 
     let mut impl_items: Vec<ImplItem> = Vec::new();
 
-    for trait_item in source.items.iter_mut() {
+    for trait_item in &mut source.items {
         match trait_item {
             TraitItem::Type(trait_item_type) => {
                 let item_type_ident = &trait_item_type.ident;

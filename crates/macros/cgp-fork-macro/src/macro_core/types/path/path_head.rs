@@ -28,7 +28,7 @@ impl PathHead {
                     let mut generics = generics.clone();
                     generics.params.extend(tail_generics.params.iter().cloned());
                     tail_path.elements.insert(0, element.clone());
-                    out_paths.push((generics, tail_path))
+                    out_paths.push((generics, tail_path));
                 }
 
                 out_paths

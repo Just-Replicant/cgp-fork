@@ -47,8 +47,8 @@ impl CgpComponentAttributes {
                     let use_type_specs = attribute
                         .parse_args_with(Punctuated::<UseTypeAttribute, Comma>::parse_terminated)?;
 
-                    for use_type_spec in use_type_specs.iter() {
-                        for type_ident in use_type_spec.type_idents.iter() {
+                    for use_type_spec in &use_type_specs {
+                        for type_ident in &use_type_spec.type_idents {
                             if let Some(equals) = &type_ident.equals {
                                 return Err(syn::Error::new_spanned(
                                     equals,

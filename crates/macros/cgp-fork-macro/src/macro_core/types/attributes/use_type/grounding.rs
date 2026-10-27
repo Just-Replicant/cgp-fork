@@ -38,7 +38,7 @@ pub fn ground_specs(specs: &[UseTypeAttribute]) -> syn::Result<Vec<UseTypeAttrib
     let mut owner_of_alias: BTreeMap<String, usize> = BTreeMap::new();
 
     for (index, spec) in specs.iter().enumerate() {
-        for type_ident in spec.type_idents.iter() {
+        for type_ident in &spec.type_idents {
             owner_of_alias.insert(type_ident.alias_ident().to_string(), index);
         }
     }
@@ -127,7 +127,7 @@ impl Grounding<'_, '_> {
         self.state[index] = VisitState::InProgress;
         self.path.push(index);
 
-        for (target, reference) in self.edges[index].iter() {
+        for (target, reference) in &self.edges[index] {
             if self.state[*target] == VisitState::InProgress {
                 return Err(self.cycle_error(*target, reference));
             }

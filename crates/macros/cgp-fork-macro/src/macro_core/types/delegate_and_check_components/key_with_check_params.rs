@@ -55,7 +55,7 @@ impl KeyWithCheckParams {
                             ty: param.clone(),
                             generics: self.generics.clone(),
                         }))),
-                    })
+                    });
                 }
 
                 entries

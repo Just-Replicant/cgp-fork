@@ -17,7 +17,7 @@ impl ToTokens for CgpProviderOrBareImpl {
         match self {
             CgpProviderOrBareImpl::Bare(item_impl) => item_impl.to_tokens(tokens),
             CgpProviderOrBareImpl::Provider(item_cgp_provider) => {
-                item_cgp_provider.to_tokens(tokens)
+                item_cgp_provider.to_tokens(tokens);
             }
         }
     }

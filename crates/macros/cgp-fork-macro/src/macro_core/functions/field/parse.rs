@@ -14,7 +14,7 @@ use crate::macro_core::types::getter::FieldMode;
 /// which `receiver_mut` reports.
 pub fn parse_field_type(
     return_type: &Type,
-    receiver_mut: &Option<Mut>,
+    receiver_mut: Option<&Mut>,
 ) -> syn::Result<(Type, FieldMode, Option<Mut>)> {
     match &return_type {
         Type::Reference(type_ref) => {
@@ -87,7 +87,7 @@ pub fn parse_field_type(
 /// `get_field_mut`, so a `&mut` reference in the field type — the outer `&mut T` or
 /// the inner reference of an `Option<&mut T>` — is only valid under a `&mut self`
 /// receiver.
-fn require_mut_receiver(type_ref: &TypeReference, receiver_mut: &Option<Mut>) -> syn::Result<()> {
+fn require_mut_receiver(type_ref: &TypeReference, receiver_mut: Option<&Mut>) -> syn::Result<()> {
     if type_ref.mutability.is_some() && receiver_mut.is_none() {
         return Err(Error::new(
             type_ref.span(),

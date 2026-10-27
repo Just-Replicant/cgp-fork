@@ -23,7 +23,7 @@ pub fn impl_async(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStre
         return Ok(item);
     };
 
-    for trait_item in target_trait.items.iter_mut() {
+    for trait_item in &mut target_trait.items {
         if let TraitItem::Fn(trait_fn) = trait_item
             && trait_fn.sig.asyncness.is_some()
         {

@@ -95,7 +95,7 @@ impl GetterMethod {
 
         let call_expr = getter_field
             .field_mode
-            .apply(call_expr, &getter_field.receiver_mut);
+            .apply(call_expr, getter_field.receiver_mut.as_ref());
 
         let return_type = &getter_field.return_type;
 

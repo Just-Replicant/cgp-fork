@@ -113,7 +113,7 @@ impl NamespaceTable {
         let namespace_ident = &self.namespace.ident;
 
         let namespace_struct_ident = Ident::new(
-            &format!("__{}Components", namespace_ident),
+            &format!("__{namespace_ident}Components"),
             namespace_ident.span(),
         );
 
@@ -134,7 +134,7 @@ impl NamespaceTable {
         let table_type: Type = parse_internal!(__Table__);
 
         let namespace_struct_ident = Ident::new(
-            &format!("__{}Components", namespace_ident),
+            &format!("__{namespace_ident}Components"),
             namespace_ident.span(),
         );
 

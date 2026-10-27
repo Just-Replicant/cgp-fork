@@ -22,7 +22,7 @@ impl FieldMode {
     /// the shared or mutable variant from `field_mut`. This is the single source of
     /// truth shared by the getter-method body and the `#[implicit]` argument
     /// binding, so both families convert a given field identically.
-    pub fn apply(&self, call_expr: TokenStream, field_mut: &Option<Mut>) -> TokenStream {
+    pub fn apply(&self, call_expr: TokenStream, field_mut: Option<&Mut>) -> TokenStream {
         match self {
             FieldMode::Reference => call_expr,
             FieldMode::OptionRef => {

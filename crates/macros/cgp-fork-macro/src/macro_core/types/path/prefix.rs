@@ -20,6 +20,6 @@ impl ToTokens for PrefixPath {
             |acc, current| quote!( #PathCons < #current, #acc > ),
         );
 
-        tokens.extend(out)
+        tokens.extend(out);
     }
 }

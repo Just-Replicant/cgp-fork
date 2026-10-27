@@ -24,7 +24,7 @@ pub fn derive_has_extractor_impl(
 
     let mut from_match_arms = Vec::<Arm>::new();
 
-    for variant in context_enum.variants.iter() {
+    for variant in &context_enum.variants {
         extractor_generics.args.push(parse_internal! {
             #IsPresent
         });
@@ -112,7 +112,7 @@ pub fn derive_has_extractor_ref_impl(
 
     let mut match_arms = Vec::<Arm>::new();
 
-    for variant in context_enum.variants.iter() {
+    for variant in &context_enum.variants {
         extractor_generics.args.push(parse_internal! {
             #IsPresent
         });
@@ -189,7 +189,7 @@ pub fn derive_has_extractor_mut_impl(
 
     let mut match_arms = Vec::<Arm>::new();
 
-    for variant in context_enum.variants.iter() {
+    for variant in &context_enum.variants {
         extractor_generics.args.push(parse_internal! {
             #IsPresent
         });

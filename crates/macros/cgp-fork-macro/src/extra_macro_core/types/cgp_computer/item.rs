@@ -40,7 +40,7 @@ impl ItemCgpComputer {
         let mut context_fields = Vec::new();
         let mut explicit_index = 0usize;
 
-        for input in item_fn.sig.inputs.iter_mut() {
+        for input in &mut item_fn.sig.inputs {
             match input {
                 FnArg::Receiver(receiver) => {
                     return Err(Error::new_spanned(

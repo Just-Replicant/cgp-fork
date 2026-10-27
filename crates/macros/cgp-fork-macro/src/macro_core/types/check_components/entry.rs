@@ -19,7 +19,7 @@ impl CheckEntry {
 
         let component_types_count = keys.len();
 
-        for component_type in keys.iter() {
+        for component_type in &keys {
             if let Some(value) = &self.value {
                 let values = value.to_values();
 
@@ -28,11 +28,11 @@ impl CheckEntry {
                         key: component_type.clone(),
                         value: None,
                         span: component_type.span(),
-                    })
+                    });
                 } else {
                     let component_params_count = values.len();
 
-                    for component_param in values.iter() {
+                    for component_param in &values {
                         let component_param_type = &component_param.ty;
                         let component_param_generics = &component_param.generics;
 
@@ -49,7 +49,7 @@ impl CheckEntry {
                                 generics: component_param_generics.clone(),
                             }),
                             span,
-                        })
+                        });
                     }
                 }
             } else {
@@ -57,7 +57,7 @@ impl CheckEntry {
                     key: component_type.clone(),
                     value: None,
                     span: component_type.span(),
-                })
+                });
             }
         }
 

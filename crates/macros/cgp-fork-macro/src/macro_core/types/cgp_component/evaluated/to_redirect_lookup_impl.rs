@@ -100,7 +100,7 @@ fn generic_params_to_path(generics: &Generics) -> syn::Result<Option<UniPath>> {
         let mut path = UniPath::default();
         for param in type_params {
             path.elements
-                .push(PathElement::Type(parse_internal!(#param)))
+                .push(PathElement::Type(parse_internal!(#param)));
         }
 
         Ok(Some(path))

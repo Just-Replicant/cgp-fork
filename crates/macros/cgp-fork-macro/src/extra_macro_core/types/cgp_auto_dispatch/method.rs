@@ -59,7 +59,7 @@ impl DispatchMethod {
     pub fn new(method: &TraitItemFn) -> syn::Result<Self> {
         let sig = &method.sig;
 
-        for generic_param in sig.generics.params.iter() {
+        for generic_param in &sig.generics.params {
             if !matches!(generic_param, GenericParam::Lifetime(_)) {
                 return Err(Error::new_spanned(
                     generic_param,

@@ -45,7 +45,7 @@ impl Parse for TypeGenerics {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let generics: Generics = input.parse()?;
 
-        for param in generics.params.iter() {
+        for param in &generics.params {
             let valid = match param {
                 GenericParam::Lifetime(life) => life.colon_token.is_none(),
                 GenericParam::Type(ty) => ty.colon_token.is_none() && ty.default.is_none(),

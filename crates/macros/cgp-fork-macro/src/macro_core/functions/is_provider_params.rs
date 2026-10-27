@@ -33,7 +33,7 @@ pub fn parse_is_provider_params(generics: &Generics) -> syn::Result<Punctuated<T
                 ));
             }
         };
-        res.push(out)
+        res.push(out);
     }
 
     Ok(res)

@@ -63,7 +63,7 @@ pub fn parse_implicit_arg(receiver: &Receiver, arg: &PatType) -> syn::Result<Imp
         _ => None,
     };
 
-    parse_named_field_arg(arg, &receiver_mut)
+    parse_named_field_arg(arg, receiver_mut.as_ref())
 }
 
 pub fn extract_implicit_args(args: &mut Punctuated<FnArg, Comma>) -> syn::Result<Vec<PatType>> {
@@ -141,7 +141,7 @@ fn is_context_arg_ident(ident: Option<&syn::Ident>) -> bool {
 /// such as a `#[cgp_computer]` function. The value is read from a shared
 /// `&Context`, so a mutable reference is rejected.
 pub fn parse_context_arg(arg: &PatType) -> syn::Result<ImplicitArgField> {
-    parse_named_field_arg(arg, &None).map_err(|err| {
+    parse_named_field_arg(arg, None).map_err(|err| {
         if err.to_string().contains("&mut self is required") {
             syn::Error::new(
                 err.span(),
@@ -155,7 +155,7 @@ pub fn parse_context_arg(arg: &PatType) -> syn::Result<ImplicitArgField> {
 
 fn parse_named_field_arg(
     arg: &PatType,
-    receiver_mut: &Option<syn::token::Mut>,
+    receiver_mut: Option<&syn::token::Mut>,
 ) -> syn::Result<ImplicitArgField> {
     let Pat::Ident(pat_ident) = &*arg.pat else {
         return Err(syn::Error::new_spanned(&arg.pat, "Expected an identifier"));

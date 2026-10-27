@@ -58,7 +58,7 @@ impl ToTokens for EmptyStruct {
             let mut generic_params = struct_generics.params.clone();
             let mut phantom_params: Punctuated<Type, Comma> = Default::default();
 
-            for param in generic_params.iter_mut() {
+            for param in &mut generic_params {
                 match param {
                     GenericParam::Type(type_param) => {
                         type_param.colon_token = None;
@@ -74,7 +74,7 @@ impl ToTokens for EmptyStruct {
                         let lifetime = &life_param.lifetime;
                         phantom_params.push(parse_quote!( #Life<#lifetime> ));
                     }
-                    _ => {}
+                    GenericParam::Const(_) => {}
                 }
             }
 
@@ -96,7 +96,7 @@ impl ToTokens for EmptyStruct {
                 pub struct #struct_ident < #generic_params > (
                     pub ::core::marker::PhantomData< #phantom_type >
                 );
-            })
+            });
         }
     }
 }

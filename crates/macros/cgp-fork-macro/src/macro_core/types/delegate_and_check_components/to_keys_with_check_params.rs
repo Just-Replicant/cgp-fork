@@ -42,7 +42,7 @@ impl ToKeysWithCheckParams for MultiDelegateKey {
                     key_type: inner.key_type,
                     generics: inner.generics,
                     check_params: inner_params,
-                })
+                });
             }
         }
 

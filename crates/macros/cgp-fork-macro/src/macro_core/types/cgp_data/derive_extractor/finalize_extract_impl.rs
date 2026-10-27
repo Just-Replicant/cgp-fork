@@ -40,7 +40,7 @@ pub fn derive_finalize_extract_impl(
 
     let mut generic_args = to_generic_args(&generics)?;
 
-    for _variant in context_enum.variants.iter() {
+    for _variant in &context_enum.variants {
         generic_args.args.push(parse_internal! {
             #IsVoid
         });

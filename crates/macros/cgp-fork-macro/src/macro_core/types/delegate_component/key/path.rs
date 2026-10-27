@@ -71,7 +71,7 @@ impl EvalDelegateKey for PathDelegateKey {
                 span,
             };
 
-            keys.push(key)
+            keys.push(key);
         }
 
         Ok(keys)

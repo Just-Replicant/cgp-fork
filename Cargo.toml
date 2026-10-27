@@ -21,3 +21,11 @@ categories      = ["rust-patterns", "no-std"]
 [workspace.dependencies]
 cgp-fork       = { version = "0.9.3", path = "./crates/main/cgp-fork" }
 cgp-fork-macro = { version = "0.9.3", path = "./crates/macros/cgp-fork-macro" }
+
+# A curated subset of `clippy::pedantic`, enforced by CI's `-D warnings`.
+[workspace.lints.clippy]
+explicit_iter_loop                  = "warn"
+match_wildcard_for_single_variants  = "warn"
+ref_option                          = "warn"
+semicolon_if_nothing_returned       = "warn"
+uninlined_format_args               = "warn"

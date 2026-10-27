@@ -15,7 +15,7 @@ snapshot_cgp_fn! {
     #[cgp_fn]
     #[async_trait]
     pub async fn greet(&self, #[implicit] name: &str) -> String {
-        format!("Hello, {}!", name)
+        format!("Hello, {name}!")
     }
 
     expand_greet(output) {
@@ -40,7 +40,7 @@ snapshot_cgp_fn! {
                         >,
                     )
                     .as_str();
-                format!("Hello, {}!", name)
+                format!("Hello, {name}!")
             }
         }
         "#)

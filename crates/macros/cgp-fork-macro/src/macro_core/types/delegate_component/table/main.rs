@@ -76,7 +76,7 @@ impl DelegateTable {
             // parameter the table's generic list declares `const` is restored as a
             // const parameter of the struct rather than read as a type parameter.
             let mut generics = struct_type.type_generics.to_generics();
-            for param in generics.params.iter_mut() {
+            for param in &mut generics.params {
                 if let GenericParam::Type(type_param) = param
                     && let Some(const_param) =
                         self.impl_generics

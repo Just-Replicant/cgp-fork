@@ -13,7 +13,7 @@ impl ToTokens for GetFieldWithModeExpr {
         let field_mut = self.get_field.field_mut;
         let expr = self
             .field_mode
-            .apply(self.get_field.to_token_stream(), &field_mut);
+            .apply(self.get_field.to_token_stream(), field_mut.as_ref());
 
         tokens.extend(expr);
     }

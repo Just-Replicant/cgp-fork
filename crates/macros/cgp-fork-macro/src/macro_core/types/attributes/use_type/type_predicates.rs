@@ -15,7 +15,7 @@ use crate::macro_core::visitors::SubstituteAbstractTypes;
 pub fn derive_use_type_predicates(specs: &[UseTypeAttribute]) -> syn::Result<Vec<WherePredicate>> {
     let mut predicates = Vec::new();
 
-    for use_type in specs.iter() {
+    for use_type in specs {
         // The pins become associated-type bindings on the trait, which
         // `to_bound_tokens` merges into whatever generic arguments the trait path
         // already carries. An empty binding list renders the path unchanged, so the

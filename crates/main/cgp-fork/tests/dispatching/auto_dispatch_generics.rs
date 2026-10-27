@@ -18,7 +18,7 @@ pub trait CanCall<T> {
 
 impl<T: Display> CanCall<T> for Foo {
     fn call_a(&self, _a: u64, b: &T) -> String {
-        format!("foo-{}", b)
+        format!("foo-{b}")
     }
 
     fn call_b(self, _a: u64, _b: &mut T) -> &str {

@@ -31,7 +31,7 @@ impl ItemCgpComponent {
     fn check_component_name_params(&self) -> syn::Result<()> {
         let trait_generics = &self.item_trait.generics;
 
-        for param in self.args.component_name.type_generics.params.iter() {
+        for param in &self.args.component_name.type_generics.params {
             let (declared, name) = match param {
                 TypeGenericParam::Lifetime(life) => (
                     trait_generics.params.iter().any(

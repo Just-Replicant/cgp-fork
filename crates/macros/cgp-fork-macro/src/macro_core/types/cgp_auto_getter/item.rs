@@ -27,8 +27,12 @@ impl ItemCgpAutoGetter {
 
         let (fields, field_type) = parse_getter_fields(&context_type, &self.item_trait)?;
 
-        let blanket_impl =
-            derive_blanket_impl(&context_type, &self.item_trait, &fields, &field_type)?;
+        let blanket_impl = derive_blanket_impl(
+            &context_type,
+            &self.item_trait,
+            &fields,
+            field_type.as_ref(),
+        )?;
 
         Ok(blanket_impl)
     }

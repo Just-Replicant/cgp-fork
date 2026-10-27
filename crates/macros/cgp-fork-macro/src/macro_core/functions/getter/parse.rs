@@ -21,7 +21,7 @@ pub fn parse_getter_fields(
     let mut field_assoc_type: Option<TraitItemType> = None;
 
     // Extract optional associated type first
-    for item in consumer_trait.items.iter() {
+    for item in &consumer_trait.items {
         if let TraitItem::Type(item_type) = item {
             if field_assoc_type.is_some() {
                 return Err(Error::new(
@@ -36,13 +36,13 @@ pub fn parse_getter_fields(
         }
     }
 
-    for item in consumer_trait.items.iter() {
+    for item in &consumer_trait.items {
         match item {
             TraitItem::Fn(method) => {
                 let getter_spec = parse_getter_method(
                     context_type,
                     method,
-                    &field_assoc_type.as_ref().map(|item| item.ident.clone()),
+                    field_assoc_type.as_ref().map(|item| &item.ident),
                 )?;
 
                 fields.push(getter_spec);
@@ -95,7 +95,7 @@ pub fn parse_getter_fields(
 fn parse_getter_method(
     context_type: &Ident,
     method: &TraitItemFn,
-    field_assoc_type: &Option<Ident>,
+    field_assoc_type: Option<&Ident>,
 ) -> syn::Result<GetterField> {
     let signature = &method.sig;
 
@@ -112,7 +112,7 @@ fn parse_getter_method(
     // A getter keys its access mutability off the receiver (`&self` vs `&mut
     // self`), not off the field type, so the mutability `parse_field_type` derives
     // from the return type is discarded here in favor of `receiver_mut`.
-    let (field_type, field_mode, _) = parse_field_type(&return_type, &receiver_mut)?;
+    let (field_type, field_mode, _) = parse_field_type(&return_type, receiver_mut.as_ref())?;
 
     Ok(GetterField {
         receiver_mode,
@@ -217,7 +217,7 @@ fn parse_phantom_arg_type(phantom_arg: &FnArg) -> syn::Result<Type> {
                 "only PhantomData is allowed as second argument",
             )),
         },
-        _ => Err(Error::new(
+        FnArg::Receiver(_) => Err(Error::new(
             phantom_arg.span(),
             "optional second argument in getter must be PhantomData",
         )),
@@ -258,7 +258,7 @@ fn parse_receiver(context_ident: &Ident, arg: &FnArg) -> syn::Result<(ReceiverMo
 fn parse_return_type(
     context_type: &Ident,
     return_type: &ReturnType,
-    field_assoc_type: &Option<Ident>,
+    field_assoc_type: Option<&Ident>,
 ) -> syn::Result<Type> {
     match return_type {
         ReturnType::Type(_, ty) => {
@@ -266,13 +266,13 @@ fn parse_return_type(
 
             ReplaceSelfTypeVisitor {
                 replaced_type: &parse_internal!(#context_type),
-                skip_assoc_types: &Vec::from_iter(field_assoc_type.clone()),
+                skip_assoc_types: &Vec::from_iter(field_assoc_type.cloned()),
             }
             .visit_type_mut(&mut replaced_type);
 
             Ok(replaced_type)
         }
-        _ => Err(Error::new(
+        ReturnType::Default => Err(Error::new(
             return_type.span(),
             "return type must be specified",
         )),

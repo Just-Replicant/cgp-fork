@@ -39,7 +39,7 @@ impl EvalDelegateKey for MultiDelegateKey {
                 key: key.ty.clone(),
             };
 
-            keys.push(key)
+            keys.push(key);
         }
 
         Ok(keys)

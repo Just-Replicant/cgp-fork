@@ -26,6 +26,6 @@ impl ToTokens for GetFieldExpr {
             #receiver.#method(
                 ::core::marker::PhantomData::<#field_name>
             )
-        })
+        });
     }
 }

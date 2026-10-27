@@ -25,7 +25,7 @@ pub fn cgp_auto_dispatch(attr: TokenStream, body: TokenStream) -> syn::Result<To
         #blanket_impl
     };
 
-    for computer in evaluated.computers.iter() {
+    for computer in &evaluated.computers {
         output.extend(lower_handler_fn(&computer.preprocess()?.eval()?)?);
     }
 

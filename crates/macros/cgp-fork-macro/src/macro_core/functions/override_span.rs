@@ -64,12 +64,12 @@ where
     let mut trees: Vec<TokenTree> = body.to_token_stream().into_iter().collect();
 
     if let Some(first) = trees.first_mut()
-        && is_synthesized(first.span(), &call_site_text)
+        && is_synthesized(first.span(), call_site_text.as_ref())
     {
         first.set_span(span);
     }
     if let Some(last) = trees.last_mut()
-        && is_synthesized(last.span(), &call_site_text)
+        && is_synthesized(last.span(), call_site_text.as_ref())
     {
         last.set_span(span);
     }
@@ -83,6 +83,6 @@ where
 /// source text is just that token, so the two never coincide. Comparing the
 /// source text works because a synthesized token *is* `call_site`, so it yields
 /// the exact same result as `call_site_text` — even when that is `None`.
-fn is_synthesized(token_span: Span, call_site_text: &Option<String>) -> bool {
-    token_span.source_text() == *call_site_text
+fn is_synthesized(token_span: Span, call_site_text: Option<&String>) -> bool {
+    token_span.source_text().as_ref() == call_site_text
 }

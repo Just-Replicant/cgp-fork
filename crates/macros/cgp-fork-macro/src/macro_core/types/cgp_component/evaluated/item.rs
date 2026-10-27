@@ -89,7 +89,7 @@ impl EvaluatedCgpComponent {
             provider_impls.items.push(ItemProviderImpl {
                 component_type: component_type.clone(),
                 item_impl,
-            })
+            });
         }
 
         Ok(provider_impls)
@@ -102,7 +102,7 @@ impl EvaluatedCgpComponent {
 
         for attribute in &self.attributes.prefixes {
             let provider_impl = attribute.to_namespace_impl(component_name)?;
-            provider_impls.push(provider_impl)
+            provider_impls.push(provider_impl);
         }
 
         Ok(provider_impls)

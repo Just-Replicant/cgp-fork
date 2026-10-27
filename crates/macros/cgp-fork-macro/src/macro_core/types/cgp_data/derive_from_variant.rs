@@ -16,7 +16,7 @@ pub fn derive_from_variant_from_enum(item_enum: &ItemEnum) -> syn::Result<Vec<It
 
     let mut item_impls: Vec<ItemImpl> = Vec::new();
 
-    for variant in item_enum.variants.iter() {
+    for variant in &item_enum.variants {
         let variant_ident = &variant.ident;
         let variant_tag = Symbol::from_ident(variant_ident.clone());
         let payload = get_variant_payload(variant)?;

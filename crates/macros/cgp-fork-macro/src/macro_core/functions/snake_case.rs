@@ -20,7 +20,7 @@ pub fn to_snake_case_ident(val: &Ident) -> Ident {
     let str_val = val.to_string();
     let mut snake_case_val = to_snake_case_str(&str_val);
     if !str_val.starts_with('_') {
-        snake_case_val = format!("__{}__", snake_case_val);
+        snake_case_val = format!("__{snake_case_val}__");
     }
 
     Ident::new(&snake_case_val, Span::call_site())
