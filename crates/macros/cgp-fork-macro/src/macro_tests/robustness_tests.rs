@@ -279,10 +279,11 @@ fn entrypoints_never_panic() {
     let iterations = env_u64("CGP_FUZZ_ITERS", 300);
     let seed = env_u64("CGP_FUZZ_SEED", 0x00C6_9F0C_0FFE_E123);
 
-    // Keep the default panic hook from printing every caught panic.
-    let previous_hook = std::panic::take_hook();
-    std::panic::set_hook(Box::new(|_| {}));
-
+    // Do not replace the process panic hook. `cargo test` runs this next to the
+    // other unit tests, and the hook is process-global: swapping it hides their
+    // panic messages, and a panic before the old hook is restored leaves the
+    // silence in place. `catch_unwind` still records the failing input. A panic
+    // also prints through the test harness hook, which is the backtrace we want.
     let mut failures = Vec::new();
     for (name, entrypoint) in entrypoints() {
         let mut rng = Rng(seed ^ name.len() as u64 ^ (name.as_bytes()[0] as u64) << 32);
@@ -310,7 +311,6 @@ fn entrypoints_never_panic() {
         }
     }
 
-    std::panic::set_hook(previous_hook);
     assert!(
         failures.is_empty(),
         "macro entrypoints panicked:\n{}",
