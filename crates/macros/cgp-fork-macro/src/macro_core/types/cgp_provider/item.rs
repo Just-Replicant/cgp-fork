@@ -37,6 +37,7 @@ impl ItemCgpProvider {
         // keeps its own span. Only fall back to the `{Provider}Component` default
         // when no override is given.
         if let Some(component_type) = &self.args.component_type {
+            self.reject_provider_trait_as_component(component_type)?;
             return Ok(component_type.clone());
         }
 
@@ -67,6 +68,42 @@ impl ItemCgpProvider {
         );
 
         parse_internal(component_ident.to_token_stream())
+    }
+
+    /// A common mistake is to name the provider trait (`#[cgp_provider(Greeter)]`)
+    /// where the component type belongs (`#[cgp_provider(GreeterComponent)]`).
+    /// Left alone, rustc reports "expected a type, found a trait" and suggests
+    /// `dyn Greeter`, which points the user the wrong way.
+    fn reject_provider_trait_as_component(&self, component_type: &Type) -> syn::Result<()> {
+        let (Type::Path(component_path), Some((trait_path, _))) =
+            (component_type, self.item_impl.trait_.as_ref())
+        else {
+            return Ok(());
+        };
+
+        if component_path.qself.is_some() || component_path.path.segments.len() != 1 {
+            return Ok(());
+        }
+
+        let (Some(component_segment), Some(trait_segment)) = (
+            component_path.path.segments.last(),
+            trait_path.segments.last(),
+        ) else {
+            return Ok(());
+        };
+
+        if component_segment.ident == trait_segment.ident {
+            return Err(Error::new_spanned(
+                component_type,
+                format!(
+                    "`#[cgp_provider]` takes the component type, not the provider trait; \
+                     the component for `{0}` is `{0}Component` unless `#[cgp_component]` named it",
+                    trait_segment.ident
+                ),
+            ));
+        }
+
+        Ok(())
     }
 
     pub fn to_provider_struct(&self) -> syn::Result<Option<EmptyStruct>> {

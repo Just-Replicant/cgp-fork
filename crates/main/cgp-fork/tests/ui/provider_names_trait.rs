@@ -1,4 +1,4 @@
-// `#[cgp_provider]` takes the component type, not the provider trait (the `dyn` hint below is misleading; see the plan).
+// `#[cgp_provider]` takes the component type, not the provider trait.
 use cgp_fork::prelude::*;
 
 #[cgp_component(Greeter)]
