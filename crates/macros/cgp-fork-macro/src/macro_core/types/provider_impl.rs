@@ -10,17 +10,6 @@ use crate::macro_core::types::cgp_provider::ProviderImplArgs;
 use crate::macro_core::types::ident::PathWithTypeArgs;
 use crate::macro_core::visitors::replace_provider_in_generics;
 
-pub fn derive_is_provider_for(
-    component_type: &Type,
-    item_impl: &ItemImpl,
-) -> syn::Result<ItemImpl> {
-    ItemProviderImpl {
-        component_type: component_type.clone(),
-        item_impl: item_impl.clone(),
-    }
-    .to_is_provider_for_impl()
-}
-
 #[derive(Default)]
 pub struct ItemProviderImpls {
     pub items: Vec<ItemProviderImpl>,

@@ -13,6 +13,7 @@ use crate::macro_core::types::path::UniPath;
 #[derive(Debug, Clone)]
 pub struct RedirectDelegateMapping {
     pub key: DelegateKey,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub arrow: FatArrow,
     pub value: UniPath,
 }

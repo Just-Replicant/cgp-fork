@@ -8,6 +8,7 @@ use crate::macro_core::types::keywords::Preset;
 /// into a `DelegateComponent` impl for every component the preset carries.
 #[derive(Debug, Clone)]
 pub struct PresetDelegateEntry {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub preset_token: Keyword<Preset>,
     pub path: Path,
 }

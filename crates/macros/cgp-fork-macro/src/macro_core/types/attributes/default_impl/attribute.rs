@@ -10,6 +10,7 @@ use crate::macro_core::types::path::UniPathOrType;
 
 pub struct DefaultImplAttribute {
     pub key_type: UniPathOrType,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub in_token: In,
     pub namespace: PathWithTypeArgs,
 }

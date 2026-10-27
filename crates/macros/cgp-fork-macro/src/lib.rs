@@ -5,20 +5,15 @@
 
 use proc_macro::TokenStream;
 
-// The same sources are private here. `macro_tests` calls the parsers directly.
-// `test_util_lib` and the `snapshot_*` macros compile for this crate's tests and
-// when the `snapshot` feature is on, which the behavior tests enable.
+// `macro_tests` calls the parsers directly. `test_util_lib` and the `snapshot_*`
+// macros compile for this crate's tests and when the `snapshot` feature is on,
+// which the behavior tests enable.
 mod async_impl;
-#[allow(dead_code, unused_imports)]
 mod extra_macro_core;
-#[allow(dead_code, unused_imports)]
 mod extra_macro_lib;
-#[allow(dead_code, unused_imports)]
 mod macro_core;
-#[allow(dead_code, unused_imports)]
 mod macro_lib;
 #[cfg(any(test, feature = "snapshot"))]
-#[allow(dead_code, unused_imports)]
 mod test_util_lib;
 
 #[cfg(test)]

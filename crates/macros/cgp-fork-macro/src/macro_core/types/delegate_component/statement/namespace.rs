@@ -15,8 +15,10 @@ use crate::macro_core::types::keywords::Namespace;
 /// on `__Key__: SomeNamespace<TableType, Delegate = __Value__>`.
 #[derive(Debug, Clone)]
 pub struct NamespaceDelegateStatement {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub namespace: Keyword<Namespace>,
     pub ident: Ident,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub semi: Semi,
 }
 

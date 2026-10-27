@@ -14,6 +14,7 @@ use crate::macro_core::types::delegate_component::{
 #[derive(Debug, Clone)]
 pub struct DirectDelegateMapping {
     pub key: DelegateKey,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub arrow: RArrow,
     pub value: DelegateValue,
 }

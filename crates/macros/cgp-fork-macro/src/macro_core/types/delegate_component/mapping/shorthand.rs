@@ -16,8 +16,10 @@ use crate::macro_core::types::keywords::Getter;
 /// from the associated type `Name`.
 #[derive(Debug, Clone)]
 pub struct TypeDelegateShorthand {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub type_token: TypeToken,
     pub name: Ident,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub eq_token: Eq,
     pub value: Type,
 }
@@ -67,6 +69,7 @@ impl EvalDelegateEntries for TypeDelegateShorthand {
 /// derives for a `Has{Field}` trait.
 #[derive(Debug, Clone)]
 pub struct GetterDelegateShorthand {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub getter_token: Keyword<Getter>,
     pub field: Ident,
 }

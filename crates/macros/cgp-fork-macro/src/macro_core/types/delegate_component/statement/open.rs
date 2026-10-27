@@ -16,8 +16,10 @@ use crate::macro_core::types::keywords::Open;
 /// the `@Component.Key` mappings that follow dispatch on the redirect path.
 #[derive(Debug, Clone)]
 pub struct OpenDelegateStatement {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub open: Keyword<Open>,
     pub components: Punctuated<Type, Comma>,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub semi: Semi,
 }
 

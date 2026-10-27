@@ -14,6 +14,7 @@ use crate::macro_core::types::keywords::New;
 /// out to become its own struct and impls.
 #[derive(Debug, Clone)]
 pub struct DelegateValueWithInnerTable {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub new: Keyword<New>,
     pub wrapper_ident: Ident,
     pub inner_table: InnerDelegateTable,

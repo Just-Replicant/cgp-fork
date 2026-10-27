@@ -12,6 +12,7 @@ use crate::macro_core::types::delegate_component::{
 #[derive(Debug, Clone)]
 pub struct NormalDelegateMapping {
     pub key: DelegateKey,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub colon: Colon,
     pub value: DelegateValue,
 }

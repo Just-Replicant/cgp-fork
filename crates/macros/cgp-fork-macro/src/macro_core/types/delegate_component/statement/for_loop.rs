@@ -15,12 +15,17 @@ use crate::macro_core::types::ident::PathWithTypeArgs;
 /// with the table type and a `Delegate =` binding appended.
 #[derive(Debug, Clone)]
 pub struct ForDelegateStatement {
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub for_token: For,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub lt: Lt,
     pub key: Ident,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub comma: Comma,
     pub value: Ident,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub gt: Gt,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub in_token: In,
     pub namespace: PathWithTypeArgs,
     pub where_clause: Option<WhereClause>,

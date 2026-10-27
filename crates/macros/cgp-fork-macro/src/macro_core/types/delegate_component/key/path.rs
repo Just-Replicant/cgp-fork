@@ -16,6 +16,7 @@ use crate::macro_core::types::path::{PathElement, PathHead};
 pub struct PathDelegateKey {
     pub attributes: Vec<Attribute>,
     pub generics: ImplGenerics,
+    #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub at: At,
     pub path: PathHead,
 }

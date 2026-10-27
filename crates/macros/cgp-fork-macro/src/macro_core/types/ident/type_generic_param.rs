@@ -150,10 +150,6 @@ pub struct TypeGenericParams {
 }
 
 impl TypeGenericParams {
-    pub fn is_empty(&self) -> bool {
-        self.params.is_empty()
-    }
-
     /// Lower these parameters into a plain [`syn::Generics`]. This is handy for
     /// downstream code that needs to feed the parameters into constructs (such
     /// as struct definitions) that are expressed in terms of `syn::Generics`.
