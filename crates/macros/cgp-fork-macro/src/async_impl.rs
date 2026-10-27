@@ -2,31 +2,47 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{ItemTrait, ReturnType, TraitItem, Type, parse_quote};
 
-pub fn impl_async(item: TokenStream) -> TokenStream {
-    match syn::parse2::<ItemTrait>(item.clone()) {
-        Ok(mut target_trait) => {
-            for trait_item in target_trait.items.iter_mut() {
-                if let TraitItem::Fn(trait_fn) = trait_item
-                    && trait_fn.sig.asyncness.is_some()
-                {
-                    let return_type: Type = match &trait_fn.sig.output {
-                        ReturnType::Default => {
-                            parse_quote!(())
-                        }
-                        ReturnType::Type(_, return_type) => return_type.as_ref().clone(),
-                    };
-
-                    let impl_return: ReturnType = parse_quote! {
-                        -> impl ::core::future::Future<Output = #return_type>
-                    };
-
-                    trait_fn.sig.output = impl_return;
-                    trait_fn.sig.asyncness = None;
-                }
-            }
-
-            target_trait.to_token_stream()
-        }
-        _ => item,
+/// Desugars every `async fn` in a trait into a method returning `impl Future`.
+///
+/// A default body is wrapped in `async move { … }`, so a trait can keep provided
+/// async methods. `#[async_trait]` takes no arguments: the desugared future is never
+/// `Send`-bounded, and `CanSendRun` is the component that asks for a `Send` future.
+///
+/// Any item other than a trait (an `impl` block, for instance) is returned unchanged,
+/// because native `async fn` in an impl already matches the desugared trait method.
+pub fn impl_async(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream> {
+    if !attr.is_empty() {
+        return Err(syn::Error::new_spanned(
+            attr,
+            "`#[async_trait]` takes no arguments; the desugared future is not `Send`. \
+             Use `CanSendRun` or a `Send` bound at the call site when a `Send` future is needed",
+        ));
     }
+
+    let Ok(mut target_trait) = syn::parse2::<ItemTrait>(item.clone()) else {
+        return Ok(item);
+    };
+
+    for trait_item in target_trait.items.iter_mut() {
+        if let TraitItem::Fn(trait_fn) = trait_item
+            && trait_fn.sig.asyncness.is_some()
+        {
+            let return_type: Type = match &trait_fn.sig.output {
+                ReturnType::Default => parse_quote!(()),
+                ReturnType::Type(_, return_type) => return_type.as_ref().clone(),
+            };
+
+            trait_fn.sig.output = parse_quote! {
+                -> impl ::core::future::Future<Output = #return_type>
+            };
+            trait_fn.sig.asyncness = None;
+
+            // A provided method keeps its body, now evaluated lazily as a future.
+            if let Some(body) = trait_fn.default.take() {
+                trait_fn.default = Some(parse_quote!({ async move #body }));
+            }
+        }
+    }
+
+    Ok(target_trait.to_token_stream())
 }

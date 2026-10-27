@@ -1362,11 +1362,15 @@ pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
 
 /// Rewrites `async fn` in a trait to a method that returns `impl Future`.
 ///
-/// The desugared method is what `#[cgp_component]` forwards. The future is not automatically
-/// `Send`; `CanSendRun` is the component that asks for a `Send` future.
+/// The desugared method is what `#[cgp_component]` forwards. A provided (default) method body
+/// is wrapped in `async move { … }`. The future is not automatically `Send`; `CanSendRun` is
+/// the component that asks for a `Send` future. The attribute takes no arguments, so
+/// `#[async_trait(?Send)]` is rejected rather than silently ignored.
 #[proc_macro_attribute]
-pub fn async_trait(_attr: TokenStream, stream: TokenStream) -> TokenStream {
-    async_impl::impl_async(stream.into()).into()
+pub fn async_trait(attr: TokenStream, stream: TokenStream) -> TokenStream {
+    async_impl::impl_async(attr.into(), stream.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 #[cfg(any(test, feature = "snapshot"))]

@@ -45,6 +45,7 @@ pub fn assert_macro_rejects_with(
     }
 }
 
+pub mod async_trait;
 pub mod blanket_trait;
 pub mod cgp_auto_dispatch;
 pub mod cgp_auto_error;
