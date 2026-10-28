@@ -36,13 +36,3 @@ pub mod eyre;
 #[cfg(feature = "std-error")]
 #[doc = include_str!("std_error/README.md")]
 pub mod std_error;
-
-// The repository README lives outside this package. Include it only when rustdoc
-// is collecting doctests (`cfg(doctest)`) and the workspace config set
-// `cgp_fork_repository_doctests` (`.cargo/config.toml`). The published crate does
-// not ship that config, so `cargo test --doc` on the crates.io sources never
-// opens a path that is not in the package. `RUSTDOCFLAGS` replaces the config
-// flags and skips these examples; the crate README is still tested.
-#[cfg(all(doctest, cgp_fork_repository_doctests))]
-#[doc = include_str!("../../../../README.md")]
-pub struct RepositoryReadmeDoctests;

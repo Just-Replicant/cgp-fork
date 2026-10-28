@@ -56,3 +56,8 @@ git_release_name = "v{{ version }}"
 [[package]]
 name = "cgp-fork-macro"
 version_group = "cgp-fork"
+
+# Workspace-only doctest crate (`publish = false`): never versioned or released.
+[[package]]
+name = "cgp-fork-doctests"
+release = false

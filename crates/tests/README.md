@@ -63,3 +63,9 @@ module *and* generates a `#[test]` asserting a pretty-printed inline `insta`
 snapshot of it. So a failing snapshot prints a diff of the generated code — accept
 it with `cargo insta` only after confirming the change is intended. Snapshot a
 macro in the concept target that owns that macro's feature.
+
+## Documentation outside the published crates
+
+**`crates/tests/doctests`** (`cgp-fork-doctests`, `publish = false`) compiles examples that live
+outside a published package, starting with the repository `README.md`. It runs under
+`cargo test --workspace --doc` like any other doctest, with no cfg flag to forget.

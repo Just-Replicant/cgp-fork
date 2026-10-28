@@ -1,7 +1,0 @@
-# In-repo `cargo test --doc` compiles the repository README, which lives
-# outside the published `cgp-fork` package. rustdoc sets `cfg(doctest)` itself;
-# this flag is the other half of the gate in `crates/main/cgp-fork/src/lib.rs`.
-# The published crate does not include this file, so its doctests never open
-# that path. An explicit `RUSTDOCFLAGS` replaces these flags.
-[build]
-rustdocflags = ["--cfg", "cgp_fork_repository_doctests"]

@@ -42,6 +42,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cgp-fork-doctests"
+version = "0.0.0"
+dependencies = [
+ "cgp-fork",
+]
+
+[[package]]
 name = "cgp-fork-macro"
 version = "0.10.0"
 dependencies = [
