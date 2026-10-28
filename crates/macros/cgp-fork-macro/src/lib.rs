@@ -174,6 +174,11 @@ pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
     Given the following provider trait implementation:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     #[cgp_provider]
     impl<Context> Greeter<Context> for GreetName
     where
@@ -188,6 +193,11 @@ pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
     Is equivalent to the following fully explicit implementation:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     #[cgp_provider(GreeterComponent)]
     impl<Context> Greeter<Context> for GreetName
     where
@@ -202,6 +212,11 @@ pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
     Which would generate the following `IsProviderFor` trait implementation:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     impl<Context> IsProviderFor<GreeterComponent, Context> for GreetName
     where
         Context: HasName,
@@ -240,6 +255,11 @@ pub fn cgp_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     Given the following provider trait implementation:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     #[cgp_impl(GreetName)]
     impl<Context> Greeter for Context
     where
@@ -254,6 +274,11 @@ pub fn cgp_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     would be equivalent to the following provider implementation using `#[cgp_provider]`:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     #[cgp_provider]
     impl<Context> Greeter<Context> for GreetName
     where
@@ -268,6 +293,11 @@ pub fn cgp_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     Which would generate the following `IsProviderFor` trait implementation:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     impl<Context> IsProviderFor<GreeterComponent, Context> for GreetName
     where
         Context: HasName,
@@ -322,6 +352,11 @@ pub fn cgp_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     Given the following provider trait implementation:
 
     ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
     #[cgp_provider]
     impl<Context> Greeter<Context> for GreetName
     where
@@ -376,6 +411,7 @@ pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     The following getter providers are generated:
 
     ```rust,ignore
+    # // doc-example: not compiled (abridged expansion of the getter providers)
     #[cgp_provider]
     impl<Context, Tag> NameGetter<Context> for UseField<Tag>
     where
@@ -483,6 +519,8 @@ pub fn cgp_auto_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
     ## Example
 
     ```rust,ignore
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
     #[cgp_auto_impl]
     pub trait CanGreet: HasName {
         fn greet(&self) -> String {
@@ -511,6 +549,8 @@ pub fn cgp_auto_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
     ## Example
 
     ```rust,ignore
+    # #[derive(Debug)]
+    # pub struct AppError { message: String }
     #[cgp_auto_error]
     impl ProvideAppError {
         type Error = AppError;
@@ -565,6 +605,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     as follows:
 
     ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
     delegate_components! {
         MyComponents {
             KeyA: ValueA,
@@ -579,6 +620,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     would generate the following implementation:
 
     ```rust,ignore
+    # // doc-example: not compiled (expansion of the table above, for illustration)
     impl DelegateComponent<Key> for MyComponents
     {
         type Delegate = Value;
@@ -600,6 +642,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     For example, given the following:
 
     ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
     delegate_components! {
         MyComponents {
             [
@@ -615,6 +658,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     It would be equivalent to the following:
 
     ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
     delegate_components! {
         MyComponents {
             KeyA: Value,
@@ -630,6 +674,16 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     provider is `UseField`, may be written as the value alone:
 
     ```rust,ignore
+    # #[cgp_type]
+    # pub trait HasNameType { type Name; }
+    # #[cgp_getter]
+    # pub trait HasName: HasNameType { fn name(&self) -> &Self::Name; }
+    # #[derive(HasField)]
+    # pub struct Person { pub name: String }
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_impl(new GreetHello)]
+    # impl Greeter { fn greet(&self) {} }
     delegate_components! {
         Person {
             type Name = String,
@@ -661,6 +715,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     For example, given the following:
 
     ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
     delegate_components! {
         new MyComponents {
             KeyA: ValueA,
@@ -685,6 +740,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     For example, given the following:
 
     ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
     delegate_components! {
         MyComponents {
             OuterKey: UseDelegate<new InnerMap {
@@ -699,6 +755,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     It would be the same as writing two separate calls to `delegate_components!` as follows:
 
     ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
     delegate_components! {
         MyComponents {
             OuterKey: UseDelegate<InnerMap>,
@@ -728,6 +785,11 @@ pub fn delegate_components(body: TokenStream) -> TokenStream {
     An optional `exclude [ .. ]` list drops types the caller already implements.
 
     ```rust,ignore
+    # pub struct FooComponent;
+    # pub struct BarComponent;
+    # pub struct App;
+    # #[allow(non_snake_case)]
+    # mod Preset { pub struct Provider; }
     cgp_for_each! {
         [ FooComponent, BarComponent ],
         exclude [ FooComponent ],
@@ -759,6 +821,12 @@ pub fn cgp_for_each(body: TokenStream) -> TokenStream {
     `UseType` or `UseField`.
 
     ```rust,ignore
+    # #[cgp_type]
+    # pub trait HasNameType { type Name; }
+    # #[cgp_getter]
+    # pub trait HasName: HasNameType { fn name(&self) -> &Self::Name; }
+    # #[derive(HasField)]
+    # pub struct Person { pub name: String }
     cgp_preset! {
         Types {
             type Name = String,
@@ -821,6 +889,8 @@ pub fn derive_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     these tables through `RedirectLookup`.
 
     ```rust,ignore
+    # use cgp_fork::core::error::ErrorRaiserComponent;
+    # pub struct RaiseFrom;
     cgp_namespace! {
         new AppNamespace {
             @app.error.ErrorRaiserComponent: RaiseFrom,
@@ -844,19 +914,26 @@ pub fn cgp_namespace(body: TokenStream) -> TokenStream {
    Given the following:
 
    ```rust,ignore
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet { fn greet(&self); }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter { fn greet(&self) {} }
+   # pub struct Person;
+   # delegate_components! { Person { GreeterComponent: GreetHello } }
    check_components! {
-       CanUsePerson for Person {
+       #[check_trait(CanUsePerson)]
+       Person {
            GreeterComponent,
        }
    }
    ```
-
 
    The code above generates a *check trait* called `CanUsePerson`, which verifies
    whether the `Person` context implements the consumer trait for
    `GreeterComponent` (i.e., `CanGreet`):
 
    ```rust,ignore
+   # // doc-example: not compiled (expansion of the check above, for illustration)
    trait CanUsePerson<Component, Params>: CanUseComponent<Component, Params> {}
 
    impl CanUsePerson<GreeterComponent, ()> for Person {}
@@ -882,9 +959,14 @@ pub fn check_components(body: TokenStream) -> TokenStream {
    Given the following code:
 
    ```rust,ignore
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet { fn greet(&self); }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter { fn greet(&self) {} }
+   # pub struct Person;
    delegate_and_check_components! {
-       CanUsePerson for Person;
-       PersonComponents {
+       #[check_trait(CanUsePerson)]
+       Person {
            GreeterComponent: GreetHello,
        }
    }
@@ -893,14 +975,20 @@ pub fn check_components(body: TokenStream) -> TokenStream {
    is equivalent to writing the two separate macro calls:
 
    ```rust,ignore
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet { fn greet(&self); }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter { fn greet(&self) {} }
+   # pub struct Person;
    delegate_components! {
-       PersonComponents {
+       Person {
            GreeterComponent: GreetHello,
        }
    }
 
    check_components! {
-       CanUsePerson for Person {
+       #[check_trait(CanUsePerson)]
+       Person {
            GreeterComponent,
        }
    }
@@ -943,6 +1031,7 @@ pub fn delegate_and_check_components(body: TokenStream) -> TokenStream {
     Given the following abstract type trait definition:
 
     ```rust,ignore
+    # use core::fmt::Display;
     #[cgp_type]
     pub trait HasNameType {
         type Name: Display;
@@ -952,6 +1041,7 @@ pub fn delegate_and_check_components(body: TokenStream) -> TokenStream {
     would be equivalent to the following fully explicit definition:
 
     ```rust,ignore
+    # use core::fmt::Display;
     #[cgp_type {
         name: NameTypeProviderComponent,
         provider: NameTypeProvider,
@@ -965,6 +1055,7 @@ pub fn delegate_and_check_components(body: TokenStream) -> TokenStream {
     Which would generate the following constructs:
 
     ```rust,ignore
+    # // doc-example: not compiled (abridged expansion)
     impl<Context, Type> NameTypeProvider<Context> for UseType<Type>
     where
         Type: Display,
@@ -1002,16 +1093,18 @@ pub fn cgp_type(attrs: TokenStream, body: TokenStream) -> TokenStream {
    Given the following:
 
    ```rust,ignore
-   #[trait_alias]
-   pub trait HasErrorType: Async + HasErrorType<Error: Async> {}
+   # use cgp_fork::core::macros::blanket_trait;
+   #[blanket_trait]
+   pub trait HasSendErrorType: Send + HasErrorType<Error: Send> {}
    ```
 
    automatically generates the following blanket implementation:
 
    ```rust,ignore
-   impl<Context> HasErrorType for Context
+   # // doc-example: not compiled (expansion of the alias above, for illustration)
+   impl<Context> HasSendErrorType for Context
    where
-       Context: Async + HasErrorType<Error: Async> {}
+       Context: Send + HasErrorType<Error: Send> {}
    ```
 */
 #[proc_macro_attribute]
@@ -1208,6 +1301,7 @@ pub fn Enum(body: TokenStream) -> TokenStream {
     to name a component inside a table.
 
     ```rust,ignore
+    # use cgp_fork::core::error::ErrorRaiserComponent;
     type ErrorRaiser = Path!(@app.error.ErrorRaiserComponent);
     ```
 */
@@ -1371,6 +1465,14 @@ pub fn cgp_computer(attr: TokenStream, body: TokenStream) -> TokenStream {
         Circle(Circle),
         Rectangle(Rectangle),
     }
+    # pub struct Circle { pub radius: f64 }
+    # pub struct Rectangle { pub width: f64, pub height: f64 }
+    # impl HasArea for Circle { fn area(&self) -> f64 { 3.0 * self.radius * self.radius } }
+    # impl HasArea for Rectangle { fn area(&self) -> f64 { self.width * self.height } }
+    # fn main() {
+    #     let shape = Shape::Rectangle(Rectangle { width: 2.0, height: 3.0 });
+    #     assert_eq!(shape.area(), 6.0);
+    # }
     ```
 
     With `HasArea` implemented for `Circle` and `Rectangle`, `Shape` implements

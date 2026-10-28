@@ -67,5 +67,19 @@ macro in the concept target that owns that macro's feature.
 ## Documentation outside the published crates
 
 **`crates/tests/doctests`** (`cgp-fork-doctests`, `publish = false`) compiles examples that live
-outside a published package, starting with the repository `README.md`. It runs under
-`cargo test --workspace --doc` like any other doctest, with no cfg flag to forget.
+outside a published package: the repository `README.md`, and the `cgp-fork-macro` docs'
+examples. It runs under `cargo test --workspace --doc` like any other doctest, with no cfg flag
+to forget.
+
+The macro crate cannot depend on `cgp-fork` (that is a cycle), so its examples stay
+`rust,ignore` there. `build.rs` extracts every one of them and compiles it here with a hidden
+`use cgp_fork::prelude::*;`. Give an example its setup with hidden `# ` lines in the macro
+crate's doc comment; they are hidden on docs.rs too. An example that cannot compile on its own,
+such as an abridged expansion or a grammar sketch with `...`, opts out with a hidden first line
+that states why:
+
+```text
+# // doc-example: not compiled (abridged expansion)
+```
+
+A marker without a reason fails the build. Of the 56 examples, 45 compile and 11 opt out.
