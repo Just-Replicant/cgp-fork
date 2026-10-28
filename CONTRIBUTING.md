@@ -22,6 +22,16 @@ Deeper documentation (construct reference, macro internals, error catalog) lives
 supported minimum is `rust-version` in `Cargo.toml` (1.89), checked in CI. Formatting uses nightly
 rustfmt because `.rustfmt.toml` groups and merges imports.
 
+The `tests/ui/*.stderr` snapshots are rustc's exact output, so they belong to the pinned
+toolchain: a new rustc often prints a type path or a note differently. CI's non-blocking
+`Toolchain canary` job runs clippy and the tests on the newest stable and beta to show that drift
+early. To move to a new toolchain, change `channel` in `rust-toolchain.toml` and regenerate the
+snapshots in the same commit:
+
+```sh
+TRYBUILD=overwrite cargo test -p cgp-fork --all-features --test ui_tests
+```
+
 ## Before you push
 
 ```sh
@@ -96,7 +106,8 @@ These are repository settings, so no file in this repository can enforce them. C
      `no_std target`, `Feature powerset (cargo-hack)`,
      `cargo-deny (advisories, licenses, bans, sources)`, `cargo-audit (RustSec)`,
      `Semver (cargo-semver-checks)`, `Package (publish dry run)`, `Coverage (cargo-llvm-cov)`,
-     `Macro fuzzing (deep)`, and `Compile-time budget`.
+     `Macro fuzzing (deep)`, and `Compile-time budget`. Leave `Toolchain canary (stable)` and
+     `Toolchain canary (beta)` optional.
    - Block force pushes and deletion of `main`.
 2. **Release token:** create a fine-grained `RELEASE_PLZ_TOKEN` (Contents and Pull requests:
    read/write) as an Actions secret, so release PRs run Tests. Then set the Actions variable

@@ -120,6 +120,29 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-features --no-fail-fast
 
+  # Early warning for the next toolchain bump: runs clippy and the tests on the
+  # newest stable and on beta instead of the pinned `rust-toolchain.toml`. A
+  # failure here is a heads-up (usually a changed diagnostic in a `tests/ui`
+  # `.stderr` snapshot or a new lint), not a broken `main`, so it never fails
+  # the workflow. Leave it out of the required checks.
+  canary:
+    name: Toolchain canary (${{ matrix.toolchain }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable, beta]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install ${{ matrix.toolchain }}
+        run: rustup toolchain install ${{ matrix.toolchain }} --profile minimal --component clippy
+      - name: Clippy
+        run: cargo +${{ matrix.toolchain }} clippy --workspace --all-features --all-targets -- -D warnings
+      - name: Tests
+        run: cargo +${{ matrix.toolchain }} test --workspace --all-features --no-fail-fast
+
   docs:
     name: Rustdoc (-D warnings)
     runs-on: ubuntu-latest
