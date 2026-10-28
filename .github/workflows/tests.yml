@@ -290,7 +290,13 @@ jobs:
         run: |
           cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
           cargo llvm-cov report --summary-only | tee coverage-summary.txt
+      # Line-coverage floor. Measured at 94.6% when the gate was added (0.10.1);
+      # the floor sits below that so ordinary churn does not trip it, but a change
+      # that drops a whole area's tests does. Raise it as coverage grows.
+      - name: Enforce the coverage floor
+        run: cargo llvm-cov report --summary-only --fail-under-lines 90
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
         with:
           name: coverage
           path: |

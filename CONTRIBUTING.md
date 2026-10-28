@@ -49,6 +49,12 @@ CI also runs the MSRV check (`cargo +1.89 check --workspace --all-features --all
 `cargo semver-checks`, `cargo package --workspace`, coverage, a deep fuzzing pass, and the
 compile-time budget.
 
+Coverage has a floor: the job fails below 90% line coverage
+(`cargo llvm-cov report --summary-only --fail-under-lines 90`). Run it locally with
+`cargo llvm-cov --workspace --all-features --summary-only`. Macro code is measured only
+through the in-crate `macro_tests` (expansion inside rustc is not instrumented), so a new
+macro rule needs a `macro_tests` case, usually a row in a `parser_rejections` table test.
+
 ### Snapshots
 
 Many tests pin a macro's exact expansion as an inline `insta` snapshot. After an intended change:

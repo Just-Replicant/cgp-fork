@@ -28,3 +28,7 @@ pub mod pipe_handlers;
 // `#[derive_promote]` lifts a `Computer` into a component provider.
 pub mod promote_computer;
 pub mod promote_with_input;
+pub mod promote_with_two_inputs;
+
+// `ReturnInput` and the `PromoteRef` owned/borrowed bridge, in every family member.
+pub mod return_input_and_promote_ref;

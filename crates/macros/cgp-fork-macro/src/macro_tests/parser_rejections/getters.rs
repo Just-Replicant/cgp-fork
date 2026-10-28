@@ -214,3 +214,138 @@ fn rejects_attribute_argument() {
         )
     });
 }
+
+/// The method-signature rules of `parse_getter_fields`, each pinned to its message.
+#[test]
+fn rejects_each_malformed_getter_signature_with_its_message() {
+    use proc_macro2::TokenStream;
+
+    use super::assert_macro_rejects_with;
+
+    let run = |body: TokenStream| {
+        move || {
+            crate::macro_lib::cgp_auto_getter(
+                quote!(),
+                quote!(
+                    pub trait HasName {
+                        #body
+                    }
+                ),
+            )
+        }
+    };
+
+    let cases: Vec<(&str, &str, TokenStream)> = vec![
+        (
+            "where clause",
+            "getter method must not contain where clause",
+            quote!(
+                fn name(&self) -> &str
+                where
+                    Self: Sized;
+            ),
+        ),
+        (
+            "no argument",
+            "getter method must contain exactly one `&self` argument",
+            quote!(
+                fn name() -> &'static str;
+            ),
+        ),
+        (
+            "three arguments",
+            "getter method must contain exactly one `&self` argument",
+            quote!(
+                fn name(&self, a: u8, b: u8) -> &str;
+            ),
+        ),
+        (
+            "non-PhantomData second argument",
+            "only PhantomData is allowed as second argument",
+            quote!(
+                fn name(&self, tag: u8) -> &str;
+            ),
+        ),
+        (
+            "PhantomData without a type argument",
+            "only PhantomData is allowed as second argument",
+            quote!(
+                fn name(&self, tag: PhantomData) -> &str;
+            ),
+        ),
+        (
+            // Known limitation: the tag must be spelled as the bare `PhantomData`.
+            "path-qualified PhantomData",
+            "type path must contain exactly one path segment",
+            quote!(
+                fn name(&self, tag: core::marker::PhantomData<u8>) -> &str;
+            ),
+        ),
+        (
+            "reference second argument",
+            "only PhantomData is allowed as second argument",
+            quote!(
+                fn name(&self, tag: &u8) -> &str;
+            ),
+        ),
+        (
+            "self by value",
+            "first argument to getter method must be a reference to self, i.e. `&self`",
+            quote!(
+                fn name(self) -> String;
+            ),
+        ),
+        (
+            "typed non-reference first argument",
+            "first argument to getter method must be a reference",
+            quote!(
+                fn name(context: Self) -> String;
+            ),
+        ),
+        (
+            "missing return type",
+            "return type must be specified",
+            quote!(
+                fn name(&self);
+            ),
+        ),
+    ];
+
+    for (label, message, body) in cases {
+        assert_macro_rejects_with(label, message, run(body));
+    }
+}
+
+/// Getter signatures the parser accepts beyond a bare `&self`: a `PhantomData`
+/// tag argument and an explicitly typed `&Self` receiver.
+#[test]
+fn accepts_phantom_tag_and_typed_receiver() {
+    for body in [
+        quote!(
+            fn name(&self, _tag: PhantomData<Self>) -> &str;
+        ),
+        quote!(
+            fn name(&self, _tag: PhantomData<u8>) -> &str;
+        ),
+        quote!(
+            fn name(context: &Self) -> &str;
+        ),
+        quote!(
+            fn name_mut(context: &mut Self) -> &mut String;
+        ),
+    ] {
+        let result = crate::macro_lib::cgp_auto_getter(
+            quote!(),
+            quote!(
+                pub trait HasName {
+                    #body
+                }
+            ),
+        );
+        assert!(
+            result.is_ok(),
+            "{body} should expand: {:?}",
+            result.err().map(|e| e.to_string())
+        );
+    }
+}
