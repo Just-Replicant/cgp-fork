@@ -48,7 +48,11 @@
 
    would generate the following impl:
 
-   ```rust,ignore
+   ```rust
+   # use cgp_fork::prelude::*;
+   # pub struct GreeterComponent;
+   # pub struct GreetHello;
+   # pub struct MyComponent;
    impl DelegateComponent<GreeterComponent> for MyComponent {
        type Delegate = GreetHello;
    }

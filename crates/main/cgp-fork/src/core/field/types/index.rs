@@ -26,11 +26,14 @@ use core::fmt::{Debug, Display};
     The following `HasField` implementation would be generated, with use of
     `Index<0>` as the field tag:
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # pub struct MyContext(u32);
     impl HasField<Index<0>> for MyContext {
         type Value = u32;
 
-        fn get_field(&self) -> &u32 {
+        fn get_field(&self, _tag: PhantomData<Index<0>>) -> &u32 {
             &self.0
         }
     }

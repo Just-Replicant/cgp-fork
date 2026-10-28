@@ -29,9 +29,15 @@ use crate::core::component::UseContext;
     assert_eq!(*person.get_field(PhantomData::<Symbol!("age")>), 30);
     ```
 
-    The macro would generate the following implementation (illustrative, not compiled):
+    The macro would generate the following implementation (written out by hand against stand-ins for the generated traits, and compiled):
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # pub struct Person {
+    #     name: String,
+    #     age: u8,
+    # }
     impl HasField<Symbol!("name")> for Person {
         type Value = String;
 

@@ -50,9 +50,12 @@
    ```
 
    The following provider trait would be generated with the `IsProviderFor` supertrait
-   (illustrative, not compiled):
+   (written out by hand against stand-ins for the generated traits, and compiled):
 
-   ```rust,ignore
+   ```rust
+   # use core::marker::PhantomData;
+   # use cgp_fork::prelude::*;
+   # pub struct FooGetterAtComponent;
    pub trait FooGetterAt<Context, I, J>:
        IsProviderFor<FooGetterAtComponent, Context, (I, J)>
    {
@@ -84,9 +87,12 @@
    }
    ```
 
-   The following implementation for `IsProviderFor` would be generated (illustrative, not compiled):
+   The following implementation for `IsProviderFor` would be generated (written out by hand against stand-ins for the generated traits, and compiled):
 
-   ```rust,ignore
+   ```rust
+   # use cgp_fork::prelude::*;
+   # pub struct FooGetterAtComponent;
+   # pub struct GetFooValue;
    impl<Context, I, J>
        IsProviderFor<FooGetterAtComponent, Context, (I, J)>
        for GetFooValue
@@ -136,9 +142,13 @@
    assert_eq!(value, 3);
    ```
 
-   The following `IsProviderFor` implementation would be generated (illustrative, not compiled):
+   The following `IsProviderFor` implementation would be generated (written out by hand against stand-ins for the generated traits, and compiled):
 
-   ```rust,ignore
+   ```rust
+   # use cgp_fork::prelude::*;
+   # pub struct FooGetterAtComponent;
+   # pub struct GetFooValue;
+   # pub struct MyAppComponents;
    impl<Context, Params>
        IsProviderFor<FooGetterAtComponent, Context, Params>
        for MyAppComponents

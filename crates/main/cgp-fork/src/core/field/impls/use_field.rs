@@ -56,15 +56,21 @@ use crate::core::types::{TypeProvider, TypeProviderComponent};
     assert_eq!(person.name(), "Alice");
     ```
 
-    The following `UseField` implementation would be generated (illustrative, not compiled):
+    The following `UseField` implementation would be generated (written out by hand against stand-ins for the generated traits, and compiled):
 
-    ```rust,ignore
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # // Stand-in for the provider trait `#[cgp_getter]` generates.
+    # pub trait NameGetter<Context> {
+    #     fn name(context: &Context) -> &str;
+    # }
     impl<Context, Tag> NameGetter<Context> for UseField<Tag>
     where
         Context: HasField<Tag, Value = String>,
     {
         fn name(context: &Context) -> &str {
-            &context.get_field(PhantomData).as_str()
+            context.get_field(PhantomData).as_str()
         }
     }
     ```

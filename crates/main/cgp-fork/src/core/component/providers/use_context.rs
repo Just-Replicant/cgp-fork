@@ -49,9 +49,17 @@ use crate::core::component::WithProvider;
     assert_eq!(<UseContext as Greeter<App>>::greet(&App), "hello");
     ```
 
-    The following `UseContext` implementation would be generated (illustrative, not compiled):
+    The following `UseContext` implementation would be generated (written out by hand against stand-ins for the generated traits, and compiled):
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
+    # pub trait CanGreet {
+    #     fn greet(&self) -> String;
+    # }
+    # // Stand-in for the provider trait `#[cgp_component]` generates.
+    # pub trait Greeter<Context> {
+    #     fn greet(context: &Context) -> String;
+    # }
     impl<Context> Greeter<Context> for UseContext
     where
         Context: CanGreet,

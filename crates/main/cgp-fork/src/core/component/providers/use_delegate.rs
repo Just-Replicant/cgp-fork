@@ -30,23 +30,31 @@ use core::marker::PhantomData;
 
     Given the following component definition:
 
-    ```rust,ignore
-    // Illustrative: this is how the crate's own `CanRaiseError` is declared.
+    ```rust
+    # mod illustration {
+    # use cgp_fork::prelude::*;
+    // This is how the crate's own `CanRaiseError` is declared.
     #[cgp_component(ErrorRaiser)]
     #[derive_delegate(UseDelegate<SourceError>)]
     pub trait CanRaiseError<SourceError>: HasErrorType {
         fn raise_error(error: SourceError) -> Self::Error;
     }
+    # }
     ```
 
-    The following `UseDelegate` implementation would be generated (illustrative, not compiled):
+    The following `UseDelegate` implementation would be generated (written out by hand against stand-ins for the generated traits, and compiled):
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
+    # // Stand-in for the provider trait `#[cgp_component]` generates.
+    # pub trait ErrorRaiser<Context: HasErrorType, SourceError> {
+    #     fn raise_error(error: SourceError) -> Context::Error;
+    # }
     impl<Context, SourceError, Components, Delegate> ErrorRaiser<Context, SourceError>
         for UseDelegate<Components>
     where
         Context: HasErrorType,
-        Components: DelegateComponent<(SourceError), Delegate = Delegate>,
+        Components: DelegateComponent<SourceError, Delegate = Delegate>,
         Delegate: ErrorRaiser<Context, SourceError>,
     {
         fn raise_error(error: SourceError) -> Context::Error {

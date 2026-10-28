@@ -38,9 +38,14 @@ use crate::core::types::traits::TypeProvider;
     assert_eq!(name, "Alice");
     ```
 
-    The following `UseType` implementation would be generated (illustrative, not compiled):
+    The following `UseType` implementation would be generated (written out by hand against stand-ins for the generated traits, and compiled):
 
-    ```rust,ignore
+    ```rust
+    # use cgp_fork::prelude::*;
+    # // Stand-in for the provider trait `#[cgp_type]` generates.
+    # pub trait NameTypeProvider<Context> {
+    #     type Name;
+    # }
     impl<Context, Type> NameTypeProvider<Context> for UseType<Type> {
         type Name = Type;
     }
