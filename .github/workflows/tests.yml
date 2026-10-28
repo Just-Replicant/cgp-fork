@@ -287,6 +287,7 @@ jobs:
       - name: Install cargo-llvm-cov
         run: command -v cargo-llvm-cov || cargo install --locked "cargo-llvm-cov@${CARGO_LLVM_COV_VERSION}"
       - name: Measure coverage
+        shell: bash
         run: |
           cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
           cargo llvm-cov report --summary-only | tee coverage-summary.txt
@@ -343,9 +344,42 @@ jobs:
       # `bash` so the job does not depend on the executable bit. Windows checkouts
       # with `core.filemode=true` drop it, and committing that mode change would
       # make `./scripts/compile-time.sh` fail here.
+      #
+      # `shell: bash` adds `-o pipefail`; without it the `| tee` hid an over-budget
+      # exit and the budget never failed the job.
       - name: Time a 200-component wiring
-        run: bash scripts/compile-time.sh | tee compile-time.txt
+        shell: bash
+        run: RESULT_FILE=compile-time-secs.txt bash scripts/compile-time.sh | tee compile-time.txt
+      # The trend series lives in the Actions cache: each push to `main` saves a
+      # new entry under a unique key, and every run restores the newest one by
+      # prefix. Pull requests read `main`'s series but never write it.
+      - name: Restore the compile-time history
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: compile-time-history.jsonl
+          key: compile-time-history-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: compile-time-history-${{ runner.os }}-
+      - name: Compare with the rolling median
+        shell: bash
+        env:
+          RECORD: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: |
+          args=(--history compile-time-history.jsonl --value "$(cat compile-time-secs.txt)")
+          if [[ "$RECORD" == "true" ]]; then
+            args+=(--record --sha "$GITHUB_SHA")
+          fi
+          python3 scripts/compile-time-trend.py "${args[@]}" | tee -a compile-time.txt
+      - name: Save the compile-time history
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && hashFiles('compile-time-history.jsonl') != ''
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: compile-time-history.jsonl
+          key: compile-time-history-${{ runner.os }}-${{ github.run_id }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
         with:
           name: compile-time
-          path: compile-time.txt
+          path: |
+            compile-time.txt
+            compile-time-history.jsonl
+          if-no-files-found: ignore

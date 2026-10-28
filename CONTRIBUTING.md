@@ -155,3 +155,10 @@ macro crates to `crates/macros/cgp-fork-macro/src/{macro_core,macro_lib,…}`. A
 - `bash scripts/compile-time.sh` times a generated crate with `N` (default 200) components against the
   budget in `scripts/compile-budget.txt`. Invoke it with `bash` so a checkout that dropped the
   executable bit still runs.
+- `python3 scripts/compile-time-trend.py --history FILE --value SECS [--record --sha SHA]` compares
+  a measurement with the median of the last 10 recorded runs and fails when it is more than 1.5×
+  that median and more than 2 s above it. In CI the `Compile-time budget` job keeps the series in
+  the Actions cache (`compile-time-history-<os>-*`): pushes to `main` append to it, pull requests
+  are only compared with it. Until three runs are recorded the trend check passes and only the
+  fixed budget applies. To reset the series (for example after a runner-image change makes every
+  build slower), delete those cache entries under *Actions → Caches*.

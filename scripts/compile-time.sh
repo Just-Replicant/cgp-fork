@@ -8,6 +8,11 @@
 #
 #   bash scripts/compile-time.sh                 # N=200, budget from scripts/compile-budget.txt
 #   N=500 BUDGET_SECS=60 bash scripts/compile-time.sh
+#   RESULT_FILE=secs.txt bash scripts/compile-time.sh   # also write the seconds alone
+#   KEEP_WORK=1 bash scripts/compile-time.sh             # keep the generated crate
+#
+# The trend over time (rolling median of earlier `main` runs) is checked
+# separately by `scripts/compile-time-trend.py`, fed from RESULT_FILE.
 #
 # The budget is deliberately loose (CI machines vary); the goal is to catch a
 # macro-expansion blow-up, not a few percent of noise.
@@ -15,12 +20,19 @@ set -euo pipefail
 # Decimal points and `date` must not depend on the locale (`awk` would treat
 # `1.5` as zero under a comma decimal and the budget check would never fire).
 export LC_ALL=C
+# The timed step rebuilds an unchanged file; with incremental compilation on it
+# can reuse the cache and under-measure. CI already sets this; local runs need it too.
+export CARGO_INCREMENTAL=0
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 n="${N:-200}"
 budget="${BUDGET_SECS:-$(tr -d '[:space:]' < "$root/scripts/compile-budget.txt")}"
 work="$(mktemp -d)"
-trap 'rm -rf "$work"' EXIT
+if [[ -n "${KEEP_WORK:-}" ]]; then
+  echo "compile-time: keeping $work" >&2
+else
+  trap 'rm -rf "$work"' EXIT
+fi
 
 mkdir -p "$work/src"
 cat > "$work/Cargo.toml" <<TOML
@@ -105,6 +117,9 @@ end=$(date +%s.%N)
 elapsed=$(awk -v s="$start" -v e="$end" 'BEGIN { printf "%.2f", e - s }')
 
 echo "compile-time: ${n} components wired and checked in ${elapsed}s (budget ${budget}s)"
+if [[ -n "${RESULT_FILE:-}" ]]; then
+  echo "$elapsed" > "$RESULT_FILE"
+fi
 if awk -v e="$elapsed" -v b="$budget" 'BEGIN { exit !(e > b) }'; then
   echo "compile-time: over budget" >&2
   exit 1
