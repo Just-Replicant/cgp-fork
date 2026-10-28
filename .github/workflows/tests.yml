@@ -263,7 +263,7 @@ jobs:
       # Packages and verifies both crates together, so the facade builds against
       # the macro crate being released rather than the one on crates.io.
       - name: Package the workspace
-        run: cargo package --workspace --locked
+        run: cargo package --workspace --exclude cgp-fork-doctests --locked
       - name: No tests or build script in the facade package
         run: |
           if cargo package -p cgp-fork --list --allow-dirty | grep -E '^(tests/|build\.rs$)'; then

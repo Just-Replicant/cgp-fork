@@ -46,7 +46,7 @@ cargo check -p cgp-fork --target thumbv7m-none-eabi --no-default-features
 
 CI also runs the MSRV check (`cargo +1.89 check --workspace --all-features --all-targets`),
 `cargo hack check --feature-powerset`, `cargo deny check`, `cargo audit`,
-`cargo semver-checks`, `cargo package --workspace`, coverage, a deep fuzzing pass, and the
+`cargo semver-checks`, `cargo package --workspace --exclude cgp-fork-doctests`, coverage, a deep fuzzing pass, and the
 compile-time budget.
 
 Coverage has a floor: the job fails below 90% line coverage

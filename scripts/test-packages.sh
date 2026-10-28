@@ -15,7 +15,9 @@ version="$(cargo metadata --no-deps --format-version 1 \
   | python3 -c 'import json,sys; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "cgp-fork"))')"
 
 # `--allow-dirty` so the check also runs on uncommitted local changes.
-cargo package --workspace --locked --allow-dirty
+# `cgp-fork-doctests` (publish = false) reads files outside its own directory,
+# so it cannot be verified from a package; it is never published anyway.
+cargo package --workspace --exclude cgp-fork-doctests --locked --allow-dirty
 
 for crate in cgp-fork cgp-fork-macro; do
   if ! cargo package -p "$crate" --list --allow-dirty | grep -qx LICENSE; then
