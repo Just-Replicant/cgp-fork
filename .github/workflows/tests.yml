@@ -25,6 +25,7 @@ env:
   CARGO_AUDIT_VERSION: "0.22.2"
   CARGO_SEMVER_CHECKS_VERSION: "0.51.0"
   CARGO_LLVM_COV_VERSION: "0.9.1"
+  CARGO_FUZZ_VERSION: "0.13.2"
   MSRV: "1.89"
 
 # Cancel in-progress runs when a new commit is pushed to the same PR, branch, or tag.
@@ -48,6 +49,8 @@ jobs:
       - name: Install nightly rustfmt
         run: rustup toolchain install nightly --profile minimal --component rustfmt
       - run: cargo +nightly fmt --all -- --check
+      # `fuzz/` is outside the workspace, so `--all` does not reach it.
+      - run: cargo +nightly fmt --manifest-path fuzz/Cargo.toml -- --check
 
   clippy:
     name: Clippy
@@ -318,6 +321,42 @@ jobs:
           seed=${{ github.run_id }}
           echo "CGP_FUZZ_SEED=$seed"
           CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro robustness
+      # The cargo-fuzz crate includes the macro modules by path; check that it
+      # still builds (on the pinned stable toolchain) so a refactor cannot
+      # silently break the scheduled coverage-guided run below.
+      - name: Check the cargo-fuzz crate builds
+        run: cargo clippy --manifest-path fuzz/Cargo.toml --locked --bins --examples -- -D warnings
+
+  # Coverage-guided fuzzing with libFuzzer. It needs nightly and runs for 30
+  # minutes, so only on the weekly schedule and on demand, never on a PR.
+  # Non-blocking: a finding uploads the crashing input as an artifact; turn it
+  # into a `macro_tests` regression test, then fix it.
+  cargo-fuzz:
+    name: Coverage-guided fuzzing (cargo-fuzz)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install nightly
+        run: rustup toolchain install nightly --profile minimal
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/cargo-fuzz
+          key: cargo-fuzz-${{ runner.os }}-${{ env.CARGO_FUZZ_VERSION }}
+      - name: Install cargo-fuzz
+        run: command -v cargo-fuzz || cargo install --locked "cargo-fuzz@${CARGO_FUZZ_VERSION}"
+      - name: Write the seed corpus
+        run: cargo +nightly run --manifest-path fuzz/Cargo.toml --locked --example write_seeds -- fuzz/corpus/entrypoints
+      - name: Fuzz every macro entrypoint for 30 minutes
+        run: cargo +nightly fuzz run entrypoints -- -max_total_time=1800 -rss_limit_mb=4096
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: cargo-fuzz-artifacts
+          path: fuzz/artifacts/
+          if-no-files-found: ignore
 
   # Every `cgp-knowledge-base-fork/<path>` reference in comments and docs must
   # name a page of the public knowledge base, or a draft in `docs/kb-pages/`

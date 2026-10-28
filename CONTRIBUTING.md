@@ -112,8 +112,9 @@ These are repository settings, so no file in this repository can enforce them. C
      `no_std target`, `Feature powerset (cargo-hack)`,
      `cargo-deny (advisories, licenses, bans, sources)`, `cargo-audit (RustSec)`,
      `Semver (cargo-semver-checks)`, `Package (publish dry run)`, `Coverage (cargo-llvm-cov)`,
-     `Macro fuzzing (deep)`, and `Compile-time budget`. Leave `Toolchain canary (stable)` and
-     `Toolchain canary (beta)` optional.
+     `Macro fuzzing (deep)`, and `Compile-time budget`. Leave `Toolchain canary (stable)`,
+     `Toolchain canary (beta)`, `Knowledge-base references`, and
+     `Coverage-guided fuzzing (cargo-fuzz)` optional (the last runs only on the schedule).
    - Block force pushes and deletion of `main`.
 2. **Release token:** create a fine-grained `RELEASE_PLZ_TOKEN` (Contents and Pull requests:
    read/write) as an Actions secret, so release PRs run Tests. Then set the Actions variable
@@ -155,6 +156,10 @@ macro crates to `crates/macros/cgp-fork-macro/src/{macro_core,macro_lib,…}`. A
 - `bash scripts/compile-time.sh` times a generated crate with `N` (default 200) components against the
   budget in `scripts/compile-budget.txt`. Invoke it with `bash` so a checkout that dropped the
   executable bit still runs.
+- `fuzz/` is a cargo-fuzz crate for coverage-guided fuzzing of every macro entrypoint
+  (`cargo +nightly fuzz run entrypoints`). It includes the macro modules by path, so a new
+  module under `crates/macros/cgp-fork-macro/src/` needs no change there, but a new top-level
+  module must also be added to `fuzz/src/lib.rs`. See `fuzz/README.md`.
 - `python3 scripts/compile-time-trend.py --history FILE --value SECS [--record --sha SHA]` compares
   a measurement with the median of the last 10 recorded runs and fails when it is more than 1.5×
   that median and more than 2 s above it. In CI the `Compile-time budget` job keeps the series in

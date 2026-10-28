@@ -16,7 +16,9 @@ use std::str::FromStr;
 
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
 
-type Entrypoint = (
+/// A macro entrypoint by name. Shared with the cargo-fuzz targets in `fuzz/`,
+/// which include this file, so both fuzzers cover the same list.
+pub type Entrypoint = (
     &'static str,
     fn(TokenStream, TokenStream) -> syn::Result<TokenStream>,
 );
@@ -30,7 +32,8 @@ macro_rules! body_only {
     }};
 }
 
-fn entrypoints() -> Vec<Entrypoint> {
+/// Every macro entrypoint, as `(attr, body)` functions.
+pub fn entrypoints() -> Vec<Entrypoint> {
     use crate::{extra_macro_lib as extra, macro_lib as lib};
     vec![
         ("async_trait", crate::async_impl::impl_async),
@@ -81,7 +84,7 @@ fn entrypoints() -> Vec<Entrypoint> {
 }
 
 /// Valid (or nearly valid) inputs the mutator starts from: `(attr, body)`.
-const SEEDS: &[(&str, &str)] = &[
+pub const SEEDS: &[(&str, &str)] = &[
     (
         "",
         "App { open ErrorRaiserComponent; GreeterComponent: GreetHello, @ErrorRaiserComponent.String: DisplayError, [FooComponent, BarComponent]: UseDelegate<new Table { u32: A, String: B }>, }",
