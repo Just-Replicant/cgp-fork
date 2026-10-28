@@ -136,7 +136,9 @@ macro crates to `crates/macros/cgp-fork-macro/src/{macro_core,macro_lib,…}`. A
 ## Other scripts
 
 - `bash scripts/check-kb-refs.sh [kb-checkout]` checks that every `cgp-knowledge-base-fork/<path>`
-  reference in comments and docs names a file that exists in the knowledge base.
+  reference in comments and docs names a file that exists in the knowledge base. A page that is
+  drafted in `docs/kb-pages/` but not yet in the knowledge base is reported as pending
+  (`KB_REFS_STRICT=1` fails on those too). CI runs it, non-blocking, as `Knowledge-base references`.
 - `bash scripts/compile-time.sh` times a generated crate with `N` (default 200) components against the
   budget in `scripts/compile-budget.txt`. Invoke it with `bash` so a checkout that dropped the
   executable bit still runs.

@@ -312,6 +312,21 @@ jobs:
           echo "CGP_FUZZ_SEED=$seed"
           CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro robustness
 
+  # Every `cgp-knowledge-base-fork/<path>` reference in comments and docs must
+  # name a page of the public knowledge base, or a draft in `docs/kb-pages/`
+  # waiting to be copied there. Non-blocking: the knowledge base is a separate
+  # repository that moves on its own.
+  kb-refs:
+    name: Knowledge-base references
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Fetch the public knowledge base
+        run: git clone --depth 1 https://github.com/Just-Replicant/cgp-knowledge-base-fork "$RUNNER_TEMP/kb"
+      - name: Check references
+        run: bash scripts/check-kb-refs.sh "$RUNNER_TEMP/kb"
+
   compile-time:
     name: Compile-time budget
     runs-on: ubuntu-latest
