@@ -3,10 +3,15 @@
 #
 #   bash scripts/upstream-sync.sh            # fetch upstream, list commits not yet merged
 #   bash scripts/upstream-sync.sh --merge    # also merge upstream/main into a new sync branch
+#   bash scripts/upstream-sync.sh --check    # exit 1 when a commit is neither merged nor reviewed
 #
 # The fork records the last merged upstream commit in `UPSTREAM_COMMIT` at the
 # repository root (and the README's "includes upstream through" line). After a
 # merge, update both, run the full verification in CONTRIBUTING.md, and open a PR.
+#
+# `UPSTREAM_REVIEWED` lists newer upstream commits that were reviewed and
+# deliberately skipped (for example docs that only concern upstream). They are
+# reported as reviewed, not pending, so a weekly check only flags new work.
 #
 # This script only fetches over anonymous HTTPS; it never pushes.
 set -euo pipefail
@@ -23,10 +28,32 @@ if ! git remote get-url upstream >/dev/null 2>&1; then
 fi
 GIT_TERMINAL_PROMPT=0 git fetch --no-tags upstream "$branch"
 
+reviewed=""
+if [[ -f UPSTREAM_REVIEWED ]]; then
+  # `|| true`: a file with only comments is fine, and grep exits 1 on no match.
+  reviewed="$( (grep -vE '^[[:space:]]*(#|$)' UPSTREAM_REVIEWED || true) | awk '{print $1}')"
+fi
+
 echo "Last merged upstream commit: $synced"
-pending="$(git rev-list --count "$synced..upstream/$branch")"
-echo "Upstream commits not yet merged: $pending"
-git log --oneline "$synced..upstream/$branch"
+newer="$(git rev-list --count "$synced..upstream/$branch")"
+unreviewed=0
+while IFS= read -r sha; do
+  [[ -z "$sha" ]] && continue
+  line="$(git log -1 --format='%h %s' "$sha")"
+  if grep -qx "$sha" <<<"$reviewed"; then
+    echo "  reviewed, not merged: $line"
+  else
+    echo "  pending:              $line"
+    unreviewed=$((unreviewed + 1))
+  fi
+done < <(git rev-list --reverse "$synced..upstream/$branch")
+echo "Upstream commits not yet merged: $newer ($unreviewed not reviewed)"
+pending="$newer"
+
+if [[ "${1:-}" == "--check" ]]; then
+  [[ "$unreviewed" -eq 0 ]]
+  exit
+fi
 
 if [[ "${1:-}" == "--merge" && "$pending" -gt 0 ]]; then
   target="$(git rev-parse --short "upstream/$branch")"

@@ -114,7 +114,8 @@ These are repository settings, so no file in this repository can enforce them. C
    `REQUIRE_RELEASE_PLZ_TOKEN` to `true`; the release-pr job then fails instead of warning when
    the token is missing.
 3. **Actions permissions:** Workflow permissions "read and write", and allow GitHub Actions to
-   create pull requests (release-plz).
+   create pull requests (release-plz). The `Upstream sync check` workflow needs `issues: write`,
+   which it requests itself.
 4. **crates.io trusted publishers** for both crates: repository `Just-Replicant/cgp-fork`, workflow
    `release-plz.yml`.
 
@@ -126,7 +127,13 @@ records the last upstream commit merged here, and the README repeats it.
 ```sh
 bash scripts/upstream-sync.sh          # fetch upstream and list the commits not merged yet
 bash scripts/upstream-sync.sh --merge  # merge them into a new upstream-sync-<sha> branch
+bash scripts/upstream-sync.sh --check  # exit 1 when a commit is neither merged nor reviewed
 ```
+
+An upstream commit that does not apply to the fork (for example docs about upstream's own release)
+goes into `UPSTREAM_REVIEWED` with a one-line reason, so it is reported as reviewed rather than
+pending. The weekly `Upstream sync check` workflow runs `--check` and opens or updates one issue
+when upstream has commits that are neither merged nor reviewed.
 
 Upstream is split into many crates, while the fork has two, so a merge usually needs its paths
 mapped by hand: upstream `crates/*/cgp-*/src` corresponds to a module of `cgp-fork`, and upstream's

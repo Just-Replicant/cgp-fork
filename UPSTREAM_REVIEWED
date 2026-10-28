@@ -1,0 +1,5 @@
+# Upstream contextgeneric/cgp commits newer than UPSTREAM_COMMIT that were
+# reviewed and deliberately not merged. `scripts/upstream-sync.sh` lists them
+# as reviewed instead of pending. One per line: <full sha> <reason>.
+# Remove entries once UPSTREAM_COMMIT moves past them.
+eca0c5fda60d87cf048460f5abdd3b6e82da5e0f docs-only (#280): describes upstream main as v0.8.0; nothing in the fork to change
