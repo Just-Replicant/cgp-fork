@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+## [0.10.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.10.0...v0.10.1) - 2026-10-28
+
+No breaking changes: the public API of both crates is unchanged (checked with
+`cargo semver-checks` against 0.10.0), and macro output is unchanged except for the raw-identifier
+fix below. This is the first release published only after the full Tests workflow passes on
+`main`.
+
+### Fixed
+
+- *(macro)* a raw identifier in a name a macro derives from (`check_components! { r#Person {..} }`,
+  `#[cgp_component(r#Greeter)]`, `#[cgp_fn] fn r#type`, `struct r#Person` with
+  `#[derive(BuildField)]`, and six more) panicked with "`…r#…` is not a valid Ident". The derived
+  name now uses the unrawed spelling (`__CheckPerson`, `GreeterComponent`, `Type`).
+- *(package)* `cargo test` on the published `cgp-fork-macro` failed: the package left out
+  `src/macro_tests/`, which `lib.rs` declares under `cfg(test)`. The tests ship again, and CI now
+  runs the test suites from the packaged `.crate` files.
+- *(package)* both crates now include the `LICENSE` file.
+- *(docs)* the `check_components!` and `delegate_and_check_components!` examples used an old
+  `CanUsePerson for Person` syntax; they now use `#[check_trait(CanUsePerson)]`. The
+  `#[blanket_trait]` example used `#[trait_alias]` and a trait that named itself as a supertrait.
+- *(docs)* `Index`'s `HasField` example left out the `PhantomData<Tag>` parameter; `UseDelegate`
+  keyed on a parenthesized `(SourceError)`; `UseField`'s example returned a `&&str`.
+
+### Changed
+
+- *(deps)* `cgp-fork-macro` no longer enables syn's `extra-traits` feature for normal builds, so
+  downstream builds compile a smaller syn. The `itertools` dependency is gone.
+- *(docs)* every documentation example is now compiled. The facade's 11 "generated code" blocks are
+  doctests. The macro crate's examples compile in a workspace-only crate (45 of 56; the other 11
+  are grammar sketches or abridged expansions and say so). The repository README compiles there
+  too, with no cfg flag to forget.
+- *(build)* the pinned toolchain is Rust 1.99.1. The MSRV is still 1.89.
+- *(ci)* publishing waits for the Tests workflow on `main`. CI also enforces a 90% line-coverage
+  floor, tracks compile time against a rolling median, adds stable/beta toolchain canaries, a
+  weekly upstream-sync check, a knowledge-base reference check, and weekly coverage-guided fuzzing
+  with cargo-fuzz (`fuzz/`).
+
 ## [0.10.0](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.3...v0.10.0) - 2026-10-27
 
 ### Breaking changes
