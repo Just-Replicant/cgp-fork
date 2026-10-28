@@ -5,32 +5,45 @@ them. The earlier analysis of v0.9.3 is kept in [`docs/history/`](history/2026-1
 
 ## Status
 
-| Item | Status | Commit |
-|---|---|---|
-| F-1 | Done | `90320d35` |
-| F-2 | Done (repository settings are documented for the maintainer) | `3e5077df` |
-| F-3 | Done | `939ded18` |
-| F-4 | Done | `26d316be` |
-| F-5 | Done in this repository; 8 drafted pages wait to be copied into the knowledge base | `d53299a5` |
-| I-1 | Done; the `.mailmap` line is a placeholder for the maintainer to fill in | this commit |
-| I-2 … I-9 | Open | |
+All 14 items are implemented on branch `fixes-0.10.1` and released as **0.10.1** (prepared in
+`e8fcab06`, not published). Three are partial. The "Remaining" column says what is left and why.
+
+| Item | Status | Commit | Remaining |
+|---|---|---|---|
+| F-1 | Done | `90320d35` | |
+| F-2 | Done in the repository | `3e5077df` | Branch protection, the `RELEASE_PLZ_TOKEN` secret, the `REQUIRE_RELEASE_PLZ_TOKEN` variable and trusted publishing are repository settings. CONTRIBUTING → "Maintainer setup" lists them for the maintainer. |
+| F-3 | Done | `939ded18` | |
+| F-4 | Done | `26d316be` | |
+| F-5 | Partial: done in this repository | `d53299a5` | The 8 pages drafted in `docs/kb-pages/` must be copied into the knowledge-base repository, a separate repository this branch does not touch. `KB_REFS_STRICT=1 bash scripts/check-kb-refs.sh` then reports 0 pending. |
+| I-1 | Done | `6fdd3151` | The maintainer fills in the `.mailmap` placeholder line with their real identity. |
+| I-2 | Done | `a09945b1` | |
+| I-3 | Done | `69e6bc4c` | Line coverage went from 91.9% to 94.6%; CI fails below 90%. |
+| I-4 | Done | `94aefde1` | |
+| I-5 | Done (dropped `itertools`) | `24f7463a` | |
+| I-6 | Done | `634d36c4` | |
+| I-7 | Done | `b560b92e` | The first two runs on `main` only record; the trend check starts with the third. |
+| I-8 | Partial | `d2c825a3` | 45 of 56 macro-crate examples compile, in `cgp-fork-doctests`. The other 11 (6 grammar sketches with `...`, 5 illustrative expansions) opt out with a stated reason. They stay `rust,ignore` in the macro crate itself, because a proc-macro crate cannot depend on its facade. |
+| I-9 | Partial | `ccff5f8d` (found and fixed: `4113e01b`) | One libFuzzer target over every entrypoint, which includes the macro modules by `#[path]`, plus a weekly CI run. Not done: the internal parser crate split, one target per entrypoint, and the one-hour run per target. See `fuzz/README.md`. |
+
+Nightly cargo also prints a warning that `homepage` duplicates `repository`
+(`redundant_homepage`). It is cosmetic and left for a later release.
 
 ## Checklist
 
-1. [ ] F-1 Make the published crates testable and complete (macro tests, LICENSE, package CI check)
-2. [ ] F-2 Gate publishing on a green CI run
-3. [ ] F-3 Bump the toolchain to 1.99.1 and add a canary job
-4. [ ] F-4 Stop README doctests from being dropped silently
-5. [ ] F-5 Fix the 11 dangling knowledge-base references
-6. [ ] I-1 Repository hygiene (`.mailmap`, comments, stale plan doc)
-7. [ ] I-2 Track upstream reviews and automate the sync check
-8. [ ] I-3 Enforce coverage and test the weak spots
-9. [ ] I-4 Compile the 11 ignored facade doc examples
-10. [ ] I-5 Bump or drop `itertools`
-11. [ ] I-6 Drop syn `extra-traits` from normal builds
-12. [ ] I-7 Track compile time over time
-13. [ ] I-8 Give macro-crate docs compiled examples
-14. [ ] I-9 Coverage-guided fuzzing with `cargo-fuzz`
+1. [x] F-1 Make the published crates testable and complete (macro tests, LICENSE, package CI check)
+2. [x] F-2 Gate publishing on a green CI run
+3. [x] F-3 Bump the toolchain to 1.99.1 and add a canary job
+4. [x] F-4 Stop README doctests from being dropped silently
+5. [~] F-5 Fix the 11 dangling knowledge-base references (drafts wait for the knowledge base)
+6. [x] I-1 Repository hygiene (`.mailmap`, comments, stale plan doc)
+7. [x] I-2 Track upstream reviews and automate the sync check
+8. [x] I-3 Enforce coverage and test the weak spots
+9. [x] I-4 Compile the 11 ignored facade doc examples
+10. [x] I-5 Bump or drop `itertools`
+11. [x] I-6 Drop syn `extra-traits` from normal builds
+12. [x] I-7 Track compile time over time
+13. [~] I-8 Give macro-crate docs compiled examples (45/56; the rest opt out with a reason)
+14. [~] I-9 Coverage-guided fuzzing with `cargo-fuzz` (one target; no crate split yet)
 
 Do F-1 to F-2 before the next release. Ship F-1 as **0.10.1**, the first release that waits for CI.
 
