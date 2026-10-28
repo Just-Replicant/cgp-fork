@@ -3,7 +3,8 @@ use syn::parse::{Parse, ParseStream};
 use crate::macro_core::types::generics::ImplGenerics;
 use crate::macro_core::types::path::PathElement;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct PathElementWithGenerics {
     pub generics: ImplGenerics,
     pub element: PathElement,

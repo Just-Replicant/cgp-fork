@@ -6,7 +6,8 @@ use syn::{Ident, LitStr, Type, parse_quote};
 
 use crate::macro_core::traits::ToType;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct Symbol {
     pub ident: String,
     pub span: Span,

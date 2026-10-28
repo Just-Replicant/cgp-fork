@@ -3,7 +3,7 @@ use syn::spanned::Spanned;
 use syn::token::Mut;
 use syn::{Error, GenericArgument, PathArguments, PathSegment, Type, TypePath, TypeReference};
 
-use crate::macro_core::functions::parse_internal;
+use crate::macro_core::functions::{parse_internal, tokens_eq};
 use crate::macro_core::types::getter::FieldMode;
 
 /// Determine, from the type a field read must produce, the field type to require,
@@ -22,7 +22,7 @@ pub fn parse_field_type(
 
             let field_mut = type_ref.mutability;
 
-            if type_ref.elem.as_ref() == &parse_internal! { str } {
+            if tokens_eq(type_ref.elem.as_ref(), &parse_internal! { str }) {
                 // Special case to handle &str as String field
 
                 let field_type: Type = parse_internal! { String };
@@ -53,7 +53,7 @@ pub fn parse_field_type(
                 let field_mut = type_ref.mutability;
                 let field_type = type_ref.elem.as_ref();
 
-                if field_type == &parse_internal! { str } {
+                if tokens_eq(field_type, &parse_internal! { str }) {
                     // `Option<&str>` is backed by an `Option<String>` field and read
                     // with `.as_deref()` (or `.as_deref_mut()` for `Option<&mut str>`),
                     // mirroring the `&str`/`String` special case for a plain reference.

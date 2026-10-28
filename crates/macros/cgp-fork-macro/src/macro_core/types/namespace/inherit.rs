@@ -4,7 +4,8 @@ use crate::macro_core::parse_internal;
 use crate::macro_core::types::delegate_component::{EvalForEntry, EvaluatedForEntry};
 use crate::macro_core::types::ident::PathWithTypeArgs;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct InheritNamespaceStatement {
     pub namespace: PathWithTypeArgs,
     pub local_table_ident: Ident,

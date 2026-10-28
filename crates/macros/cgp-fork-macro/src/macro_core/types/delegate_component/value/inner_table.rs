@@ -12,7 +12,8 @@ use crate::macro_core::types::keywords::New;
 /// The legacy nested-dispatch value `Wrapper<new Inner { .. }>`: it evaluates to
 /// the type `Wrapper<Inner..>` (dropping `new`), and the inner table is lifted
 /// out to become its own struct and impls.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct DelegateValueWithInnerTable {
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub new: Keyword<New>,

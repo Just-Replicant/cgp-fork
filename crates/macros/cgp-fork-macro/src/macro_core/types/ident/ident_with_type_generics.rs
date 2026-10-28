@@ -7,7 +7,8 @@ use crate::macro_core::types::ident::TypeGenericParams;
 
 /// An identifier followed by an optional definition-site generic parameter
 /// list, e.g. `Foo`, `Foo<A, B>`, or `Bar<'a, C>`.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct IdentWithTypeGenerics {
     pub ident: Ident,
     pub type_generics: TypeGenericParams,

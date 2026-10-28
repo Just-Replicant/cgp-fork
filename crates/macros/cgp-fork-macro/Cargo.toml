@@ -27,11 +27,15 @@ proc-macro = true
 snapshot = ["dep:prettyplease"]
 
 [dependencies]
-syn         = { version = "3", features = ["full", "extra-traits", "visit", "visit-mut"] }
+# No `extra-traits`: the macros compare syntax with `tokens_eq` and derive `Debug`
+# only under `cfg(test)`, so downstream builds compile a smaller syn.
+syn         = { version = "3", features = ["full", "visit", "visit-mut"] }
 quote       = { version = "1" }
 proc-macro2 = { version = "1" }
 prettyplease = { version = "0.3", optional = true }
 
 [dev-dependencies]
+# The unit tests print and compare syntax trees (`Debug`, `PartialEq`).
+syn   = { version = "3", features = ["full", "extra-traits", "visit", "visit-mut"] }
 insta = { version = "1" }
 prettyplease = { version = "0.3" }

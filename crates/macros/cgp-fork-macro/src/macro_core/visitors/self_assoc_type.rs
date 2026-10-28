@@ -5,6 +5,8 @@ use syn::token::Plus;
 use syn::visit_mut::{VisitMut, visit_type_mut, visit_type_param_bound_mut};
 use syn::{Ident, TraitItemType, Type, TypeParamBound, parse_quote};
 
+use crate::macro_core::functions::tokens_eq;
+
 pub fn get_bounds_and_replace_self_assoc_type(
     item_type: &TraitItemType,
 ) -> Punctuated<TypeParamBound, Plus> {
@@ -28,7 +30,7 @@ impl VisitMut for ReplaceSelfAssocTypeVisitor {
     fn visit_type_mut(&mut self, node: &mut Type) {
         if let Type::Path(type_path) = node {
             let type_ident = &self.type_ident;
-            if type_path == &parse_quote! { Self :: #type_ident } {
+            if tokens_eq(&*type_path, &parse_quote! { Self :: #type_ident }) {
                 *node = parse_quote!(#type_ident);
                 return;
             }

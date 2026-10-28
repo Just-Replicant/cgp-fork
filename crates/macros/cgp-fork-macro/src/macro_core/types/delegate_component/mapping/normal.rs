@@ -9,7 +9,8 @@ use crate::macro_core::types::delegate_component::{
 
 /// A `Key: Value` mapping — the common form, whose evaluated `Delegate` is the
 /// value type directly.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct NormalDelegateMapping {
     pub key: DelegateKey,
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]

@@ -22,7 +22,8 @@ use crate::macro_core::types::ident::{IdentWithTypeArgs, TypeArgs};
 /// Only the final segment may carry generic arguments. Intermediate generics
 /// (e.g. `path::to<X>::Foo`) and parenthesized arguments (e.g. `Fn(A) -> B`)
 /// are rejected.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct PathWithTypeArgs {
     /// The full path with the final segment's arguments stripped, e.g.
     /// `path::to::Foo` for an input of `path::to::Foo<A, B>`.

@@ -8,7 +8,8 @@ use crate::macro_core::types::delegate_component::{
 
 /// The right side of a Normal or Direct mapping: either a plain provider type or
 /// a legacy `Wrapper<new Inner { .. }>` value that opens a nested table.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum DelegateValue {
     Type(Type),
     WithTable(DelegateValueWithInnerTable),

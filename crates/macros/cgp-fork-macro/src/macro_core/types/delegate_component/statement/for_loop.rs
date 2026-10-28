@@ -13,7 +13,8 @@ use crate::macro_core::types::ident::PathWithTypeArgs;
 /// The `for <Key, Value> in SomeTable where .. { .. }` loop that pulls mappings
 /// out of another lookup table, reconstructing each entry's namespace-trait bound
 /// with the table type and a `Delegate =` binding appended.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct ForDelegateStatement {
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub for_token: For,

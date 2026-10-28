@@ -11,6 +11,7 @@ mod reject_attributes;
 mod shape;
 mod snake_case;
 mod strip;
+mod tokens_eq;
 
 pub use camel_case::*;
 pub use delegated_impls::*;
@@ -25,3 +26,4 @@ pub use reject_attributes::*;
 pub use shape::*;
 pub use snake_case::*;
 pub use strip::*;
+pub use tokens_eq::*;

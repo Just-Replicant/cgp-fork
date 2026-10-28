@@ -13,7 +13,8 @@ use crate::macro_core::types::keywords::Namespace;
 /// The `namespace SomeNamespace;` header. It forwards every lookup through the
 /// named namespace trait via a blanket `DelegateComponent<__Key__>` impl bounded
 /// on `__Key__: SomeNamespace<TableType, Delegate = __Value__>`.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct NamespaceDelegateStatement {
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub namespace: Keyword<Namespace>,

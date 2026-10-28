@@ -9,7 +9,8 @@ use crate::macro_core::types::generics::ImplGenerics;
 
 /// The left side of a mapping, dispatched on a fork: a leading `@` is a `Path`
 /// key, a leading `[` a `Multi` (array) key, otherwise a `Single` key.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum DelegateKey {
     Single(SingleDelegateKey),
     Multi(MultiDelegateKey),

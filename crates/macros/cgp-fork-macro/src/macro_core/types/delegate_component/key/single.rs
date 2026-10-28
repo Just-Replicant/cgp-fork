@@ -7,7 +7,8 @@ use crate::macro_core::types::generics::ImplGenerics;
 
 /// A single component key: optional generics and a type, evaluating to one
 /// keyed impl carrying those generics.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct SingleDelegateKey {
     pub attributes: Vec<Attribute>,
     pub generics: ImplGenerics,

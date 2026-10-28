@@ -5,9 +5,10 @@ use quote::ToTokens;
 use syn::parse::{Parse, ParseStream};
 use syn::{Error, Generics};
 
-use crate::macro_core::functions::parse_internal;
+use crate::macro_core::functions::{parse_internal, tokens_eq};
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct ImplGenerics {
     pub generics: Generics,
 }
@@ -34,7 +35,7 @@ impl Parse for ImplGenerics {
 
         let generics2: Generics = parse_internal(impl_generics.to_token_stream())?;
 
-        if generics != generics2 {
+        if !tokens_eq(&generics, &generics2) {
             return Err(Error::new_spanned(generics, "invalid impl generics syntax"));
         }
 

@@ -14,7 +14,8 @@ use crate::macro_core::types::keywords::Getter;
 /// `type Name = Type` — the obvious provider is `UseType<Type>`, and the
 /// component is `{Name}TypeProviderComponent`, the name `#[cgp_type]` derives
 /// from the associated type `Name`.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct TypeDelegateShorthand {
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub type_token: TypeToken,
@@ -67,7 +68,8 @@ impl EvalDelegateEntries for TypeDelegateShorthand {
 /// `getter field` — the obvious provider is `UseField` of the field's symbol,
 /// and the component is `{Field}GetterComponent`, the name `#[cgp_getter]`
 /// derives for a `Has{Field}` trait.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct GetterDelegateShorthand {
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub getter_token: Keyword<Getter>,

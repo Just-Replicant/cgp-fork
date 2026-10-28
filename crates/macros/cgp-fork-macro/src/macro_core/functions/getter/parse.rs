@@ -7,7 +7,7 @@ use syn::{
     Signature, TraitItem, TraitItemFn, TraitItemType, Type,
 };
 
-use crate::macro_core::functions::{parse_field_type, parse_single_segment_type_path};
+use crate::macro_core::functions::{parse_field_type, parse_single_segment_type_path, tokens_eq};
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::cgp_getter::{GetterField, ReceiverMode};
 use crate::macro_core::types::cgp_type::validate_assoc_type_item;
@@ -72,9 +72,13 @@ pub fn parse_getter_fields(
             let field_assoc_type_ident = &field_assoc_type.ident;
             let field_type = &field.field_type;
 
-            if field_type != &parse_internal! { Self :: #field_assoc_type_ident }
-                && field_type != &parse_internal! { #context_type :: #field_assoc_type_ident }
-            {
+            if !tokens_eq(
+                field_type,
+                &parse_internal! { Self :: #field_assoc_type_ident },
+            ) && !tokens_eq(
+                field_type,
+                &parse_internal! { #context_type :: #field_assoc_type_ident },
+            ) {
                 return Err(Error::new(
                     field.field_type.span(),
                     "getter method return type must match the associated type",

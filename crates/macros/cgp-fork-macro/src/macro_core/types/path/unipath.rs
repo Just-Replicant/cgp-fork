@@ -8,7 +8,8 @@ use syn::token::{At, Dot};
 use crate::macro_core::exports::{Nil, PathCons};
 use crate::macro_core::types::path::{PathElement, PrefixPath};
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct UniPath {
     pub elements: Punctuated<PathElement, Dot>,
 }

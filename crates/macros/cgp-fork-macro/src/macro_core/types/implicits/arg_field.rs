@@ -1,11 +1,12 @@
 use syn::token::Mut;
 use syn::{Expr, Ident, Stmt, Type};
 
+use crate::macro_core::functions::tokens_eq;
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::field::{FieldName, HasFieldBound};
 use crate::macro_core::types::getter::{FieldMode, GetFieldExpr, GetFieldWithModeExpr};
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone)]
 pub struct ImplicitArgField {
     pub field_name: Ident,
     pub field_type: Type,
@@ -13,6 +14,21 @@ pub struct ImplicitArgField {
     pub field_mode: FieldMode,
     pub arg_type: Type,
 }
+
+/// Two implicit arguments are the same when they read the same field the same way.
+/// Written by hand because `syn::Type: PartialEq` needs syn's `extra-traits`; as
+/// with `syn`'s derive, spans are ignored and every `mut` token is equal.
+impl PartialEq for ImplicitArgField {
+    fn eq(&self, other: &Self) -> bool {
+        self.field_name == other.field_name
+            && tokens_eq(&self.field_type, &other.field_type)
+            && self.field_mut.is_some() == other.field_mut.is_some()
+            && self.field_mode == other.field_mode
+            && tokens_eq(&self.arg_type, &other.arg_type)
+    }
+}
+
+impl Eq for ImplicitArgField {}
 
 impl ImplicitArgField {
     pub fn to_has_field_bound(&self) -> syn::Result<HasFieldBound> {

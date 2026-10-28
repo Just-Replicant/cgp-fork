@@ -17,7 +17,8 @@ use crate::macro_core::types::ident::{parse_angle_bracketed, to_tokens_angle_bra
 /// (`Item: Clone`), none of which are valid in the plain type-argument
 /// positions that CGP cares about. By modelling only the three valid forms, we
 /// reject inputs like `Foo<A, B = C>` at parse time.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum TypeArg {
     /// A lifetime argument, e.g. the `'a` in `Foo<'a>`.
     Lifetime(Lifetime),
@@ -97,7 +98,8 @@ impl ToTokens for TypeArg {
 /// An empty list represents both the absence of any angle brackets (the bare
 /// `Foo` case) and an explicit empty `Foo<>`; the two are not distinguished, and
 /// an empty list always renders as nothing.
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct TypeArgs {
     pub args: Punctuated<TypeArg, Comma>,
 }

@@ -11,7 +11,8 @@ use crate::macro_core::types::delegate_component::{
 /// A `Key -> Value` mapping that forwards to the value's own entry for the key:
 /// `Delegate` becomes `<Value as DelegateComponent<Key>>::Delegate`, with a
 /// matching `Value: DelegateComponent<Key>` bound.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct DirectDelegateMapping {
     pub key: DelegateKey,
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]

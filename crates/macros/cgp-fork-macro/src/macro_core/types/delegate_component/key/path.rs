@@ -12,7 +12,8 @@ use crate::macro_core::types::path::{PathElement, PathHead};
 /// The `@`-prefixed open key. It lowers each path to a prefix type terminated by
 /// a `__Wildcard__` generic, into which the dispatch parameter slots at lookup
 /// time; a brace group in the path expands to one key per element.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct PathDelegateKey {
     pub attributes: Vec<Attribute>,
     pub generics: ImplGenerics,

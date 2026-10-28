@@ -10,7 +10,8 @@ use crate::macro_core::types::delegate_component::{
 
 /// The array-key form `[A, B]`, evaluating to one key per bracketed element so
 /// several components share a single value.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct MultiDelegateKey {
     pub attributes: Vec<Attribute>,
     pub keys: Punctuated<SingleDelegateKey, Comma>,

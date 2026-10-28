@@ -13,7 +13,8 @@ use crate::macro_core::types::ident::TypeArgs;
 /// [`PathWithTypeArgs`].
 ///
 /// [`PathWithTypeArgs`]: crate::macro_core::types::ident::PathWithTypeArgs
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct IdentWithTypeArgs {
     pub ident: Ident,
     pub type_args: TypeArgs,

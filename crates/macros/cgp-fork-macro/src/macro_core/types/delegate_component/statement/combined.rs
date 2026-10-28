@@ -11,7 +11,8 @@ use crate::macro_core::types::keywords::{Namespace, Open};
 
 /// A leading table statement — `namespace`, `open`, or `for` — all of which
 /// lower into the same flat entry list as ordinary mappings.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum DelegateStatement {
     Namespace(NamespaceDelegateStatement),
     Open(OpenDelegateStatement),

@@ -1,4 +1,5 @@
 use proc_macro2::Span;
+use quote::ToTokens;
 use syn::spanned::Spanned;
 use syn::token::Eq;
 use syn::{Error, ImplItem, ImplItemConst, TraitItem, Type, Visibility};
@@ -74,7 +75,7 @@ pub fn trait_item_to_delegated_impl_items(
         _ => {
             return Err(Error::new(
                 trait_item.span(),
-                format!("unsupported trait item: {trait_item:?}"),
+                format!("unsupported trait item: `{}`", trait_item.to_token_stream()),
             ));
         }
     };

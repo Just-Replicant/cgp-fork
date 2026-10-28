@@ -26,7 +26,8 @@ use crate::macro_core::types::ident::{parse_angle_bracketed, to_tokens_angle_bra
 /// [`TypeGenericParams`] for guidance on which of the two to use.
 ///
 /// [`TypeGenerics`]: crate::macro_core::types::generics::TypeGenerics
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum TypeGenericParam {
     /// A lifetime parameter, e.g. the `'a` in `Bar<'a>`.
     Lifetime(Lifetime),
@@ -38,7 +39,8 @@ pub enum TypeGenericParam {
 
 /// A const generic parameter at a definition site: the `const N: usize` in
 /// `Bar<const N: usize>`. Defaults (`= 0`) are deliberately not represented.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct ConstGenericParam {
     pub const_token: Const,
     pub ident: Ident,
@@ -144,7 +146,8 @@ impl ToTokens for TypeGenericParam {
 /// Both the absence of angle brackets and an explicit empty `<>` are
 /// represented as an empty [`Punctuated`]. An empty list renders as nothing,
 /// so a parsed `<>` round-trips back to no angle brackets.
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct TypeGenericParams {
     pub params: Punctuated<TypeGenericParam, Comma>,
 }

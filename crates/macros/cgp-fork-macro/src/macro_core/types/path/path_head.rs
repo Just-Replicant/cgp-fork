@@ -6,7 +6,8 @@ use syn::{braced, bracketed};
 use crate::macro_core::types::generics::ImplGenerics;
 use crate::macro_core::types::path::{PathElementWithGenerics, UniPath};
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum PathHead {
     Type(Box<PathElementWithGenerics>, Box<PathHead>),
     Nested(Punctuated<PathHead, Comma>),

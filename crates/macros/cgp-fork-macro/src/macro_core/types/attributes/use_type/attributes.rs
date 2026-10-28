@@ -2,7 +2,7 @@ use quote::ToTokens;
 use syn::visit_mut::VisitMut;
 use syn::{ItemImpl, ItemTrait, Type};
 
-use crate::macro_core::functions::parse_internal;
+use crate::macro_core::functions::{parse_internal, tokens_eq};
 use crate::macro_core::types::attributes::UseTypeAttribute;
 use crate::macro_core::types::attributes::use_type::grounding::ground_specs;
 use crate::macro_core::types::attributes::use_type::type_predicates::{
@@ -42,7 +42,7 @@ impl UseTypeAttributes {
         for use_type in &grounded {
             let trait_path = &use_type.trait_path;
 
-            if use_type.context_type == self_type {
+            if tokens_eq(&use_type.context_type, &self_type) {
                 // A `Self`-context import becomes a supertrait of the generated
                 // trait, so the abstract type is available to every signature.
                 item_trait

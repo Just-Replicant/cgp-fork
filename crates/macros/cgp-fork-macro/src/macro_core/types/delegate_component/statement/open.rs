@@ -14,7 +14,8 @@ use crate::macro_core::types::keywords::Open;
 /// component (`open A;`). Each listed component is wired to a
 /// `RedirectLookup` rooted at the component name in the context's own table, so
 /// the `@Component.Key` mappings that follow dispatch on the redirect path.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct OpenDelegateStatement {
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]
     pub open: Keyword<Open>,

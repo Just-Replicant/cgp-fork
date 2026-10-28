@@ -13,7 +13,8 @@ use crate::macro_core::types::delegate_component::{
 /// comma-separated mappings. Statements must lead, which is why one written
 /// after a mapping fails to parse. The `Default` value is the empty table, which
 /// is what a `cgp_namespace!` header written without a body parses to.
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct DelegateEntries {
     pub statements: Vec<DelegateStatement>,
     pub entries: Punctuated<DelegateMapping, Comma>,

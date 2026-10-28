@@ -5,7 +5,7 @@ use syn::token::For;
 use syn::visit_mut::VisitMut;
 use syn::{Error, Ident, ImplItem, Item, ItemImpl, Type};
 
-use crate::macro_core::functions::{parse_internal, to_snake_case_ident};
+use crate::macro_core::functions::{parse_internal, to_snake_case_ident, tokens_eq};
 use crate::macro_core::types::cgp_impl::helpers::extract_helper_items;
 use crate::macro_core::types::cgp_impl::{CgpProviderOrBareImpl, ImplArgs};
 use crate::macro_core::types::cgp_provider::{ItemCgpProvider, ProviderArgs};
@@ -41,7 +41,7 @@ impl LoweredCgpImpl {
             &self.provider_trait_path,
         )?;
 
-        if self.args.provider_type == parse_internal!(Self) {
+        if tokens_eq(&self.args.provider_type, &parse_internal!(Self)) {
             if self.item_impl.trait_.is_none() {
                 return Err(Error::new(
                     self.item_impl.span(),

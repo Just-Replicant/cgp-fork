@@ -10,7 +10,8 @@ use crate::macro_core::types::path::UniPath;
 
 /// A `Key => @path` mapping that redirects the lookup along an `@`-path:
 /// `Delegate` becomes `RedirectLookup<TableType, Path>`.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct RedirectDelegateMapping {
     pub key: DelegateKey,
     #[allow(dead_code, reason = "syntax token, parsed to validate the input")]

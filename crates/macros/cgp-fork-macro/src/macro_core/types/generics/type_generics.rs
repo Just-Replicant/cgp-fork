@@ -19,7 +19,8 @@ use crate::macro_core::functions::parse_internal;
 /// normalizes a `const N: T` parameter down to a bare `N`).
 ///
 /// [`TypeGenericParams`]: crate::macro_core::types::ident::TypeGenericParams
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct TypeGenerics {
     pub generics: Generics,
 }

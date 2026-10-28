@@ -11,7 +11,8 @@ use crate::macro_core::types::keywords::{Getter, Preset};
 
 /// One `Key OP Value` entry, its variant chosen by the operator: `:` is Normal,
 /// `->` is Direct, `=>` is Redirect.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub enum DelegateMapping {
     Normal(NormalDelegateMapping),
     Direct(DirectDelegateMapping),

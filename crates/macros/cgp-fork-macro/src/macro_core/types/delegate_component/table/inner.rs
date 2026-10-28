@@ -14,7 +14,8 @@ pub trait ExtractInnerDelegateTables {
 
 /// A nested table lifted out of a `UseDelegate<new Inner { .. }>` value; it is
 /// evaluated exactly like a top-level table, keyed on its own identifier.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub struct InnerDelegateTable {
     pub table_ident: Ident,
     pub table_generics: TypeGenerics,
