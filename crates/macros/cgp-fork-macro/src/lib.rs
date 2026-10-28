@@ -31,6 +31,9 @@ mod robustness_tests;
 #[cfg(test)]
 #[path = "macro_tests/shape_macro_parsing_tests.rs"]
 mod shape_macro_parsing_tests;
+#[cfg(test)]
+#[path = "macro_tests/token_rewrite_tests.rs"]
+mod token_rewrite_tests;
 
 /**
     `#[cgp_component]` is the most basic macro used to define a CGP component.

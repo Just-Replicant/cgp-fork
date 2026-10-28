@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use proc_macro2::{Group, TokenStream, TokenTree};
 use quote::format_ident;
 use syn::visit_mut::{self, VisitMut};
@@ -43,7 +42,10 @@ pub fn replace_self_value_in_token_stream(
 
     let mut result_stream: Vec<TokenTree> = Vec::new();
 
-    let mut token_iter = stream.into_iter().multipeek();
+    // `vec::IntoIter::as_slice` is the not-yet-consumed tail, so the tokens after
+    // the current one can be inspected without consuming them.
+    let tokens: Vec<TokenTree> = stream.into_iter().collect();
+    let mut token_iter = tokens.into_iter();
 
     while let Some(tree) = token_iter.next() {
         match tree {
@@ -52,8 +54,11 @@ pub fn replace_self_value_in_token_stream(
                 // path intact — its leading `self` is the current module, not the
                 // receiver. A value `self` is never followed by `::`, so a trailing
                 // `::` unambiguously marks the path form.
-                let is_module_path = matches!(token_iter.peek(), Some(TokenTree::Punct(p)) if p.as_char() == ':')
-                    && matches!(token_iter.peek(), Some(TokenTree::Punct(p)) if p.as_char() == ':');
+                let is_module_path = matches!(
+                    token_iter.as_slice(),
+                    [TokenTree::Punct(colon1), TokenTree::Punct(colon2), ..]
+                        if colon1.as_char() == ':' && colon2.as_char() == ':'
+                );
 
                 if ident == self_ident && !is_module_path {
                     result_stream.push(TokenTree::Ident(replaced_ident.clone()));

@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use proc_macro2::{Group, Ident, TokenStream, TokenTree};
 use quote::{ToTokens, format_ident};
 use syn::visit_mut::{self, VisitMut};
@@ -80,7 +79,10 @@ pub fn replace_self_type_in_token_stream(
 
     let mut result_stream: Vec<TokenTree> = Vec::new();
 
-    let mut token_iter = stream.into_iter().multipeek();
+    // `vec::IntoIter::as_slice` is the not-yet-consumed tail, so the tokens after
+    // the current one can be inspected without consuming them.
+    let tokens: Vec<TokenTree> = stream.into_iter().collect();
+    let mut token_iter = tokens.into_iter();
 
     while let Some(tree) = token_iter.next() {
         match tree {
@@ -89,21 +91,17 @@ pub fn replace_self_type_in_token_stream(
                     let replaced_ident = replaced_ident.clone();
 
                     // Do not replace self if it is an associated type expression that refers to local associated type
-                    let replaced = match token_iter.peek() {
-                        Some(TokenTree::Punct(p)) if p.as_char() == ':' => {
-                            match token_iter.peek() {
-                                Some(TokenTree::Punct(p)) if p.as_char() == ':' => {
-                                    match token_iter.peek() {
-                                        Some(TokenTree::Ident(assoc_type))
-                                            if local_assoc_types.contains(assoc_type) =>
-                                        {
-                                            ident.to_token_stream()
-                                        }
-                                        _ => replaced_ident,
-                                    }
-                                }
-                                _ => replaced_ident,
-                            }
+                    let replaced = match token_iter.as_slice() {
+                        [
+                            TokenTree::Punct(colon1),
+                            TokenTree::Punct(colon2),
+                            TokenTree::Ident(assoc_type),
+                            ..,
+                        ] if colon1.as_char() == ':'
+                            && colon2.as_char() == ':'
+                            && local_assoc_types.contains(assoc_type) =>
+                        {
+                            ident.to_token_stream()
                         }
                         _ => replaced_ident,
                     };
