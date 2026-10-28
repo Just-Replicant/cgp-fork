@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Report (and optionally merge) upstream contextgeneric/cgp changes.
 #
-#   scripts/upstream-sync.sh            # fetch upstream, list commits not yet merged
-#   scripts/upstream-sync.sh --merge    # also merge upstream/main into a new sync branch
+#   bash scripts/upstream-sync.sh            # fetch upstream, list commits not yet merged
+#   bash scripts/upstream-sync.sh --merge    # also merge upstream/main into a new sync branch
 #
 # The fork records the last merged upstream commit in `UPSTREAM_COMMIT` at the
 # repository root (and the README's "includes upstream through" line). After a
