@@ -1,3 +1,4 @@
+use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream};
 use syn::{Ident, Item, ItemImpl, ItemStruct};
 
@@ -39,7 +40,10 @@ impl ItemCgpRecord {
         let item_struct = &self.item_struct;
 
         let context_ident = &item_struct.ident;
-        let builder_ident = Ident::new(&format!("__Partial{context_ident}"), context_ident.span());
+        let builder_ident = Ident::new(
+            &format!("__Partial{}", context_ident.unraw()),
+            context_ident.span(),
+        );
 
         let builder_struct = derive_builder_struct(item_struct, &builder_ident)?;
 

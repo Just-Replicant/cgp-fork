@@ -1,4 +1,5 @@
 use quote::ToTokens;
+use syn::ext::IdentExt;
 use syn::{
     Attribute, Error, Ident, ImplItem, ImplItemFn, Item, ItemImpl, ItemTrait, Meta, TraitItemFn,
     Type,
@@ -69,13 +70,13 @@ fn helper_trait_ident(
         && provider.ident != "Self"
     {
         return Ok(Ident::new(
-            &format!("__Impl_{}__", provider.ident),
+            &format!("__Impl_{}__", provider.ident.unraw()),
             provider.ident.span(),
         ));
     }
 
     Ok(Ident::new(
-        &format!("__Impl_{trait_ident}__"),
+        &format!("__Impl_{}__", trait_ident.unraw()),
         trait_ident.span(),
     ))
 }

@@ -1,5 +1,6 @@
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
+use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::token::{Colon, Plus};
@@ -72,7 +73,10 @@ impl ItemCgpPreset {
         });
 
         let macro_name = Ident::new(
-            &format!("__cgp_with_{}", to_snake_case_str(&self.name.to_string())),
+            &format!(
+                "__cgp_with_{}",
+                to_snake_case_str(&self.name.unraw().to_string())
+            ),
             Span::call_site(),
         );
         let with_components = define_with_components_macro(&macro_name, &own_keys, &self.parents);

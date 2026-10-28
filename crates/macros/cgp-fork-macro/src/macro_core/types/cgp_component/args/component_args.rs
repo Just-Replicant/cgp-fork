@@ -1,4 +1,5 @@
 use proc_macro2::Span;
+use syn::ext::IdentExt;
 use syn::parse::Parse;
 use syn::{Error, Ident};
 
@@ -46,7 +47,7 @@ impl TryFrom<CgpComponentRawArgs> for CgpComponentArgs {
         // way `derive_check_trait_ident` spans its derived check trait.
         let component_name = raw_args.component_name.unwrap_or_else(|| {
             IdentWithTypeGenerics::from(Ident::new(
-                &format!("{provider_ident}Component"),
+                &format!("{}Component", provider_ident.unraw()),
                 provider_ident.span(),
             ))
         });

@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
 use proc_macro2::Span;
+use syn::ext::IdentExt;
 use syn::visit::Visit;
 use syn::visit_mut::{VisitMut, visit_type_reference_mut};
 use syn::{
@@ -162,7 +163,10 @@ fn synthesize_log_method(
     }
 
     let detail_ident = Ident::new(
-        &format!("__{}", to_camel_case_str(&method.sig.ident.to_string())),
+        &format!(
+            "__{}",
+            to_camel_case_str(&method.sig.ident.unraw().to_string())
+        ),
         method.sig.ident.span(),
     );
 

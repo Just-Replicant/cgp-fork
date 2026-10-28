@@ -1,3 +1,4 @@
+use syn::ext::IdentExt;
 use syn::{Ident, ItemFn, Visibility};
 
 use crate::macro_core::functions::{extract_and_parse_implicit_args, to_camel_case_str};
@@ -15,7 +16,7 @@ impl ItemCgpFn {
 
         let ident = self.ident.clone().unwrap_or_else(|| {
             Ident::new(
-                &to_camel_case_str(&item_fn.sig.ident.to_string()),
+                &to_camel_case_str(&item_fn.sig.ident.unraw().to_string()),
                 item_fn.sig.ident.span(),
             )
         });

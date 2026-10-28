@@ -26,6 +26,9 @@ mod invalid_expansion_tests;
 #[path = "macro_tests/parser_rejections_tests.rs"]
 mod parser_rejections_tests;
 #[cfg(test)]
+#[path = "macro_tests/raw_ident_tests.rs"]
+mod raw_ident_tests;
+#[cfg(test)]
 #[path = "macro_tests/robustness_tests.rs"]
 mod robustness_tests;
 #[cfg(test)]

@@ -1,3 +1,4 @@
+use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream};
 use syn::{Ident, Item, ItemEnum, ItemImpl};
 
@@ -40,13 +41,15 @@ impl ItemCgpVariant {
 
         let context_ident = &item_enum.ident;
 
-        let extractor_ident =
-            Ident::new(&format!("__Partial{context_ident}"), context_ident.span());
+        let extractor_ident = Ident::new(
+            &format!("__Partial{}", context_ident.unraw()),
+            context_ident.span(),
+        );
 
         let extractor_enum = derive_extractor_enum(item_enum, &extractor_ident)?;
 
         let extractor_ref_ident = Ident::new(
-            &format!("__PartialRef{context_ident}"),
+            &format!("__PartialRef{}", context_ident.unraw()),
             context_ident.span(),
         );
         let extractor_ref_enum = derive_extractor_enum_ref(item_enum, &extractor_ref_ident)?;

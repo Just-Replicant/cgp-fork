@@ -193,18 +193,21 @@ fn rejects_field_attr_with_arguments() {
 }
 
 #[test]
-#[should_panic(expected = "is not a valid Ident")]
-fn panics_on_raw_function_name() {
-    // The default trait name is built from the raw spelling, so `fn r#type`
-    // yields `R#type`, which is not a valid identifier, and the macro panics.
-    let _ = crate::macro_lib::cgp_fn(
+fn derives_trait_name_from_unrawed_function_name() {
+    // The default trait name comes from the unrawed spelling: `fn r#type`
+    // names `Type`. (It used to build `R#type`, and `Ident::new` panicked.)
+    let tokens = crate::macro_lib::cgp_fn(
         quote!(),
         quote! {
             fn r#type(&self) -> u64 {
                 1
             }
         },
-    );
+    )
+    .expect("a raw function name expands")
+    .to_string();
+
+    assert!(tokens.starts_with("trait Type {"), "{tokens}");
 }
 
 #[test]

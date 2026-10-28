@@ -41,7 +41,7 @@ impl TypeDelegateShorthand {
     /// cover the `Name` the user wrote; the entry span still points at `Name`.
     pub fn component_key(&self) -> Type {
         let ident = Ident::new(
-            &format!("{}TypeProviderComponent", self.name),
+            &format!("{}TypeProviderComponent", self.name.unraw()),
             Span::call_site(),
         );
         syn::parse_quote!(#ident)

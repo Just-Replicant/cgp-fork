@@ -1,4 +1,5 @@
 use quote::{ToTokens, quote};
+use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -203,5 +204,10 @@ pub fn derive_check_trait_ident(context_type: &Type, prefix: &str) -> syn::Resul
     let context_path: PathWithTypeArgs = parse2(context_type.to_token_stream())?;
     let ident = context_path.ident();
 
-    Ok(Ident::new(&format!("{prefix}{ident}"), ident.span()))
+    // `unraw`: a raw `r#Person` must derive `__CheckPerson`, since `r#` cannot
+    // start a longer identifier (`Ident::new` would panic).
+    Ok(Ident::new(
+        &format!("{prefix}{}", ident.unraw()),
+        ident.span(),
+    ))
 }
