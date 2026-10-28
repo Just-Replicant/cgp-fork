@@ -244,6 +244,11 @@ jobs:
             echo "unexpected files in the cgp-fork package" >&2
             exit 1
           fi
+      # Unpacks both `.crate` files and runs `cargo test` from them, so a test
+      # module that points at an excluded file, or a missing LICENSE, fails here
+      # rather than for whoever builds the published sources.
+      - name: Test the packaged crates
+        run: bash scripts/test-packages.sh
 
   coverage:
     name: Coverage (cargo-llvm-cov)

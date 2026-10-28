@@ -10,8 +10,8 @@ homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "CGP procedural macros for defining and wiring components."
-# Macro unit and rejection tests stay in the repository.
-exclude      = ["src/macro_tests/"]
+# `src/macro_tests/` ships with the crate: `lib.rs` declares those modules under
+# `cfg(test)`, so `cargo test` on the published sources needs them.
 
 [lints]
 workspace = true
