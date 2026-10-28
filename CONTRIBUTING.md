@@ -72,13 +72,40 @@ reads them on every push to `main`:
 
 - `feat`, `fix`, and `perf` commits (or any type with `!`) open or update a release PR that bumps
   the shared workspace version and writes `CHANGELOG.md`.
-- Merging that PR publishes both crates with crates.io trusted publishing and tags `v<version>`.
+- Merging that PR publishes both crates with crates.io trusted publishing and tags `v<version>`,
+  but only after the Tests workflow has passed on that merge commit: the release job runs on
+  Tests' `workflow_run` completion and checks out the exact commit Tests passed. A failed or
+  cancelled Tests run publishes nothing; the next green run on `main` does.
 - Breaking changes need a `!` and a `BREAKING CHANGE:` footer, and a minor bump while the version
   is `0.x`.
 
 Edit `CHANGELOG.md` by hand only under `## Unreleased`, and only for context a commit subject
 cannot carry. release-plz moves those notes into the release section; do not add a second
 `### Added` (or other) heading to a released section.
+
+## Maintainer setup
+
+These are repository settings, so no file in this repository can enforce them. Configure them once:
+
+1. **Branch protection for `main`** (Settings → Branches, or a ruleset):
+   - Require a pull request before merging.
+   - Require status checks to pass, and require branches to be up to date before merging.
+     Mark these Tests jobs as required: `Rustfmt (nightly)`, `Clippy`,
+     `Test (nextest, --all-features)`, `Test (nextest, --no-default-features)`,
+     `Test (macos-latest)`, `Test (windows-latest)`, `Rustdoc (-D warnings)`, `MSRV (1.89)`,
+     `no_std target`, `Feature powerset (cargo-hack)`,
+     `cargo-deny (advisories, licenses, bans, sources)`, `cargo-audit (RustSec)`,
+     `Semver (cargo-semver-checks)`, `Package (publish dry run)`, `Coverage (cargo-llvm-cov)`,
+     `Macro fuzzing (deep)`, and `Compile-time budget`.
+   - Block force pushes and deletion of `main`.
+2. **Release token:** create a fine-grained `RELEASE_PLZ_TOKEN` (Contents and Pull requests:
+   read/write) as an Actions secret, so release PRs run Tests. Then set the Actions variable
+   `REQUIRE_RELEASE_PLZ_TOKEN` to `true`; the release-pr job then fails instead of warning when
+   the token is missing.
+3. **Actions permissions:** Workflow permissions "read and write", and allow GitHub Actions to
+   create pull requests (release-plz).
+4. **crates.io trusted publishers** for both crates: repository `Just-Replicant/cgp-fork`, workflow
+   `release-plz.yml`.
 
 ## Keeping up with upstream
 

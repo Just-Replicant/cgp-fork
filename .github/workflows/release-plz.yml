@@ -1,11 +1,14 @@
 name: Release-plz
 
-# On every push to main:
-# - `release-pr` opens or updates one pull request with the next shared version
-#   and the changelog, when a feat, fix, perf, refactor, or breaking commit
-#   is present.
-# - `release` publishes when that version is newer than crates.io, tags
-#   `v<version>`, and creates the GitHub release.
+# - `release-pr` runs on every push to main. It opens or updates one pull
+#   request with the next shared version and the changelog, when a feat, fix,
+#   perf, or breaking commit is present.
+# - `release` runs only after the Tests workflow has finished **successfully**
+#   for a push to main (`workflow_run`), and checks out exactly the commit
+#   Tests passed. It publishes when that version is newer than crates.io, tags
+#   `v<version>`, and creates the GitHub release. A red, cancelled, or still
+#   running Tests run never publishes. A manual `workflow_dispatch` runs the
+#   test suite itself first.
 #
 # Publishing uses crates.io trusted publishing. There is no
 # `CARGO_REGISTRY_TOKEN`: release-plz exchanges this job's OIDC token for a
@@ -21,8 +24,11 @@ name: Release-plz
 # - Recommended: a fine-grained `RELEASE_PLZ_TOKEN` with Contents and Pull requests
 #   read/write. The default `GITHUB_TOKEN` cannot start the Tests workflow on
 #   the release pull request. With the PAT, that pull request runs Tests; without
-#   it the release-pr job warns, and the release job runs the test suite itself
-#   before publishing either way.
+#   it the release-pr job warns. Once the secret exists, set the repository
+#   variable `REQUIRE_RELEASE_PLZ_TOKEN` to `true` to make a missing token an
+#   error instead of a warning.
+# - Branch protection for `main` is a repository setting; see CONTRIBUTING.md,
+#   "Maintainer setup".
 #
 # The binary is pinned. This workflow does not use a third-party action.
 # The binary reads the forge token from `--git-token` (`GIT_TOKEN`). It does
@@ -30,6 +36,10 @@ name: Release-plz
 
 on:
   push:
+    branches: [main]
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -42,7 +52,22 @@ jobs:
   release-plz-release:
     name: Release-plz release
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'Just-Replicant' }}
+    # Publish only a commit the full Tests workflow passed on a push to main,
+    # or on an explicit manual dispatch (which runs the tests below first).
+    if: >-
+      ${{ github.repository_owner == 'Just-Replicant' && (
+        github.event_name == 'workflow_dispatch' || (
+          github.event_name == 'workflow_run' &&
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main'
+        )
+      ) }}
+    # One release at a time; a queued release waits rather than cancelling one
+    # that is publishing.
+    concurrency:
+      group: release-plz-release
+      cancel-in-progress: false
     permissions:
       contents: write
       pull-requests: read
@@ -52,6 +77,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          # The commit Tests passed, not whatever main points at now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           token: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
       - name: Install pinned toolchain
         run: rustup toolchain install
@@ -63,9 +90,10 @@ jobs:
           tar -xzf "$tmpdir/release-plz.tar.gz" -C "$tmpdir"
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
-      # Release PRs opened with the default GITHUB_TOKEN do not trigger the Tests
-      # workflow, so never publish a commit that has not passed the suite here.
-      - name: Test before publishing
+      # A `workflow_run` release already waited for the full Tests workflow. A
+      # manual dispatch did not, so it runs the test suite here first.
+      - name: Test before a manual release
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           cargo test --workspace --all-features --locked --no-fail-fast
           cargo test --workspace --no-default-features --locked --no-fail-fast
@@ -77,7 +105,7 @@ jobs:
   release-plz-pr:
     name: Release-plz PR
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'Just-Replicant' }}
+    if: ${{ github.repository_owner == 'Just-Replicant' && github.event_name != 'workflow_run' }}
     permissions:
       contents: write
       pull-requests: write
@@ -100,12 +128,18 @@ jobs:
           tar -xzf "$tmpdir/release-plz.tar.gz" -C "$tmpdir"
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
-      - name: Warn when release PRs will not run Tests
+      - name: Check for the release PR token
         env:
           HAS_PAT: ${{ secrets.RELEASE_PLZ_TOKEN != '' }}
+          REQUIRE_PAT: ${{ vars.REQUIRE_RELEASE_PLZ_TOKEN == 'true' }}
         run: |
           if [ "$HAS_PAT" != "true" ]; then
-            echo "::warning::RELEASE_PLZ_TOKEN is not set, so the release PR will not trigger the Tests workflow. The release job still runs the test suite before publishing."
+            msg="RELEASE_PLZ_TOKEN is not set, so the release PR will not trigger the Tests workflow. Publishing still waits for Tests on main."
+            if [ "$REQUIRE_PAT" = "true" ]; then
+              echo "::error::$msg"
+              exit 1
+            fi
+            echo "::warning::$msg"
           fi
       - name: Run release-plz release-pr
         run: release-plz release-pr --git-token "$GIT_TOKEN"
