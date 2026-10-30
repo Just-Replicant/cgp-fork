@@ -50,7 +50,7 @@ failure-case targets `parser_rejections` and `invalid_expansion`.
 
 ```
 cargo nextest run -p cgp-fork --all-features             # the main suite
-cargo nextest run -p cgp-fork-macro                      # macro internals + rejection cases
+cargo nextest run -p cgp-fork-macro-impl                 # macro internals + rejection cases
 cargo nextest run --all-features --workspace            # everything
 
 cargo insta test -p cgp-fork --all-features --review     # review snapshot diffs interactively

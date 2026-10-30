@@ -10,8 +10,8 @@ homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "CGP procedural macros for defining and wiring components."
-# `src/macro_tests/` ships with the crate: `lib.rs` declares those modules under
-# `cfg(test)`, so `cargo test` on the published sources needs them.
+# The proc-macro shim: every parser and code generator lives in
+# `cgp-fork-macro-impl` (see docs/adr/0002-macro-impl-crate.md).
 
 [lints]
 workspace = true
@@ -24,18 +24,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 proc-macro = true
 
 [features]
-snapshot = ["dep:prettyplease"]
+# The hidden `snapshot_*` macros used by the behavior tests of `cgp-fork`.
+snapshot = ["cgp-fork-macro-impl/snapshot"]
 
 [dependencies]
-# No `extra-traits`: the macros compare syntax with `tokens_eq` and derive `Debug`
-# only under `cfg(test)`, so downstream builds compile a smaller syn.
-syn         = { version = "3", features = ["full", "visit", "visit-mut"] }
-quote       = { version = "1" }
-proc-macro2 = { version = "1" }
-prettyplease = { version = "0.3", optional = true }
-
-[dev-dependencies]
-# The unit tests print and compare syntax trees (`Debug`, `PartialEq`).
-syn   = { version = "3", features = ["full", "extra-traits", "visit", "visit-mut"] }
-insta = { version = "1" }
-prettyplease = { version = "0.3" }
+cgp-fork-macro-impl = { workspace = true }
+syn                 = { version = "3", features = ["full", "visit", "visit-mut"] }

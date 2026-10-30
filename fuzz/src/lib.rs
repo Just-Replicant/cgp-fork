@@ -1,30 +1,14 @@
-//! The `cgp-fork-macro` implementation, compiled as an ordinary library so
-//! libFuzzer can link it.
+//! Fuzzing harness for the `cgp-fork` procedural macros.
 //!
-//! The modules are the macro crate's own source files, included by path; only
-//! the `#[proc_macro*]` wrappers in its `lib.rs` are left out. The entrypoint
-//! list and seeds come from the in-tree robustness fuzzer
-//! (`src/macro_tests/robustness_tests.rs`), so both fuzzers cover the same
-//! macros. A new entrypoint added there is fuzzed here too.
-#![allow(dead_code, unused_imports, clippy::all)]
-
-#[path = "../../crates/macros/cgp-fork-macro/src/async_impl.rs"]
-mod async_impl;
-#[path = "../../crates/macros/cgp-fork-macro/src/extra_macro_core/mod.rs"]
-mod extra_macro_core;
-#[path = "../../crates/macros/cgp-fork-macro/src/extra_macro_lib/mod.rs"]
-mod extra_macro_lib;
-#[path = "../../crates/macros/cgp-fork-macro/src/macro_core/mod.rs"]
-mod macro_core;
-#[path = "../../crates/macros/cgp-fork-macro/src/macro_lib/mod.rs"]
-mod macro_lib;
-#[path = "../../crates/macros/cgp-fork-macro/src/macro_tests/robustness_tests.rs"]
-mod robustness;
+//! The macros are implemented in `cgp-fork-macro-impl`, an ordinary library, so
+//! libFuzzer links it directly. The entrypoint list and seeds come from its
+//! `registry` module, which the in-tree robustness fuzzer uses too, so both
+//! fuzzers cover the same macros.
 
 use std::str::FromStr;
 
+pub use cgp_fork_macro_impl::registry::{Entrypoint, SEEDS, entrypoints};
 use proc_macro2::TokenStream;
-pub use robustness::{Entrypoint, SEEDS, entrypoints};
 
 /// Run one fuzz input.
 ///

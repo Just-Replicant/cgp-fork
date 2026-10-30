@@ -1,8 +1,8 @@
 # Coverage-guided fuzzing of the macro parsers with cargo-fuzz (libFuzzer).
 #
 # A proc-macro crate cannot be linked into a libFuzzer binary, so this crate
-# compiles the macro implementation modules of `cgp-fork-macro` directly (see
-# `src/lib.rs`). It is not a workspace member and is never published.
+# depends on `cgp-fork-macro-impl`, the ordinary library behind the
+# `cgp-fork-macro` shim. It is not a workspace member and is never published.
 #
 #   cargo +nightly fuzz run entrypoints            # from the repository root
 #   cargo +nightly fuzz run entrypoints -- -max_total_time=60
@@ -19,14 +19,11 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-# The same syn features as cgp-fork-macro's normal build.
-syn         = { version = "3", features = ["full", "visit", "visit-mut"] }
-quote       = "1"
-proc-macro2 = "1"
+cgp-fork-macro-impl = { path = "../crates/macros/cgp-fork-macro-impl" }
+proc-macro2         = "1"
 
 [lib]
-# The included modules derive `Debug` under `cfg(test)`, which needs syn's
-# `extra-traits`; this crate has no unit tests of its own, so skip that build.
+# No unit tests of its own: the entrypoint list is tested in the impl crate.
 test    = false
 doctest = false
 

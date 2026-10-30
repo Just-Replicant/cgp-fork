@@ -320,8 +320,8 @@ jobs:
         run: |
           seed=${{ github.run_id }}
           echo "CGP_FUZZ_SEED=$seed"
-          CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro robustness
-      # The cargo-fuzz crate includes the macro modules by path; check that it
+          CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro-impl robustness
+      # The cargo-fuzz crate links cgp-fork-macro-impl; check that it
       # still builds (on the pinned stable toolchain) so a refactor cannot
       # silently break the scheduled coverage-guided run below.
       - name: Check the cargo-fuzz crate builds

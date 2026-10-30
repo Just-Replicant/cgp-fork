@@ -30,7 +30,15 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 name = "cgp-fork-macro-fuzz"
 version = "0.0.0"
 dependencies = [
+ "cgp-fork-macro-impl",
  "libfuzzer-sys",
+ "proc-macro2",
+]
+
+[[package]]
+name = "cgp-fork-macro-impl"
+version = "0.10.1"
+dependencies = [
  "proc-macro2",
  "quote",
  "syn",
