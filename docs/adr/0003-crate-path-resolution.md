@@ -36,9 +36,14 @@ The resolver:
   `[target.*.…dependencies]`; a match yields `::<key with - replaced by _>`;
 - falls back to `::cgp_fork` in every other case (no manifest, not found, the facade itself whose
   `lib.rs` has `extern crate self as cgp_fork`, or a parse it does not understand);
-- caches the answer per manifest path for the lifetime of the compiler process;
-- can be forced with the environment variable `CGP_FORK_CRATE` (for build systems without Cargo,
-  such as Bazel or Buck).
+- also follows `name = { workspace = true }` to `[workspace.dependencies]` in the nearest
+  ancestor manifest that declares `[workspace]`;
+- caches the answer per manifest directory and thread, and re-reads the manifest when its
+  modification time changes (rust-analyzer's proc-macro server expands many crates in one
+  process); only strings are cached, never token handles;
+- can be forced with the environment variable `CGP_FORK_CRATE`, set to a crate name (`cgp`) or a
+  path (`::reexports::cgp`), for build systems without Cargo such as Bazel or Buck. Cargo does not
+  track this variable, so changing it needs a clean rebuild of the affected crates.
 
 The parse is a small line-oriented scan of the TOML subset Cargo manifests use for dependencies,
 covering both `name = { package = "cgp-fork", … }` and `[dependencies.name]` tables.
@@ -50,3 +55,8 @@ covering both `name = { package = "cgp-fork", … }` and `[dependencies.name]` t
 - Expansion for ordinary users is byte-for-byte unchanged (still `::cgp_fork`).
 - A manifest edit that only renames the dependency is picked up on the next build, because Cargo
   rebuilds the crate when its manifest changes.
+- `cgp_preset!` generates a `macro_rules!` that expands in the crates using the preset. It names
+  the facade as the crate that defines the preset does, so a preset and its users must import
+  `cgp-fork` under the same name (as before this change, when both had to use `cgp_fork`).
+- Implementation: `crates/macros/cgp-fork-macro-impl/src/crate_path.rs`; unit tests in
+  `src/macro_tests/crate_path_tests.rs`.

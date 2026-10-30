@@ -13,6 +13,7 @@
 */
 
 pub mod async_impl;
+pub mod crate_path;
 pub mod extra_macro_lib;
 pub mod macro_lib;
 pub mod registry;
@@ -24,6 +25,9 @@ mod macro_core;
 #[cfg(any(test, feature = "snapshot"))]
 pub mod test_util_lib;
 
+#[cfg(test)]
+#[path = "macro_tests/crate_path_tests.rs"]
+mod crate_path_tests;
 #[cfg(test)]
 #[path = "macro_tests/ident_with_type_params_tests.rs"]
 mod ident_with_type_params_tests;

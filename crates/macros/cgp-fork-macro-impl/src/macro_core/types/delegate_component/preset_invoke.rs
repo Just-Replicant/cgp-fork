@@ -63,6 +63,9 @@ pub fn define_with_components_macro(
     keys: &[Type],
     parents: &[Path],
 ) -> TokenStream {
+    // The generated `macro_rules!` expands in the crates that use the preset, which are assumed
+    // to import `cgp-fork` under the same name as the crate defining it.
+    let root = crate::crate_path::crate_root();
     quote! {
         #[macro_export]
         #[doc(hidden)]
@@ -71,7 +74,7 @@ pub fn define_with_components_macro(
                 #macro_name! { exclude [], $ph => { $($body)* } }
             };
             ( exclude [ $($exclude:ty),* $(,)? ], $ph:ident => { $($body:tt)* } ) => {
-                ::cgp_fork::prelude::cgp_for_each! {
+                #root::prelude::cgp_for_each! {
                     [ #(#keys),* ],
                     exclude [ $($exclude),* ],
                     $ph => { $($body)* }
