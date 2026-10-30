@@ -3,6 +3,23 @@
 Analysis of `main` @ `33842521` (2026-10-28, v0.10.1 prepared, unreleased).
 Every claim below cites a file in that checkout. Effort figures are estimates.
 
+## Status (2026-10-30, branch `rewrite/phase-0-1`)
+
+| Phase | Status | Notes |
+|---|---|---|
+| 0 Decide and baseline | Done; the hard-fork decision is waiting for the maintainer | [ADR 0001](adr/0001-hard-fork.md) is *Proposed* (hybrid now, hard fork before phase 3); nothing upstream-related was removed. Baseline in [docs/baseline/2026-10-30.md](baseline/2026-10-30.md), `scripts/baseline.sh`. |
+| 1 Internals split | Done, except the shared IR (moved to phase 1b) | `cgp-fork-macro-impl` crate ([ADR 0002](adr/0002-macro-impl-crate.md)); crate-path resolution ([ADR 0003](adr/0003-crate-path-resolution.md)); `crates/tests/renamed-dep`; 38 per-entrypoint fuzz targets. Snapshots unchanged; 867 tests pass ([after phase 1](baseline/2026-10-30-after-phase-1.md)). |
+| 1b Shared IR | Not started | Port the 38 entrypoints to one `parse → IR → validate → emit` pipeline, one entrypoint per commit with snapshot parity. Deferred because it is a multi-week change on its own; `crate_path::CrateRoot` is its first piece. |
+| 2 to 6 | Not started | |
+
+What changed from the plan as written:
+
+- The crate path is detected from the caller's `Cargo.toml` (plus a `CGP_FORK_CRATE` override)
+  instead of a per-call `crate = …` argument, so renamed projects need no source changes and no
+  new dependency was added (see ADR 0003 for the options).
+- `cgp_preset!` presets still assume the preset's users import `cgp-fork` under the same name as
+  the crate that defines the preset.
+
 ## 1. What the project is
 
 - **Idea.** cgp-fork is a fork of Context-Generic Programming (CGP, upstream `contextgeneric/cgp`): a Rust
@@ -203,8 +220,9 @@ the prerequisite listed in `IMPROVEMENT_PLAN.md` I-9 for per-entrypoint fuzzing.
 
 | Phase | Weeks (est.) | Deliverable | Exit criteria |
 |---|---|---|---|
-| 0 Decide & baseline | 1 | hard-fork decision, ADRs, baseline metrics | 824 tests green; compile bench baseline recorded |
-| 1 Internals split | 3 | `macro-impl` crate, IR, crate-path override | all existing tests + snapshots unchanged; renamed-dep test passes; per-entrypoint fuzz targets |
+| 0 Decide & baseline (**done**, decision pending) | 1 | hard-fork decision, ADRs, baseline metrics | 824 tests green; compile bench baseline recorded |
+| 1 Internals split (**done**, IR moved to 1b) | 3 | `macro-impl` crate, IR, crate-path override | all existing tests + snapshots unchanged; renamed-dep test passes; per-entrypoint fuzz targets |
+| 1b Shared IR | 3 | one IR for every entrypoint | snapshots unchanged after each ported entrypoint |
 | 2 Diagnostics | 2 | `on_unimplemented` everywhere, new UI tests | every `tests/ui` case reads without type-level strings in the first line |
 | 3 Handler/data unification | 4 | `Handler`/`AsyncHandler`, mode-generic extractors/dispatch, compat aliases | old tests pass via `compat-0.10`; new tests ported |
 | 4 Async/run/runtime | 2 | `#[cgp_async]`, tokio/smol adapters | async tests on 3 OS |
@@ -240,7 +258,7 @@ the prerequisite listed in `IMPROVEMENT_PLAN.md` I-9 for per-entrypoint fuzzing.
 ## 13. Quick wins before the rewrite (≤ 1 day each)
 
 1. Add `#[diagnostic::on_unimplemented]` to `CanUseComponent` and `DelegateComponent`.
-2. Add a crate-path override to `export_constructs!` (`macro_core/macros/export.rs`).
+2. ~~Add a crate-path override to `export_constructs!` (`macro_core/macros/export.rs`).~~ Done in phase 1.
 3. Remove `docs/IMPROVEMENT_PLAN.md` from `.gitignore` (it is tracked).
 4. Drop `homepage` (duplicates `repository`).
-5. Add the renamed-dependency case to the UI/integration tests.
+5. ~~Add the renamed-dependency case to the UI/integration tests.~~ Done in phase 1 (`crates/tests/renamed-dep`).
