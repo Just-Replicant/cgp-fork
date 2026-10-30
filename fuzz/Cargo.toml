@@ -4,8 +4,9 @@
 # depends on `cgp-fork-macro-impl`, the ordinary library behind the
 # `cgp-fork-macro` shim. It is not a workspace member and is never published.
 #
-#   cargo +nightly fuzz run entrypoints            # from the repository root
-#   cargo +nightly fuzz run entrypoints -- -max_total_time=60
+#   cargo +nightly fuzz run entrypoints            # every macro, from the repository root
+#   cargo +nightly fuzz run cgp_component          # one macro (one target per entrypoint)
+#   cargo +nightly fuzz list
 #
 # See fuzz/README.md.
 [package]
@@ -33,6 +34,278 @@ path  = "fuzz_targets/entrypoints.rs"
 test  = false
 doc   = false
 bench = false
+
+# One target per macro entrypoint. Regenerate with
+# `cargo run --manifest-path fuzz/Cargo.toml --example write_targets`.
+# BEGIN generated targets (examples/write_targets.rs)
+
+[[bin]]
+name  = "async_trait"
+path  = "fuzz_targets/async_trait.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "blanket_trait"
+path  = "fuzz_targets/blanket_trait.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_auto_error"
+path  = "fuzz_targets/cgp_auto_error.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_auto_getter"
+path  = "fuzz_targets/cgp_auto_getter.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_auto_impl"
+path  = "fuzz_targets/cgp_auto_impl.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_component"
+path  = "fuzz_targets/cgp_component.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_fn"
+path  = "fuzz_targets/cgp_fn.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_getter"
+path  = "fuzz_targets/cgp_getter.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_impl"
+path  = "fuzz_targets/cgp_impl.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_new_provider"
+path  = "fuzz_targets/cgp_new_provider.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_provider"
+path  = "fuzz_targets/cgp_provider.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_type"
+path  = "fuzz_targets/cgp_type.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_provider"
+path  = "fuzz_targets/derive_provider.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_computer"
+path  = "fuzz_targets/cgp_computer.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_producer"
+path  = "fuzz_targets/cgp_producer.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_auto_dispatch"
+path  = "fuzz_targets/cgp_auto_dispatch.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_auto_log"
+path  = "fuzz_targets/cgp_auto_log.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "delegate_components"
+path  = "fuzz_targets/delegate_components.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "delegate_and_check_components"
+path  = "fuzz_targets/delegate_and_check_components.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "check_components"
+path  = "fuzz_targets/check_components.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_for_each"
+path  = "fuzz_targets/cgp_for_each.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_preset"
+path  = "fuzz_targets/cgp_preset.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "cgp_namespace"
+path  = "fuzz_targets/cgp_namespace.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "type_symbol"
+path  = "fuzz_targets/type_symbol.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "type_path"
+path  = "fuzz_targets/type_path.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "type_product"
+path  = "fuzz_targets/type_product.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "product"
+path  = "fuzz_targets/product.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "type_sum"
+path  = "fuzz_targets/type_sum.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "type_struct"
+path  = "fuzz_targets/type_struct.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "type_enum"
+path  = "fuzz_targets/type_enum.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_has_field"
+path  = "fuzz_targets/derive_has_field.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_has_fields"
+path  = "fuzz_targets/derive_has_fields.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_build_field"
+path  = "fuzz_targets/derive_build_field.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_extract_field"
+path  = "fuzz_targets/derive_extract_field.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_from_variant"
+path  = "fuzz_targets/derive_from_variant.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_cgp_data"
+path  = "fuzz_targets/derive_cgp_data.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_cgp_record"
+path  = "fuzz_targets/derive_cgp_record.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
+name  = "derive_cgp_variant"
+path  = "fuzz_targets/derive_cgp_variant.rs"
+test  = false
+doc   = false
+bench = false
+
+# END generated targets
 
 # Keep this crate out of the repository workspace: it needs nightly and
 # libFuzzer, which the workspace's stable CI must not build.

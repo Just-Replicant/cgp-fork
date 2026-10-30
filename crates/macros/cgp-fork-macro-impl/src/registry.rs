@@ -120,3 +120,15 @@ pub const SEEDS: &[(&str, &str)] = &[
         "impl App { fn raise_error(e: String) -> Error { todo!() } }",
     ),
 ];
+
+/// The cargo-fuzz target that fuzzes one entrypoint (`fuzz/fuzz_targets/<name>.rs`).
+///
+/// Type-level macros (`Symbol`, `Product`, …) get a `type_` prefix, so `Product` and
+/// `product` stay distinct file names on case-insensitive file systems.
+pub fn fuzz_target_name(entrypoint: &str) -> String {
+    if entrypoint.starts_with(|c: char| c.is_ascii_uppercase()) {
+        format!("type_{}", entrypoint.to_ascii_lowercase())
+    } else {
+        entrypoint.to_owned()
+    }
+}

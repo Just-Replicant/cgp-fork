@@ -37,6 +37,9 @@ mod parser_rejections_tests;
 #[path = "macro_tests/raw_ident_tests.rs"]
 mod raw_ident_tests;
 #[cfg(test)]
+#[path = "macro_tests/registry_tests.rs"]
+mod registry_tests;
+#[cfg(test)]
 #[path = "macro_tests/robustness_tests.rs"]
 mod robustness_tests;
 #[cfg(test)]
