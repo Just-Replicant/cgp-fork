@@ -66,3 +66,8 @@ version_group = "cgp-fork"
 [[package]]
 name = "cgp-fork-doctests"
 release = false
+
+# Workspace-only check that renamed dependencies work (`publish = false`).
+[[package]]
+name = "cgp-fork-renamed-dep"
+release = false

@@ -68,6 +68,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "cgp-fork-renamed-dep"
+version = "0.0.0"
+dependencies = [
+ "cgp-fork",
+ "futures",
+]
+
+[[package]]
 name = "console"
 version = "0.16.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
