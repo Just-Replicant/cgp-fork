@@ -1,0 +1,52 @@
+# ADR 0003: Resolve the facade's path in generated code
+
+- Status: Accepted
+- Date: 2026-10-30
+- Plan: [rewrite plan §3 item 2 and §7.1](../rewrite-plan.md#71-macro-pipeline-cgp-fork-macro-impl), phase 1
+
+## Context
+
+Every macro expansion named the facade as `::cgp_fork::macro_prelude::…`
+(`macro_core/macros/export.rs`). A user who renames the dependency,
+
+```toml
+[dependencies]
+cgp = { package = "cgp-fork", version = "0.10" }
+```
+
+got `error[E0433]: cannot find cgp_fork in the list of imported crates` from every macro.
+
+## Options
+
+1. Require an explicit `crate = path` argument on every macro call. Precise, but every invocation
+   in a renamed project needs it, and declarative helpers cannot pass it along.
+2. Read the calling crate's `Cargo.toml` at expansion time and find the name `cgp-fork` is
+   imported under. This is what `proc-macro-crate` does; serde-adjacent and Bevy-style ecosystems
+   use the same approach.
+3. A global override through an environment variable.
+
+## Decision
+
+Option 2, written in-crate rather than with `proc-macro-crate`, to keep the macro crates'
+dependency set at `syn`, `quote` and `proc-macro2` (and so keep downstream build times flat).
+The resolver:
+
+- reads `$CARGO_MANIFEST_DIR/Cargo.toml` and looks for a key whose table sets
+  `package = "cgp-fork"` in `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]` and
+  `[target.*.…dependencies]`; a match yields `::<key with - replaced by _>`;
+- falls back to `::cgp_fork` in every other case (no manifest, not found, the facade itself whose
+  `lib.rs` has `extern crate self as cgp_fork`, or a parse it does not understand);
+- caches the answer per manifest path for the lifetime of the compiler process;
+- can be forced with the environment variable `CGP_FORK_CRATE` (for build systems without Cargo,
+  such as Bazel or Buck).
+
+The parse is a small line-oriented scan of the TOML subset Cargo manifests use for dependencies,
+covering both `name = { package = "cgp-fork", … }` and `[dependencies.name]` tables.
+
+## Consequences
+
+- Renamed dependencies work; `crates/tests/renamed-dep` is a workspace crate that imports
+  `cgp-fork` as `cgp` and exercises the main macros.
+- Expansion for ordinary users is byte-for-byte unchanged (still `::cgp_fork`).
+- A manifest edit that only renames the dependency is picked up on the next build, because Cargo
+  rebuilds the crate when its manifest changes.
