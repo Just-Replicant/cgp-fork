@@ -6,19 +6,27 @@ and so on — rather than by the macro that implements each concept, because a s
 macro such as `delegate_components!` serves many concepts at once. This README is
 the map of what is here and how to run it.
 
-## The two trees
+## The trees
 
-The suite lives inside the two workspace crates.
+The suite lives inside these workspace crates.
 
 **`cgp-fork` `tests/`** is the main suite: realistic example code that must compile and
 run. Because much of CGP is compile-time wiring, a test here often passes simply
 by compiling. It is also where the user-facing macros are exercised end-to-end and
 where the canonical macro-expansion snapshots live.
 
-**`cgp-fork-macro` `src/macro_tests/`** tests the macro internals directly (the parsers
+**`cgp-fork-macro-impl` `src/macro_tests/`** tests the macro internals directly (the parsers
 and AST types), and is the home for **rejection cases** — inputs CGP
 refuses during expansion — and for pinning the invalid tokens a macro currently
-emits.
+emits. It also holds the `crate_path` tests (how generated code names the facade) and the
+`registry` tests that keep the fuzz targets in step with the entrypoints.
+
+**`crates/tests/renamed-dep`** imports `cgp-fork` under the name `cgp` and compiles copies of
+representative behavior tests with every `cgp_fork` path renamed, so every macro must generate
+paths through the caller's own name for the facade (ADR 0003). When a macro starts naming a new
+facade item, add a test here that uses it.
+
+**`crates/tests/doctests`** compiles the repository README and the macro-crate examples.
 
 A third category lives in another repository: the cases where a macro *accepts*
 input whose *expansion* then fails to compile are UI fixtures in
@@ -42,7 +50,7 @@ getters, field access, extensible records, extensible variants, checking,
 dispatching, namespaces, handlers, monadic handlers, async and Send bounds,
 blanket traits, runtime, and the standalone error backends (`error_backends`). The example in each error
 backend's README (`src/{anyhow,eyre,std_error}/README.md`) is the module's rustdoc and runs as a
-doctest under `cargo test --doc --all-features`, so those examples are tested without being copied. The set grows and subdivides over time. `cgp-fork-macro` `src/macro_tests` follows
+doctest under `cargo test --doc --all-features`, so those examples are tested without being copied. The set grows and subdivides over time. `cgp-fork-macro-impl` `src/macro_tests` follows
 the same shape, with `ident_with_type_params` for parser corner cases and the
 failure-case targets `parser_rejections` and `invalid_expansion`.
 
@@ -51,6 +59,7 @@ failure-case targets `parser_rejections` and `invalid_expansion`.
 ```
 cargo nextest run -p cgp-fork --all-features             # the main suite
 cargo nextest run -p cgp-fork-macro-impl                 # macro internals + rejection cases
+cargo nextest run -p cgp-fork-renamed-dep                # macros under a renamed dependency
 cargo nextest run --all-features --workspace            # everything
 
 cargo insta test -p cgp-fork --all-features --review     # review snapshot diffs interactively

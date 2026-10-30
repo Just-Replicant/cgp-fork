@@ -26,6 +26,9 @@ cargo add cgp-fork
 use cgp_fork::prelude::*;
 ```
 
+Renaming the dependency (for example `cgp = { package = "cgp-fork", version = "0.10" }`) works:
+the macros read your `Cargo.toml` and generate paths through the name you chose.
+
 Rust **1.89+** on stable.
 
 ## Example

@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### Fixed
+
+- *(macro)* the macros work when the dependency is renamed
+  (`cgp = { package = "cgp-fork" }`). Generated code used to name `::cgp_fork` and failed with
+  `E0433`; it now uses the name the caller's `Cargo.toml` imports `cgp-fork` under, including
+  through `workspace = true`. `CGP_FORK_CRATE` overrides the detection for non-Cargo builds.
+  Expansion is unchanged for crates that use the default name.
+
+### Changed
+
+- *(macro)* the parsers and code generators moved into a new crate, `cgp-fork-macro-impl`, an
+  internal dependency of `cgp-fork-macro` with no stability guarantee. Users still depend only on
+  `cgp-fork`; macro names and output are unchanged.
+- *(fuzz)* one cargo-fuzz target per macro entrypoint, generated from the shared entrypoint
+  registry, alongside the all-entrypoints target.
+
+### Documentation
+
+- The 1.0 rewrite plan (`docs/rewrite-plan.md`), architecture decision records (`docs/adr/`), and
+  a measured baseline (`docs/baseline/`, `scripts/baseline.sh`).
+
 ## [0.10.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.10.0...v0.10.1) - 2026-10-28
 
 No breaking changes: the public API of both crates is unchanged (checked with
