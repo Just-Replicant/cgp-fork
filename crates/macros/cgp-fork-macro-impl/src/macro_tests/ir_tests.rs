@@ -317,3 +317,16 @@ fn comparisons_and_arrows_do_not_count_as_generics() {
         .unwrap();
     assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
 }
+
+#[test]
+fn reference_runs_inside_generics_add_up() {
+    // Found by the third fuzz round (cgp_fn, cgp_computer): runs of `&` split by nested
+    // generics, `A<&&&&A<&&&&…`, each stayed below the limit on their own.
+    let source = format!(
+        "pub trait HasN {{ fn n(&self) -> {}u8{}; }}",
+        "A<&&&&".repeat(100),
+        ">".repeat(100)
+    );
+    let tokens: TokenStream = source.parse().unwrap();
+    assert!(crate::ir::check_nesting_depth(&tokens).is_err());
+}
