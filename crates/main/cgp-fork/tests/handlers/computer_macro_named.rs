@@ -4,6 +4,9 @@
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_computer.md and
 //! cgp-knowledge-base-fork/cgp/reference/macros/cgp_computer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::extra::handler::Computer;
 use cgp_fork::prelude::*;
 use cgp_fork_macro::snapshot_cgp_computer;
@@ -19,6 +22,7 @@ snapshot_cgp_computer! {
         fn add(a: u64, b: u64) -> u64 {
             a + b
         }
+        #[allow(deprecated)]
         impl<__Context__, __Code__> Computer<__Context__, __Code__, (u64, u64)> for MyAdder {
             type Output = u64;
             fn compute(
@@ -29,12 +33,14 @@ snapshot_cgp_computer! {
                 add(arg_0, arg_1)
             }
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (u64, u64))> for MyAdder {}
         pub struct MyAdder;
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<ComputerRefComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -43,6 +49,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<ComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -56,6 +63,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -64,6 +72,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -77,6 +86,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerRefComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -85,6 +95,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -98,6 +109,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -106,6 +118,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -119,6 +132,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerRefComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -127,6 +141,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -140,6 +155,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -148,6 +164,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -161,6 +178,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerRefComponent> for MyAdder
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
@@ -169,6 +187,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,

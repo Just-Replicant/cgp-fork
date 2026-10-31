@@ -6,7 +6,7 @@ use syn::spanned::Spanned;
 use syn::{Error, ItemImpl, TraitItem};
 
 use crate::extra_macro_core::types::cgp_auto_dispatch::ItemCgpAutoDispatch;
-use crate::extra_macro_lib::handler_fn::lower_handler_fn;
+use crate::extra_macro_core::types::cgp_handler::lower_handler;
 use crate::ir::{Diagnostics, FamilyIr, IrFamily};
 use crate::macro_core::types::cgp_component::ItemCgpComponent;
 use crate::macro_core::types::cgp_fn::ItemCgpFn;
@@ -91,8 +91,8 @@ impl FamilyIr for ComponentDef {
                     #blanket_impl
                 };
 
-                for computer in &evaluated.computers {
-                    output.extend(lower_handler_fn(&computer.preprocess()?.eval()?)?);
+                for handler in &evaluated.handlers {
+                    output.extend(lower_handler(&handler.eval()?)?);
                 }
 
                 Ok(output)

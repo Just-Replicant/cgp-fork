@@ -14,6 +14,9 @@
 //! See cgp-knowledge-base-fork/cgp/concepts/extensible-records.md and
 //! cgp-knowledge-base-fork/cgp/reference/traits/has_builder.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use core::convert::Infallible;
 use std::marker::PhantomData;
 

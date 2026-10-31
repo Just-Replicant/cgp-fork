@@ -1,0 +1,17 @@
+error: use of deprecated tuple struct `cgp_fork::extra::dispatch::MatchWithHandlers`: use `cgp_fork::handler::MatchWith<H>`
+ --> tests/ui/deprecated_dispatch.rs:4:32
+  |
+4 | use cgp_fork::extra::dispatch::MatchWithHandlers;
+  |                                ^^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_dispatch.rs:2:9
+  |
+2 | #![deny(deprecated)]
+  |         ^^^^^^^^^^
+
+error: use of deprecated struct `cgp_fork::extra::dispatch::MatchWithHandlers`: use `cgp_fork::handler::MatchWith<H>`
+ --> tests/ui/deprecated_dispatch.rs:7:21
+  |
+7 | pub type Dispatch = MatchWithHandlers<Product![]>;
+  |                     ^^^^^^^^^^^^^^^^^

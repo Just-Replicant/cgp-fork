@@ -11,13 +11,12 @@ use syn::{
 };
 
 use crate::extra_macro_core::exports::{
-    AsyncComputer, Computer, MatchFirstWithValueHandlers, MatchFirstWithValueHandlersMut,
-    MatchFirstWithValueHandlersRef, MatchWithValueHandlers, MatchWithValueHandlersMut,
-    MatchWithValueHandlersRef,
+    UnifiedAll, UnifiedAsyncHandler, UnifiedFirst, UnifiedHandler, UnifiedMatchValues,
 };
 use crate::extra_macro_core::functions::derive_computer_ident;
-use crate::extra_macro_core::types::cgp_computer::ItemCgpComputer;
+use crate::extra_macro_core::types::cgp_handler::ItemCgpHandler;
 use crate::extra_macro_core::visitors::{ElaborateElidedLifetimes, collect_lifetimes};
+use crate::macro_core::exports::{Mut, Owned, Ref};
 use crate::macro_core::functions::merge_generics;
 use crate::macro_core::parse_internal;
 
@@ -39,7 +38,7 @@ pub enum DispatchReceiver {
 /// the single lifetime the arguments use.
 pub struct DispatchMethod {
     pub method: TraitItemFn,
-    /// The per-variant computer's name: `Compute` plus the method name in
+    /// The per-variant handler's name: `Compute` plus the method name in
     /// PascalCase.
     pub computer_ident: Ident,
     pub receiver: DispatchReceiver,
@@ -214,14 +213,19 @@ impl DispatchMethod {
 
         let has_args = !self.arg_types.is_empty();
 
-        let matcher = match (&self.receiver, has_args) {
-            (DispatchReceiver::Owned, false) => quote! { #MatchWithValueHandlers },
-            (DispatchReceiver::Owned, true) => quote! { #MatchFirstWithValueHandlers },
-            (DispatchReceiver::Ref(_), false) => quote! { #MatchWithValueHandlersRef },
-            (DispatchReceiver::Ref(_), true) => quote! { #MatchFirstWithValueHandlersRef },
-            (DispatchReceiver::Mut(_), false) => quote! { #MatchWithValueHandlersMut },
-            (DispatchReceiver::Mut(_), true) => quote! { #MatchFirstWithValueHandlersMut },
+        // `MatchValues<Handler, Strategy, Mode>`: `First` when the method has arguments
+        // (the input is `(enum, args)`), and the mode from the receiver.
+        let strategy = if has_args {
+            quote! { #UnifiedFirst }
+        } else {
+            quote! { #UnifiedAll }
         };
+        let mode = match &self.receiver {
+            DispatchReceiver::Owned => quote! { #Owned },
+            DispatchReceiver::Ref(_) => quote! { #Ref },
+            DispatchReceiver::Mut(_) => quote! { #Mut },
+        };
+        let matcher = quote! { #UnifiedMatchValues<#computer_ident, #strategy, #mode> };
 
         let context_type = self.context_type();
         let output_type = self.output_type();
@@ -258,15 +262,15 @@ impl DispatchMethod {
             if signature.asyncness.is_some() {
                 (
                     parse_internal! {
-                        #matcher<#computer_ident>: #hrtb
-                            #AsyncComputer<(), (), #input_type, Output = #output_type>
+                        #matcher: #hrtb
+                            #UnifiedAsyncHandler<(), (), #input_type, Output = #output_type>
                     },
-                    // Name the provider trait so the call stays unambiguous when the
-                    // consumer trait `CanComputeAsync` is also in scope. The `_`
+                    // Name the provider trait so the call stays unambiguous when a
+                    // consumer trait with the same method is also in scope. The `_`
                     // arguments are inferred, which avoids naming the lifetimes only
                     // the bound's `for<..>` declares.
                     quote! {
-                        <#matcher<#computer_ident> as #AsyncComputer<_, _, _>>::compute_async(
+                        <#matcher as #UnifiedAsyncHandler<_, _, _>>::handle_async(
                             &(),
                             ::core::marker::PhantomData::<()>,
                             #args,
@@ -276,13 +280,13 @@ impl DispatchMethod {
             } else {
                 (
                     parse_internal! {
-                        #matcher<#computer_ident>: #hrtb
-                            #Computer<(), (), #input_type, Output = #output_type>
+                        #matcher: #hrtb
+                            #UnifiedHandler<(), (), #input_type, Output = #output_type>
                     },
-                    // As above, qualified so that an imported `CanCompute` does not
+                    // As above, qualified so that an imported `CanHandle` does not
                     // make the call ambiguous.
                     quote! {
-                        <#matcher<#computer_ident> as #Computer<_, _, _>>::compute(
+                        <#matcher as #UnifiedHandler<_, _, _>>::handle(
                             &(),
                             ::core::marker::PhantomData::<()>,
                             #args,
@@ -302,10 +306,12 @@ impl DispatchMethod {
         Ok((impl_item, predicate))
     }
 
-    /// The `#[cgp_computer]` input for this method's per-variant computer: a
+    /// The `#[cgp_handler]` input for this method's per-variant handler: a
     /// private helper function, generic over any payload implementing the
-    /// trait, that calls the method on the payload.
-    pub fn to_computer(&self, item_trait: &ItemTrait) -> syn::Result<ItemCgpComputer> {
+    /// trait, that calls the method on the payload. The handler is also wired to
+    /// the 0.10 components (with `compat-0.10`), as the 0.10 `Computer` it used
+    /// to be.
+    pub fn to_handler(&self, item_trait: &ItemTrait) -> syn::Result<ItemCgpHandler> {
         let method_ident = &self.method.sig.ident;
         let async_token = &self.method.sig.asyncness;
         let trait_ident = &item_trait.ident;
@@ -368,8 +374,9 @@ impl DispatchMethod {
             method_ident.span(),
         );
 
-        Ok(ItemCgpComputer {
+        Ok(ItemCgpHandler {
             ident: Some(self.computer_ident.clone()),
+            legacy_wiring: true,
             item_fn: parse_internal! {
                 #async_token fn #helper_ident #impl_generics (
                     __Variants__: #context_type,

@@ -145,6 +145,13 @@ doc   = false
 bench = false
 
 [[bin]]
+name  = "cgp_handler"
+path  = "fuzz_targets/cgp_handler.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
 name  = "cgp_auto_dispatch"
 path  = "fuzz_targets/cgp_auto_dispatch.rs"
 test  = false

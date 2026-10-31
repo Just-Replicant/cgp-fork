@@ -1,5 +1,6 @@
 mod camel_case;
 mod delegated_impls;
+mod deprecation;
 mod diagnostic_attrs;
 mod field;
 mod generics;
@@ -16,6 +17,7 @@ mod tokens_eq;
 
 pub use camel_case::*;
 pub use delegated_impls::*;
+pub use deprecation::*;
 pub use diagnostic_attrs::*;
 pub use field::*;
 pub use generics::*;

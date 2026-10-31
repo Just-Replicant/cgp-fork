@@ -8,6 +8,10 @@ use crate::extra::handler::{
 ///
 /// Implemented for `Computer`, `TryComputer`, `AsyncComputer`, and `Handler`. A failure in
 /// either provider stops the chain.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::Pipe<Product![ProviderA, ProviderB]>` (or `cgp_fork::handler::TryPipe`)"
+)]
 pub struct ComposeHandlers<ProviderA, ProviderB>(pub PhantomData<(ProviderA, ProviderB)>);
 
 #[cgp_provider]

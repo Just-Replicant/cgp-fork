@@ -55,9 +55,10 @@ pub mod prelude {
     pub use crate::core::field::traits::{Mode, ModeExtractor, ModeFields};
     pub use crate::core::field::types::{Mut, Owned, Ref};
     pub use crate::handler::{
-        All, AsyncHandler, AsyncHandlerComponent, BuildWith, FieldValue, First, Handler,
-        HandlerComponent, IgnoreInput, MatchFields, MatchValues, MatchWith, Merge, MergeOutputs,
-        NoCode, OnField, Pipe, Promote, PromoteDeref, PromoteOk, ReturnInput, SetField,
-        TryBuildWith, TryMerge, TryMergeOutputs, TryPipe, TrySetField, UseInputDelegate,
+        All, AsyncHandler, AsyncHandlerComponent, BuildWith, DispatchHandlers, Downcast,
+        FieldValue, First, Handler, HandlerComponent, IgnoreInput, MatchFields, MatchValues,
+        MatchWith, Merge, MergeOutputs, NoCode, OnField, Pipe, Promote, PromoteDeref, PromoteOk,
+        ReturnInput, SetField, TryBuildWith, TryMerge, TryMergeOutputs, TryPipe, TrySetField,
+        UseInputDelegate,
     };
 }

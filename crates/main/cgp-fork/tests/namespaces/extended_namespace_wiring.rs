@@ -11,6 +11,9 @@
 //! See cgp-knowledge-base-fork/cgp/reference/macros/cgp_namespace.md and
 //! cgp-knowledge-base-fork/cgp/reference/macros/delegate_components.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::core::error::{
     ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent,
 };

@@ -26,6 +26,18 @@ impl ItemCgpComputer {
     /// field and is not part of the provider's input tuple. Those attributes are
     /// stripped from the function that is emitted.
     pub fn preprocess(&self) -> syn::Result<PreprocessedCgpComputer> {
+        self.preprocess_for("Computer", true)
+    }
+
+    /// [`preprocess`](Self::preprocess), with errors that call the function a `{noun}`
+    /// function (`#[cgp_handler]` shares this stage). With `read_result` false the return
+    /// type is not inspected: a unified handler's fallibility is its output type, so any
+    /// `Result` alias is fine.
+    pub fn preprocess_for(
+        &self,
+        noun: &str,
+        read_result: bool,
+    ) -> syn::Result<PreprocessedCgpComputer> {
         let mut item_fn = self.item_fn.clone();
         let sig = &item_fn.sig;
 
@@ -45,7 +57,7 @@ impl ItemCgpComputer {
                 FnArg::Receiver(receiver) => {
                     return Err(Error::new_spanned(
                         receiver,
-                        "Computer functions cannot have a receiver",
+                        format!("{noun} functions cannot have a receiver"),
                     ));
                 }
                 FnArg::Typed(pat_type) => {
@@ -60,7 +72,9 @@ impl ItemCgpComputer {
                     if let Some(impl_trait) = find_impl_trait(&pat_type.ty) {
                         return Err(Error::new_spanned(
                             impl_trait,
-                            "Computer function parameters cannot use `impl Trait`; declare a generic parameter instead",
+                            format!(
+                                "{noun} function parameters cannot use `impl Trait`; declare a generic parameter instead"
+                            ),
                         ));
                     }
 
@@ -80,13 +94,18 @@ impl ItemCgpComputer {
         if let Some(impl_trait) = find_impl_trait(&output) {
             return Err(Error::new_spanned(
                 impl_trait,
-                "Computer functions cannot return `impl Trait`",
+                format!("{noun} functions cannot return `impl Trait`"),
             ));
         }
 
         // A re-parse of the user's own return type, so its tokens keep their spans
         // and an error lands on the offending token.
-        let maybe_result: MaybeResultType = parse2(output.to_token_stream())?;
+        let is_fallible = if read_result {
+            let maybe_result: MaybeResultType = parse2(output.to_token_stream())?;
+            maybe_result.error_type.is_some()
+        } else {
+            false
+        };
 
         Ok(PreprocessedCgpComputer {
             provider_ident,
@@ -97,7 +116,7 @@ impl ItemCgpComputer {
             context_fields: ImplicitArgFields::new(context_fields),
             output,
             is_async: self.item_fn.sig.asyncness.is_some(),
-            is_fallible: maybe_result.error_type.is_some(),
+            is_fallible,
         })
     }
 }

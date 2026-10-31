@@ -7,6 +7,7 @@ use crate::extra::handler::{
 /// A handler that returns its input unchanged.
 ///
 /// Implemented for `Computer`, `TryComputer` (`Ok(input)`), `AsyncComputer`, and `Handler`.
+#[deprecated(since = "0.11.0", note = "use `cgp_fork::handler::ReturnInput`")]
 pub struct ReturnInput;
 
 #[cgp_provider]

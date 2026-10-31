@@ -9,6 +9,10 @@ use crate::core::prelude::*;
 /// Produces a value from the context alone. There is no input.
 ///
 /// `#[cgp_producer]` defines a provider for this. `Code` selects which value to produce.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`) with a `()` input; wrap the provider in `cgp_fork::handler::IgnoreInput` to accept any input"
+)]
 pub trait CanProduce<Code> {
     /// The value `produce` returns.
     type Output;

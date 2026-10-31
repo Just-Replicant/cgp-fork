@@ -69,16 +69,21 @@ impl CgpComponentAttributes {
                         .derive_delegate_attributes
                         .attributes
                         .push(derive_delegate_attribute);
-                } else if ident == "derive_promote" {
+                } else if ident == "derive_promote" || ident == "derive_handler" {
                     if parsed_attributes.derive_promote.is_some() {
                         return Err(syn::Error::new_spanned(
-                            attribute,
-                            "duplicate `#[derive_promote]`; a component promotes through one provider",
+                            &attribute,
+                            format!(
+                                "duplicate `#[{ident}]`; a component promotes through one provider (`#[derive_handler]` or `#[derive_promote]`)"
+                            ),
                         ));
                     }
 
-                    parsed_attributes.derive_promote =
-                        Some(attribute.parse_args_with(DerivePromoteAttribute::parse)?);
+                    let unified = ident == "derive_handler";
+                    parsed_attributes.derive_promote = Some(
+                        attribute
+                            .parse_args_with(DerivePromoteAttribute::parse_args(ident, unified))?,
+                    );
                 } else {
                     attributes.push(attribute);
                 }

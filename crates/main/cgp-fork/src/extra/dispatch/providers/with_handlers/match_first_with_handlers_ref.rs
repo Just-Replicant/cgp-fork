@@ -5,6 +5,10 @@ use crate::extra::dispatch::DispatchMatchers;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
 /// [`MatchFirstWithHandlers`](super::match_first_with_handlers::MatchFirstWithHandlers) for a shared borrow.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::MatchWith<H, First, Ref>` (`cgp_fork::handler::MatchWith`)"
+)]
 pub struct MatchFirstWithHandlersRef<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]

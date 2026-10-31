@@ -1,7 +1,7 @@
 //! Entrypoint for the `ui` target: the diagnostics users see for common mistakes.
 //!
 //! Each `tests/ui/*.rs` case must fail to compile with exactly the `.stderr` beside
-//! it. The deeper "accepted, but the expansion fails to compile" fixtures live in
+//! it; each `tests/ui_pass/*.rs` case must compile. The deeper "accepted, but the expansion fails to compile" fixtures live in
 //! `cargo-cgp`; these few pin the messages this repository is responsible for.
 //!
 //! Regenerate after an intended change with
@@ -14,4 +14,6 @@
 fn ui() {
     let cases = trybuild::TestCases::new();
     cases.compile_fail("tests/ui/*.rs");
+    // The replacements for the deprecated names compile under `deny(warnings)`.
+    cases.pass("tests/ui_pass/*.rs");
 }

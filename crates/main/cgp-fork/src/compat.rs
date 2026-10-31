@@ -16,6 +16,9 @@
 //! such as `[ComputerComponent, TryComputerComponent]: Compat<MyHandler>` serves 0.10
 //! consumers while the provider is ported.
 
+// The bridges implement the deprecated 0.10 traits by design.
+#![allow(deprecated)]
+
 use crate::core::prelude::*;
 use crate::extra::handler as legacy;
 use crate::extra::handler::{

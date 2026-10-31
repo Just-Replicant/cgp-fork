@@ -3,6 +3,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_component.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork_macro::snapshot_cgp_component;
 
 snapshot_cgp_component! {
@@ -61,6 +64,7 @@ snapshot_cgp_component! {
         pub struct PromoteAreaCalculator<__Provider__>(
             pub ::core::marker::PhantomData<__Provider__>,
         );
+        const _: () = DERIVE_PROMOTE;
         impl<__Context__> AreaCalculator<__Context__> for UseContext
         where
             __Context__: HasArea,
@@ -98,6 +102,7 @@ snapshot_cgp_component! {
             >>::Delegate: IsProviderFor<AreaCalculatorComponent, __Context__, ()>
                 + AreaCalculator<__Context__>,
         {}
+        #[allow(deprecated)]
         impl<__Context__, __Provider__> AreaCalculator<__Context__>
         for PromoteAreaCalculator<__Provider__>
         where
@@ -111,6 +116,7 @@ snapshot_cgp_component! {
                 >>::compute(__context__, ::core::marker::PhantomData::<()>, ())
             }
         }
+        #[allow(deprecated)]
         impl<__Context__, __Provider__> IsProviderFor<AreaCalculatorComponent, __Context__, ()>
         for PromoteAreaCalculator<__Provider__>
         where

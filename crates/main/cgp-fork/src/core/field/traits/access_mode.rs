@@ -12,11 +12,35 @@ use crate::core::field::traits::{
 use crate::core::field::types::{Mut, Owned, Ref};
 
 /// An access mode: [`Owned`], [`Ref`] or [`Mut`].
-pub trait Mode: sealed::Sealed {}
+///
+/// [`Map`](Mode::Map) applies the mode to a type: `T`, `&'a T` or `&'a mut T`. The derived
+/// borrowed partial enums (`__PartialRef…`) take their mode as a `Mode` parameter, so one
+/// enum serves the shared and the mutable extractor.
+///
+/// This replaces `MapTypeRef` and its markers `IsOwned`, `IsRef` and `IsMut` (0.10), which
+/// remain as deprecated aliases. Field-state maps such as [`IsPresent`] and [`IsNothing`] stay
+/// [`MapType`]s: their `Map<T>` has no lifetime, and a borrow cannot be written without one
+/// (`&'a T` needs `T: 'a`).
+///
+/// [`IsPresent`]: crate::core::field::impls::IsPresent
+/// [`IsNothing`]: crate::core::field::impls::IsNothing
+/// [`MapType`]: crate::core::field::traits::MapType
+pub trait Mode: sealed::Sealed {
+    /// `T` accessed in this mode for `'a`.
+    type Map<'a, T: 'a>: 'a;
+}
 
-impl Mode for Owned {}
-impl Mode for Ref {}
-impl Mode for Mut {}
+impl Mode for Owned {
+    type Map<'a, T: 'a> = T;
+}
+
+impl Mode for Ref {
+    type Map<'a, T: 'a> = &'a T;
+}
+
+impl Mode for Mut {
+    type Map<'a, T: 'a> = &'a mut T;
+}
 
 mod sealed {
     pub trait Sealed {}

@@ -5,6 +5,7 @@ use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, Com
 ///
 /// The output is `Result`: `Ok` is the provider's output, `Err` is the remainder when this value
 /// is a different variant.
+#[deprecated(since = "0.11.0", note = "use `cgp_fork::handler::OnField<Tag, P>`")]
 pub struct ExtractFieldAndHandle<Tag, Provider = UseContext>(pub PhantomData<(Tag, Provider)>);
 
 #[cgp_provider]

@@ -26,6 +26,8 @@ define_keyword!(CgpComputer, "cgp_computer");
 
 define_keyword!(CgpProducer, "cgp_producer");
 
+define_keyword!(CgpHandler, "cgp_handler");
+
 define_keyword!(CgpAutoDispatch, "cgp_auto_dispatch");
 
 define_keyword!(CgpType, "cgp_type");

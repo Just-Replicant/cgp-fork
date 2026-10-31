@@ -9,6 +9,7 @@ use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, Com
 ///
 /// Each handler returns `Result`. `Err` means "not this variant" and the next handler runs.
 /// A leftover remainder is uninhabited once every variant has a handler.
+#[deprecated(since = "0.11.0", note = "use `cgp_fork::handler::MatchWith<H>`")]
 pub struct MatchWithHandlers<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]

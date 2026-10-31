@@ -12,6 +12,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/reference/components/producer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::core::error::ErrorTypeProviderComponent;
 use cgp_fork::extra::handler::{ComputerRef, HandlerRef, TryComputerRef};
 use cgp_fork::prelude::*;

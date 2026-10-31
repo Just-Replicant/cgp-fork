@@ -17,7 +17,7 @@
 //!
 //! [`BuildWith`] (with [`SetField`] and [`Merge`]) is the unified `BuildWithHandlers`.
 
-use crate::core::field::impls::CanBuildFrom;
+use crate::core::field::impls::{CanBuildFrom, CanDowncastFields};
 use crate::core::field::traits::{MapFields, Mode, ModeExtractor};
 use crate::core::field::types::Owned;
 use crate::core::prelude::*;
@@ -760,4 +760,93 @@ pub struct ToTryMerge;
 
 impl MapType for ToTryMerge {
     type Map<Provider> = TryMerge<Provider>;
+}
+
+/// Tries `Handlers`, a [`Cons`] list of handlers that each return
+/// `Result<Output, Remainder>`, in order: the first `Ok` wins, and each `Err` (the input
+/// with one more variant removed) goes to the next handler.
+///
+/// The output is `Result<Output, Remainder>`, so a partial match can be chained further.
+/// [`MatchWith`] is the same loop for a complete match, which unwraps the uninhabited
+/// remainder. The unified `DispatchMatchers`.
+pub struct DispatchHandlers<Handlers>(pub PhantomData<Handlers>);
+
+#[cgp_provider]
+impl<Context, Code, Input, Handlers> Handler<Context, Code, Input> for DispatchHandlers<Handlers>
+where
+    Handlers: MatchHandlers<Context, Code, Input>,
+{
+    type Output = Result<Handlers::Output, Handlers::Remainder>;
+
+    fn handle(
+        context: &Context,
+        code: PhantomData<Code>,
+        input: Input,
+    ) -> Result<Handlers::Output, Handlers::Remainder> {
+        Handlers::match_handlers(context, code, input)
+    }
+}
+
+#[cgp_provider]
+impl<Context, Code, Input, Handlers> AsyncHandler<Context, Code, Input>
+    for DispatchHandlers<Handlers>
+where
+    Handlers: AsyncMatchHandlers<Context, Code, Input>,
+{
+    type Output = Result<Handlers::Output, Handlers::Remainder>;
+
+    async fn handle_async(
+        context: &Context,
+        code: PhantomData<Code>,
+        input: Input,
+    ) -> Result<Handlers::Output, Handlers::Remainder> {
+        Handlers::match_handlers_async(context, code, input).await
+    }
+}
+
+/// Downcasts the input to the extensible enum `Inner` (a subset of its variants) and runs
+/// `Provider` on it.
+///
+/// The output is `Result<Provider::Output, Remainder>`; `Err` is the input with `Inner`'s
+/// variants removed. The unified `DowncastAndHandle`.
+pub struct Downcast<Inner, Provider = UseContext>(pub PhantomData<(Inner, Provider)>);
+
+#[cgp_provider]
+impl<Context, Code, Input, Inner, Provider> Handler<Context, Code, Input>
+    for Downcast<Inner, Provider>
+where
+    Input: CanDowncastFields<Inner>,
+    Provider: Handler<Context, Code, Inner>,
+{
+    type Output = Result<Provider::Output, Input::Remainder>;
+
+    fn handle(
+        context: &Context,
+        code: PhantomData<Code>,
+        input: Input,
+    ) -> Result<Provider::Output, Input::Remainder> {
+        let inner = input.downcast_fields(PhantomData::<Inner>)?;
+        Ok(Provider::handle(context, code, inner))
+    }
+}
+
+#[cgp_provider]
+impl<Context, Code, Input, Inner, Provider> AsyncHandler<Context, Code, Input>
+    for Downcast<Inner, Provider>
+where
+    Input: CanDowncastFields<Inner>,
+    Provider: AsyncHandler<Context, Code, Inner>,
+{
+    type Output = Result<Provider::Output, Input::Remainder>;
+
+    async fn handle_async(
+        context: &Context,
+        code: PhantomData<Code>,
+        input: Input,
+    ) -> Result<Provider::Output, Input::Remainder> {
+        match input.downcast_fields(PhantomData::<Inner>) {
+            Ok(inner) => Ok(Provider::handle_async(context, code, inner).await),
+            Err(remainder) => Err(remainder),
+        }
+    }
 }

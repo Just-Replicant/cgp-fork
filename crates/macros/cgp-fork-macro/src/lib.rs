@@ -106,6 +106,19 @@ use proc_macro::TokenStream;
 
     A runnable version of this wiring is the `UseContext` example in `cgp-fork`
     (`cgp_fork::core::component::UseContext`), which is compiled as a doctest.
+
+    ## `#[derive_handler(Name)]`
+
+    On a component with one method, also generates a provider `Name<P>` that implements the
+    component by calling the unified `Handler` `P`, with the method's arguments (after
+    `&self`) as its input: none is `()`, one is that value, more are a tuple. Wire it as
+    `Name<SomeHandler>`. It replaces the deprecated `#[derive_promote(Name)]`, which calls a
+    0.10 `Computer`.
+
+    ## Deprecation
+
+    A `#[deprecated]` attribute on the consumer trait deprecates the provider trait and the
+    component struct too; the generated impls allow the lint, so only users are warned.
 */
 #[proc_macro_attribute]
 pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -1373,6 +1386,10 @@ pub fn derive_cgp_data(item: TokenStream) -> TokenStream {
     defines the provider `MagicNumber`, so `MagicNumber::produce(&context, code)`
     returns `42`.
 */
+#[deprecated(
+    since = "0.11.0",
+    note = "use `#[cgp_handler]`: a function without parameters becomes a `Handler` of `()` (wrap the provider in `IgnoreInput` to accept any input)"
+)]
 #[proc_macro_attribute]
 pub fn cgp_producer(attr: TokenStream, body: TokenStream) -> TokenStream {
     extra_macro_lib::cgp_producer(attr.into(), body.into())
@@ -1405,9 +1422,51 @@ pub fn cgp_producer(attr: TokenStream, body: TokenStream) -> TokenStream {
     defines the provider `Add`, so `Add::compute(&context, code, (1, 2))`
     returns `3`.
 */
+#[deprecated(
+    since = "0.11.0",
+    note = "use `#[cgp_handler]`, which defines a unified `Handler` (or, for an `async` function, `AsyncHandler`) provider"
+)]
 #[proc_macro_attribute]
 pub fn cgp_computer(attr: TokenStream, body: TokenStream) -> TokenStream {
     extra_macro_lib::cgp_computer(attr.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_handler]` defines a provider of the unified handler family
+    (`cgp_fork::handler`) from a function.
+
+    The function's parameters become the provider's input (one parameter is the
+    input itself, several are a tuple, none is `()`) and its return type the
+    output. A `#[implicit]` or `#[field]` parameter is read from a same-named
+    field of the context instead of the input. A synchronous function implements
+    `Handler`, and through `Promote` also `AsyncHandler`; an `async` function
+    implements `AsyncHandler`. A fallible function simply returns a `Result`;
+    there is no separate fallible component. The provider is named after the
+    function in PascalCase, or after the identifier given as the attribute's
+    argument.
+
+    It replaces `#[cgp_computer]` and `#[cgp_producer]`. A 0.10 consumer can
+    still use the provider through `cgp_fork::compat::Compat`.
+
+    ## Example
+
+    ```rust,ignore
+    use cgp_fork::handler::{CanHandle, Handler};
+
+    #[cgp_handler]
+    fn add(a: u64, b: u64) -> u64 {
+        a + b
+    }
+    ```
+
+    defines the provider `Add`, so `Add::handle(&context, code, (1, 2))`
+    returns `3`.
+*/
+#[proc_macro_attribute]
+pub fn cgp_handler(attr: TokenStream, body: TokenStream) -> TokenStream {
+    extra_macro_lib::cgp_handler(attr.into(), body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }

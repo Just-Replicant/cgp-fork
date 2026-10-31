@@ -14,21 +14,21 @@ pub struct PreprocessedCgpAutoDispatch {
 
 impl PreprocessedCgpAutoDispatch {
     /// Evaluate into the dispatch IR: the enum-level blanket impl, and one
-    /// `#[cgp_computer]` input per method, left for the entrypoint to lower.
+    /// `#[cgp_handler]` input per method, left for the entrypoint to lower.
     pub fn eval(&self) -> syn::Result<EvaluatedCgpAutoDispatch> {
         Ok(EvaluatedCgpAutoDispatch {
             item_trait: self.item_trait.clone(),
             blanket_impl: self.to_blanket_impl()?,
-            computers: self
+            handlers: self
                 .methods
                 .iter()
-                .map(|method| method.to_computer(&self.item_trait))
+                .map(|method| method.to_handler(&self.item_trait))
                 .collect::<syn::Result<_>>()?,
         })
     }
 
     /// The impl of the trait for any `__Variants__`, each method running a
-    /// value-handler matcher over that method's per-variant computer.
+    /// `MatchValues` over that method's per-variant handler.
     pub fn to_blanket_impl(&self) -> syn::Result<ItemImpl> {
         let item_trait = &self.item_trait;
         let trait_ident = &item_trait.ident;

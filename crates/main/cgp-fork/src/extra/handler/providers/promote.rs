@@ -10,6 +10,10 @@ use crate::extra::handler::{
 /// A `Computer` becomes a `TryComputer` that always returns `Ok`. An `AsyncComputer` becomes a
 /// `Handler` that always returns `Ok`. A `TryComputer` becomes a `Handler` through
 /// [`PromoteAsync`](crate::extra::handler::PromoteAsync).
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::IgnoreInput` (a producer that ignores its input), `cgp_fork::handler::PromoteOk` (wrap the output in `Ok`), or `cgp_fork::handler::Promote` (sync to async)"
+)]
 pub struct Promote<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

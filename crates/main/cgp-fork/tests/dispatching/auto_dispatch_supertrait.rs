@@ -38,16 +38,24 @@ snapshot_cgp_auto_dispatch! {
         }
         impl<__Variants__> CanGreet for __Variants__
         where
-            MatchWithValueHandlersRef<
+            unified::MatchValues<
                 ComputeGreet,
-            >: for<'__a__> Computer<(), (), &'__a__ __Variants__, Output = String>,
+                unified::All,
+                Ref,
+            >: for<'__a__> unified::Handler<(), (), &'__a__ __Variants__, Output = String>,
             __Variants__: HasExtractor,
             __Variants__: HasName,
         {
             fn greet(&self) -> String {
-                <MatchWithValueHandlersRef<
+                <unified::MatchValues<
                     ComputeGreet,
-                > as Computer<_, _, _>>::compute(&(), ::core::marker::PhantomData::<()>, self)
+                    unified::All,
+                    Ref,
+                > as unified::Handler<
+                    _,
+                    _,
+                    _,
+                >>::handle(&(), ::core::marker::PhantomData::<()>, self)
             }
         }
         fn __compute_greet__<'__a__, __Variants__: CanGreet>(
@@ -60,9 +68,9 @@ snapshot_cgp_auto_dispatch! {
             __Variants__: CanGreet,
             __Context__,
             __Code__,
-        > Computer<__Context__, __Code__, (&'__a__ __Variants__)> for ComputeGreet {
+        > unified::Handler<__Context__, __Code__, (&'__a__ __Variants__)> for ComputeGreet {
             type Output = String;
-            fn compute(
+            fn handle(
                 _context: &__Context__,
                 _code: ::core::marker::PhantomData<__Code__>,
                 (arg_0): (&'__a__ __Variants__),
@@ -75,156 +83,72 @@ snapshot_cgp_auto_dispatch! {
             __Variants__: CanGreet,
             __Context__,
             __Code__,
-        > IsProviderFor<ComputerComponent, __Context__, (__Code__, (&'__a__ __Variants__))>
-        for ComputeGreet {}
+        > IsProviderFor<
+            unified::HandlerComponent,
+            __Context__,
+            (__Code__, (&'__a__ __Variants__)),
+        > for ComputeGreet {}
         pub struct ComputeGreet;
         #[diagnostic::do_not_recommend]
-        impl DelegateComponent<ComputerRefComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<ComputerRefComponent>>::Delegate;
+        impl DelegateComponent<unified::AsyncHandlerComponent> for ComputeGreet {
+            type Delegate = unified::Promote<Self>;
         }
         impl<
             __Context__,
             __Params__: ?Sized,
-        > IsProviderFor<ComputerRefComponent, __Context__, __Params__> for ComputeGreet
+        > IsProviderFor<unified::AsyncHandlerComponent, __Context__, __Params__> for ComputeGreet
         where
-            PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
-            <PromoteComputer<
+            unified::Promote<
                 Self,
-            > as DelegateComponent<
-                ComputerRefComponent,
-            >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
+            >: IsProviderFor<unified::AsyncHandlerComponent, __Context__, __Params__>,
         {}
-        #[diagnostic::do_not_recommend]
-        impl DelegateComponent<TryComputerComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<TryComputerComponent>>::Delegate;
+        __cgp_compat_0_10! {
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            ComputerComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            ComputerComponent, __Context__, __Params__ > for ComputeGreet where Compat < Self > :
+            IsProviderFor < ComputerComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            ComputerRefComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            ComputerRefComponent, __Context__, __Params__ > for ComputeGreet where Compat < Self
+            > : IsProviderFor < ComputerRefComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            TryComputerComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            TryComputerComponent, __Context__, __Params__ > for ComputeGreet where Compat < Self
+            > : IsProviderFor < TryComputerComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            TryComputerRefComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            TryComputerRefComponent, __Context__, __Params__ > for ComputeGreet where Compat <
+            Self > : IsProviderFor < TryComputerRefComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            AsyncComputerComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            AsyncComputerComponent, __Context__, __Params__ > for ComputeGreet where Compat <
+            Self > : IsProviderFor < AsyncComputerComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            AsyncComputerRefComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            AsyncComputerRefComponent, __Context__, __Params__ > for ComputeGreet where Compat <
+            Self > : IsProviderFor < AsyncComputerRefComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            HandlerComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            HandlerComponent, __Context__, __Params__ > for ComputeGreet where Compat < Self > :
+            IsProviderFor < HandlerComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            HandlerRefComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            HandlerRefComponent, __Context__, __Params__ > for ComputeGreet where Compat < Self >
+            : IsProviderFor < HandlerRefComponent, __Context__, __Params__ > {}
+            #[diagnostic::do_not_recommend] #[allow(deprecated)] impl DelegateComponent <
+            ProducerComponent > for ComputeGreet { type Delegate = Compat < Self >; }
+            #[allow(deprecated)] impl < __Context__, __Params__ : ? Sized > IsProviderFor <
+            ProducerComponent, __Context__, __Params__ > for ComputeGreet where Compat < Self > :
+            IsProviderFor < ProducerComponent, __Context__, __Params__ > {}
         }
-        impl<
-            __Context__,
-            __Params__: ?Sized,
-        > IsProviderFor<TryComputerComponent, __Context__, __Params__> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
-            <PromoteComputer<
-                Self,
-            > as DelegateComponent<
-                TryComputerComponent,
-            >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
-        {}
-        #[diagnostic::do_not_recommend]
-        impl DelegateComponent<TryComputerRefComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<TryComputerRefComponent>>::Delegate;
-        }
-        impl<
-            __Context__,
-            __Params__: ?Sized,
-        > IsProviderFor<TryComputerRefComponent, __Context__, __Params__> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
-            <PromoteComputer<
-                Self,
-            > as DelegateComponent<
-                TryComputerRefComponent,
-            >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
-        {}
-        #[diagnostic::do_not_recommend]
-        impl DelegateComponent<AsyncComputerComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<AsyncComputerComponent>>::Delegate;
-        }
-        impl<
-            __Context__,
-            __Params__: ?Sized,
-        > IsProviderFor<AsyncComputerComponent, __Context__, __Params__> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
-            <PromoteComputer<
-                Self,
-            > as DelegateComponent<
-                AsyncComputerComponent,
-            >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
-        {}
-        #[diagnostic::do_not_recommend]
-        impl DelegateComponent<AsyncComputerRefComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<AsyncComputerRefComponent>>::Delegate;
-        }
-        impl<
-            __Context__,
-            __Params__: ?Sized,
-        > IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
-            <PromoteComputer<
-                Self,
-            > as DelegateComponent<
-                AsyncComputerRefComponent,
-            >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
-        {}
-        #[diagnostic::do_not_recommend]
-        impl DelegateComponent<HandlerComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<HandlerComponent>>::Delegate;
-        }
-        impl<
-            __Context__,
-            __Params__: ?Sized,
-        > IsProviderFor<HandlerComponent, __Context__, __Params__> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
-            <PromoteComputer<
-                Self,
-            > as DelegateComponent<
-                HandlerComponent,
-            >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
-        {}
-        #[diagnostic::do_not_recommend]
-        impl DelegateComponent<HandlerRefComponent> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
-        {
-            type Delegate = <PromoteComputer<
-                Self,
-            > as DelegateComponent<HandlerRefComponent>>::Delegate;
-        }
-        impl<
-            __Context__,
-            __Params__: ?Sized,
-        > IsProviderFor<HandlerRefComponent, __Context__, __Params__> for ComputeGreet
-        where
-            PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
-            <PromoteComputer<
-                Self,
-            > as DelegateComponent<
-                HandlerRefComponent,
-            >>::Delegate: IsProviderFor<HandlerRefComponent, __Context__, __Params__>,
-        {}
         ")
     }
 }

@@ -8,6 +8,10 @@ use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, Com
 ///
 /// The first handler that returns `Ok` wins. `args` is threaded through so a later handler still
 /// sees them.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::MatchWith<H, First>` (`cgp_fork::handler::MatchWith`)"
+)]
 pub struct MatchFirstWithHandlers<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]

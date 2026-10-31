@@ -7,6 +7,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_computer.md and
 //! cgp-knowledge-base-fork/cgp/reference/macros/cgp_computer.md.
+
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
 #![allow(clippy::needless_lifetimes)]
 
 use core::fmt::Display;
@@ -32,6 +35,7 @@ snapshot_cgp_computer! {
         {
             format!("<{value}>")
         }
+        #[allow(deprecated)]
         impl<T, __Context__, __Code__> Computer<__Context__, __Code__, (T)> for Describe
         where
             T: Display,
@@ -45,6 +49,7 @@ snapshot_cgp_computer! {
                 describe(arg_0)
             }
         }
+        #[allow(deprecated)]
         impl<
             T,
             __Context__,
@@ -55,6 +60,7 @@ snapshot_cgp_computer! {
         {}
         pub struct Describe;
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<ComputerRefComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -63,6 +69,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<ComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -76,6 +83,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -84,6 +92,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -97,6 +106,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerRefComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -105,6 +115,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -118,6 +129,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -126,6 +138,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -139,6 +152,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerRefComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -147,6 +161,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -160,6 +175,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -168,6 +184,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -181,6 +198,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerRefComponent> for Describe
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
@@ -189,6 +207,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -216,6 +235,7 @@ snapshot_cgp_computer! {
         fn first_char<'a>(value: &'a str) -> &'a str {
             &value[..1]
         }
+        #[allow(deprecated)]
         impl<'a, __Context__, __Code__> Computer<__Context__, __Code__, (&'a str)>
         for FirstChar {
             type Output = &'a str;
@@ -227,6 +247,7 @@ snapshot_cgp_computer! {
                 first_char(arg_0)
             }
         }
+        #[allow(deprecated)]
         impl<
             'a,
             __Context__,
@@ -234,6 +255,7 @@ snapshot_cgp_computer! {
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (&'a str))> for FirstChar {}
         pub struct FirstChar;
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<ComputerRefComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -242,6 +264,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<ComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -255,6 +278,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -263,6 +287,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -276,6 +301,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerRefComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -284,6 +310,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -297,6 +324,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -305,6 +333,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -318,6 +347,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerRefComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -326,6 +356,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -339,6 +370,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -347,6 +379,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -360,6 +393,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerRefComponent> for FirstChar
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
@@ -368,6 +402,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -395,6 +430,7 @@ snapshot_cgp_computer! {
         fn sum_array<const N: usize>(values: [u64; N]) -> u64 {
             values.iter().sum()
         }
+        #[allow(deprecated)]
         impl<const N: usize, __Context__, __Code__> Computer<__Context__, __Code__, ([u64; N])>
         for SumArray {
             type Output = u64;
@@ -406,6 +442,7 @@ snapshot_cgp_computer! {
                 sum_array(arg_0)
             }
         }
+        #[allow(deprecated)]
         impl<
             const N: usize,
             __Context__,
@@ -413,6 +450,7 @@ snapshot_cgp_computer! {
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, ([u64; N]))> for SumArray {}
         pub struct SumArray;
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<ComputerRefComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -421,6 +459,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<ComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -434,6 +473,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -442,6 +482,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -455,6 +496,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerRefComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -463,6 +505,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<TryComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -476,6 +519,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -484,6 +528,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -497,6 +542,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerRefComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -505,6 +551,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<AsyncComputerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -518,6 +565,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -526,6 +574,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -539,6 +588,7 @@ snapshot_cgp_computer! {
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerRefComponent> for SumArray
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
@@ -547,6 +597,7 @@ snapshot_cgp_computer! {
                 Self,
             > as DelegateComponent<HandlerRefComponent>>::Delegate;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,

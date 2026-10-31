@@ -10,6 +10,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/reference/components/computer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::core::error::ErrorTypeProviderComponent;
 use cgp_fork::extra::handler::{
     AsyncComputerRef, ComputerRef, HandlerRef, PromoteRef, ReturnInput, TryComputerRef,

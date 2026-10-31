@@ -9,6 +9,9 @@
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_producer.md and
 //! cgp-knowledge-base-fork/cgp/reference/macros/cgp_producer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::core::error::ErrorTypeProviderComponent;
 use cgp_fork::extra::handler::{Producer, TryComputer};
 use cgp_fork::prelude::*;
@@ -25,6 +28,7 @@ snapshot_cgp_producer! {
         fn magic_number() -> u64 {
             42
         }
+        #[allow(deprecated)]
         impl<__Context__, __Code__> Producer<__Context__, __Code__> for TheAnswer {
             type Output = u64;
             fn produce(
@@ -34,13 +38,16 @@ snapshot_cgp_producer! {
                 magic_number()
             }
         }
+        #[allow(deprecated)]
         impl<__Context__, __Code__> IsProviderFor<ProducerComponent, __Context__, (__Code__)>
         for TheAnswer {}
         pub struct TheAnswer;
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<ComputerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -49,9 +56,11 @@ snapshot_cgp_producer! {
             PromoteProducer<Self>: IsProviderFor<ComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<ComputerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -60,9 +69,11 @@ snapshot_cgp_producer! {
             PromoteProducer<Self>: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -71,9 +82,11 @@ snapshot_cgp_producer! {
             PromoteProducer<Self>: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<TryComputerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -84,9 +97,11 @@ snapshot_cgp_producer! {
             >: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -97,9 +112,11 @@ snapshot_cgp_producer! {
             >: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<AsyncComputerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -110,9 +127,11 @@ snapshot_cgp_producer! {
             >: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,
@@ -121,9 +140,11 @@ snapshot_cgp_producer! {
             PromoteProducer<Self>: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
         #[diagnostic::do_not_recommend]
+        #[allow(deprecated)]
         impl DelegateComponent<HandlerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
+        #[allow(deprecated)]
         impl<
             __Context__,
             __Params__: ?Sized,

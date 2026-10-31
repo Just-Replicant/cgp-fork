@@ -8,6 +8,9 @@
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_computer.md and
 //! cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_producer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::extra::handler::{Computer, Producer};
 use cgp_fork::prelude::*;
 

@@ -78,7 +78,7 @@ fn every_entrypoint_has_a_fuzz_target() {
     }
 }
 
-/// The registry lists exactly the 38 entrypoints of the proc-macro shim, by name.
+/// The registry lists exactly the 39 entrypoints of the proc-macro shim, by name.
 #[test]
 fn registry_names_every_entrypoint() {
     let names: BTreeSet<_> = entrypoints().into_iter().map(|(name, _)| name).collect();
@@ -98,6 +98,7 @@ fn registry_names_every_entrypoint() {
         "derive_provider",
         "cgp_computer",
         "cgp_producer",
+        "cgp_handler",
         "cgp_auto_dispatch",
         "cgp_auto_log",
         "delegate_components",
@@ -163,6 +164,7 @@ fn entrypoints_parse_into_their_documented_family() {
                 "cgp_new_provider",
                 "cgp_computer",
                 "cgp_producer",
+                "cgp_handler",
                 "cgp_auto_error",
             ],
         ),

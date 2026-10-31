@@ -16,12 +16,17 @@ pub use crate::core::component::{
     UseContext, UseDelegate, UseFields, WithContext, WithProvider,
 };
 pub use crate::core::error::{CanRaiseError, CanWrapError, HasErrorType};
-pub use crate::core::field::impls::{IsMut, IsNothing, IsPresent, IsRef, IsVoid, UseField};
+// The 0.10 names of the access modes and of their trait, kept so existing imports resolve.
+#[allow(deprecated)]
+pub use crate::core::field::impls::{IsMut, IsRef};
+pub use crate::core::field::impls::{IsNothing, IsPresent, IsVoid, UseField};
+#[allow(deprecated)]
+pub use crate::core::field::traits::MapTypeRef;
 pub use crate::core::field::traits::{
     BuildField, ExtractField, FieldGetter, FinalizeBuild, FinalizeExtract, FromFields, FromVariant,
     HasBuilder, HasExtractor, HasExtractorMut, HasExtractorRef, HasField, HasFieldMut, HasFields,
-    HasFieldsRef, IntoBuilder, MapType, MapTypeRef, MutFieldGetter, PartialData, ToFields,
-    ToFieldsRef, UpdateField,
+    HasFieldsRef, IntoBuilder, MapType, Mode, MutFieldGetter, PartialData, ToFields, ToFieldsRef,
+    UpdateField,
 };
 pub use crate::core::field::types::{
     Chars, Cons, Either, Field, Index, Life, MRef, Nil, Symbol, Void,

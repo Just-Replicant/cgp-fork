@@ -1,5 +1,8 @@
 //! `Compat` adapters between the 0.10 family and the unified one (`compat-0.10`).
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::compat::{Compat, CompatProducer, CompatRef, CompatTry};
 use cgp_fork::core::error::ErrorTypeProviderComponent;
 use cgp_fork::extra::handler::{

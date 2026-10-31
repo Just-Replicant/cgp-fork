@@ -147,7 +147,7 @@ snapshot_derive_cgp_data! {
         }
         pub enum __PartialRefFooBarBazGeneric<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             Foo: '__a__,
             Bar: '__a__,
             Baz: '__a__,
@@ -155,9 +155,9 @@ snapshot_derive_cgp_data! {
             __F1__: MapType,
             __F2__: MapType,
         > {
-            Foo(<__F0__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Foo>>),
-            Bar(<__F1__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Bar>>),
-            Baz(<__F2__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Baz>>),
+            Foo(<__F0__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Foo>>),
+            Bar(<__F1__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Bar>>),
+            Baz(<__F2__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Baz>>),
         }
         impl<Foo, Bar, Baz, __F0__: MapType, __F1__: MapType, __F2__: MapType> PartialData
         for __PartialFooBarBazGeneric<Foo, Bar, Baz, __F0__, __F1__, __F2__> {
@@ -165,7 +165,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             Foo,
             Bar,
             Baz,
@@ -203,7 +203,7 @@ snapshot_derive_cgp_data! {
         impl<Foo, Bar, Baz> HasExtractorRef for FooBarBazGeneric<Foo, Bar, Baz> {
             type ExtractorRef<'__a__> = __PartialRefFooBarBazGeneric<
                 '__a__,
-                IsRef,
+                Ref,
                 Foo,
                 Bar,
                 Baz,
@@ -224,7 +224,7 @@ snapshot_derive_cgp_data! {
         impl<Foo, Bar, Baz> HasExtractorMut for FooBarBazGeneric<Foo, Bar, Baz> {
             type ExtractorMut<'__a__> = __PartialRefFooBarBazGeneric<
                 '__a__,
-                IsMut,
+                Mut,
                 Foo,
                 Bar,
                 Baz,
@@ -248,7 +248,7 @@ snapshot_derive_cgp_data! {
                 match self {}
             }
         }
-        impl<'__a__, __R__: MapTypeRef, Foo, Bar, Baz> FinalizeExtract
+        impl<'__a__, __R__: Mode, Foo, Bar, Baz> FinalizeExtract
         for __PartialRefFooBarBazGeneric<'__a__, __R__, Foo, Bar, Baz, IsVoid, IsVoid, IsVoid> {
             fn finalize_extract<__T__>(self) -> __T__ {
                 match self {}
@@ -337,7 +337,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             Foo,
             Bar,
             Baz,
@@ -354,7 +354,7 @@ snapshot_derive_cgp_data! {
             __F1__,
             __F2__,
         > {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Foo>;
+            type Value = <__R__ as Mode>::Map<'__a__, Foo>;
             type Remainder = __PartialRefFooBarBazGeneric<
                 '__a__,
                 __R__,
@@ -384,7 +384,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             Foo,
             Bar,
             Baz,
@@ -401,7 +401,7 @@ snapshot_derive_cgp_data! {
             IsPresent,
             __F2__,
         > {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Bar>;
+            type Value = <__R__ as Mode>::Map<'__a__, Bar>;
             type Remainder = __PartialRefFooBarBazGeneric<
                 '__a__,
                 __R__,
@@ -431,7 +431,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             Foo,
             Bar,
             Baz,
@@ -448,7 +448,7 @@ snapshot_derive_cgp_data! {
             __F1__,
             IsPresent,
         > {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Baz>;
+            type Value = <__R__ as Mode>::Map<'__a__, Baz>;
             type Remainder = __PartialRefFooBarBazGeneric<
                 '__a__,
                 __R__,

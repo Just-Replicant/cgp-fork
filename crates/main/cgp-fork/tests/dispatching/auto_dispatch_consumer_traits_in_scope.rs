@@ -7,6 +7,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_auto_dispatch.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 // Only their presence in scope matters: the generated calls must not resolve to them.
 #[allow(unused_imports)]
 use cgp_fork::extra::handler::{CanCompute, CanComputeAsync};

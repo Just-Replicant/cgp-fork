@@ -1,4 +1,14 @@
 macro_rules! export_construct {
+    ( $from:ident => $module:ident :: $to:ident ) => {
+        pub struct $from;
+
+        impl ::quote::ToTokens for $from {
+            fn to_tokens(&self, tokens: &mut ::proc_macro2::TokenStream) {
+                let root = $crate::crate_path::crate_root();
+                tokens.extend(::quote::quote! { #root::macro_prelude::$module::$to })
+            }
+        }
+    };
     ( $from:ident => $to:ident ) => {
         pub struct $from;
 
@@ -15,8 +25,8 @@ macro_rules! export_construct {
 }
 
 macro_rules! export_constructs {
-    ( $( $from:ident $( => $to:ident )? ),* $(,)? ) => {
-        $( $crate::macro_core::export_construct! { $from $( => $to )* } )*
+    ( $( $from:ident $( => $( $to:ident )::+ )? ),* $(,)? ) => {
+        $( $crate::macro_core::export_construct! { $from $( => $( $to )::+ )? } )*
     };
 }
 

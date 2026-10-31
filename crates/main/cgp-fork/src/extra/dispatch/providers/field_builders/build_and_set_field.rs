@@ -4,6 +4,10 @@ use crate::extra::handler::{
 };
 
 /// Runs `Provider` on a builder and writes the result into the `Tag` field.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::SetField` (or `cgp_fork::handler::TrySetField`)"
+)]
 pub struct BuildAndSetField<Tag, Provider = UseContext>(pub PhantomData<(Tag, Provider)>);
 
 #[cgp_provider]

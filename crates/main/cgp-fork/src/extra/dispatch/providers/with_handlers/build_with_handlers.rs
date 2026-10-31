@@ -7,6 +7,10 @@ use crate::extra::handler::{
 /// Builds an `Output` by starting from `Output::builder()` and piping `Handlers` over that builder.
 ///
 /// The pipe's result must implement [`FinalizeBuild`](crate::core::field::traits::FinalizeBuild).
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::BuildWith` (or `cgp_fork::handler::TryBuildWith` for handlers that return `Result`)"
+)]
 pub struct BuildWithHandlers<Output, Handlers>(pub PhantomData<(Output, Handlers)>);
 
 #[cgp_provider]

@@ -12,6 +12,10 @@ use crate::extra::handler::UseInputDelegate;
 /// Fallible form of [`CanCompute`](crate::extra::handler::CanCompute).
 ///
 /// Failure is the context's abstract error from [`HasErrorType`](crate::core::error::HasErrorType).
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`) with `Output = Result<T, Context::Error>`"
+)]
 pub trait CanTryCompute<Code, Input> {
     /// The success value.
     type Output;
@@ -26,6 +30,10 @@ pub trait CanTryCompute<Code, Input> {
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
 /// [`CanTryCompute`] for a shared borrow of `Input`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`) with a `&T` input and `Output = Result<T, Context::Error>`"
+)]
 pub trait CanTryComputeRef<Code, Input> {
     /// The success value.
     type Output;

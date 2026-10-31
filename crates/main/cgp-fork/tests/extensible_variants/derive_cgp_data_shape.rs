@@ -220,14 +220,14 @@ snapshot_derive_cgp_data! {
             Circle(<__F0__ as MapType>::Map<Circle>),
             Rectangle(<__F1__ as MapType>::Map<Rectangle>),
         }
-        pub enum __PartialRefShape<'__a__, __R__: MapTypeRef, __F0__: MapType, __F1__: MapType> {
-            Circle(<__F0__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Circle>>),
-            Rectangle(<__F1__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Rectangle>>),
+        pub enum __PartialRefShape<'__a__, __R__: Mode, __F0__: MapType, __F1__: MapType> {
+            Circle(<__F0__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Circle>>),
+            Rectangle(<__F1__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Rectangle>>),
         }
         impl<__F0__: MapType, __F1__: MapType> PartialData for __PartialShape<__F0__, __F1__> {
             type Target = Shape;
         }
-        impl<'__a__, __R__: MapTypeRef, __F0__: MapType, __F1__: MapType> PartialData
+        impl<'__a__, __R__: Mode, __F0__: MapType, __F1__: MapType> PartialData
         for __PartialRefShape<'__a__, __R__, __F0__, __F1__> {
             type Target = Shape;
         }
@@ -247,7 +247,7 @@ snapshot_derive_cgp_data! {
             }
         }
         impl HasExtractorRef for Shape {
-            type ExtractorRef<'__a__> = __PartialRefShape<'__a__, IsRef, IsPresent, IsPresent>
+            type ExtractorRef<'__a__> = __PartialRefShape<'__a__, Ref, IsPresent, IsPresent>
             where
                 Self: '__a__;
             fn extractor_ref<'__a__>(&'__a__ self) -> Self::ExtractorRef<'__a__> {
@@ -258,7 +258,7 @@ snapshot_derive_cgp_data! {
             }
         }
         impl HasExtractorMut for Shape {
-            type ExtractorMut<'__a__> = __PartialRefShape<'__a__, IsMut, IsPresent, IsPresent>
+            type ExtractorMut<'__a__> = __PartialRefShape<'__a__, Mut, IsPresent, IsPresent>
             where
                 Self: '__a__;
             fn extractor_mut<'__a__>(&'__a__ mut self) -> Self::ExtractorMut<'__a__> {
@@ -273,7 +273,7 @@ snapshot_derive_cgp_data! {
                 match self {}
             }
         }
-        impl<'__a__, __R__: MapTypeRef> FinalizeExtract
+        impl<'__a__, __R__: Mode> FinalizeExtract
         for __PartialRefShape<'__a__, __R__, IsVoid, IsVoid> {
             fn finalize_extract<__T__>(self) -> __T__ {
                 match self {}
@@ -361,7 +361,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F1__: MapType,
         > ExtractField<
             Symbol<
@@ -369,7 +369,7 @@ snapshot_derive_cgp_data! {
                 Chars<'C', Chars<'i', Chars<'r', Chars<'c', Chars<'l', Chars<'e', Nil>>>>>>,
             >,
         > for __PartialRefShape<'__a__, __R__, IsPresent, __F1__> {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Circle>;
+            type Value = <__R__ as Mode>::Map<'__a__, Circle>;
             type Remainder = __PartialRefShape<'__a__, __R__, IsVoid, __F1__>;
             fn extract_field(
                 self,
@@ -393,7 +393,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F0__: MapType,
         > ExtractField<
             Symbol<
@@ -413,7 +413,7 @@ snapshot_derive_cgp_data! {
                 >,
             >,
         > for __PartialRefShape<'__a__, __R__, __F0__, IsPresent> {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Rectangle>;
+            type Value = <__R__ as Mode>::Map<'__a__, Rectangle>;
             type Remainder = __PartialRefShape<'__a__, __R__, __F0__, IsVoid>;
             fn extract_field(
                 self,
