@@ -68,6 +68,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "cgp-fork-preset-consumer"
+version = "0.0.0"
+dependencies = [
+ "cgp-fork",
+ "cgp-fork-renamed-dep",
+]
+
+[[package]]
 name = "cgp-fork-renamed-dep"
 version = "0.0.0"
 dependencies = [
