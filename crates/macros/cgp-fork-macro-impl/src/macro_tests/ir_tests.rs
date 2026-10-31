@@ -330,3 +330,25 @@ fn reference_runs_inside_generics_add_up() {
     let tokens: TokenStream = source.parse().unwrap();
     assert!(crate::ir::check_nesting_depth(&tokens).is_err());
 }
+
+#[test]
+fn identifiers_longer_than_the_limit_are_rejected() {
+    // Found by cargo-fuzz (cgp_namespace): a 600-character path name became a type-level
+    // string nested once per character and overflowed the stack when re-parsed.
+    let limit = crate::ir::MAX_IDENT_LEN;
+    let at_limit: TokenStream = format!("new Ns {{ @{} }}", "x".repeat(limit))
+        .parse()
+        .unwrap();
+    assert!(crate::ir::check_nesting_depth(&at_limit).is_ok());
+
+    let long: TokenStream = format!("new Ns {{ @{} }}", "x".repeat(limit + 1))
+        .parse()
+        .unwrap();
+    let error = crate::macro_lib::cgp_namespace(long).expect_err("a long name must be rejected");
+    assert!(
+        error
+            .to_string()
+            .starts_with("this identifier is longer than 255 characters"),
+        "{error}"
+    );
+}

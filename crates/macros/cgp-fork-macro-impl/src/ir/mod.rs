@@ -37,7 +37,7 @@ pub use diagnostics::Diagnostics;
 pub use family::{FamilyIr, IrFamily};
 pub use getter::Getter;
 pub use namespace::Namespace;
-pub use nesting::{MAX_NESTING_DEPTH, check_nesting_depth};
+pub use nesting::{MAX_IDENT_LEN, MAX_NESTING_DEPTH, check_nesting_depth};
 pub use pipeline::{Pipeline, parse_body_without_args, run};
 pub use provider_impl::ProviderImpl;
 pub use trait_rewrite::TraitRewrite;
