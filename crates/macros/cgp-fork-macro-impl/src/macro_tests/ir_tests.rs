@@ -8,6 +8,7 @@ use quote::quote;
 use syn::Error;
 
 use crate::ir::{Diagnostics, IrFamily, Pipeline, parse_body_without_args, run};
+use crate::registry::EntrypointFn;
 
 thread_local! {
     static EMITTED: Cell<bool> = const { Cell::new(false) };
@@ -154,4 +155,69 @@ fn ir_families_are_listed_once() {
     all.sort();
     all.dedup();
     assert_eq!(all.len(), IrFamily::ALL.len());
+}
+
+/// The component pipelines check the `name:` parameters in their validate stage and
+/// report every undeclared one at once.
+#[test]
+fn component_pipelines_report_every_undeclared_name_parameter() {
+    let expected = [
+        "the component name's parameter `A` is not a generic parameter of the trait `CanFoo`",
+        "the component name's parameter `B` is not a generic parameter of the trait `CanFoo`",
+    ];
+
+    let cases: [(&str, EntrypointFn, TokenStream); 3] = [
+        (
+            "cgp_component",
+            crate::macro_lib::cgp_component,
+            quote!(
+                pub trait CanFoo<T> {
+                    fn foo(&self, value: T);
+                }
+            ),
+        ),
+        (
+            "cgp_getter",
+            crate::macro_lib::cgp_getter,
+            quote!(
+                pub trait CanFoo<T> {
+                    fn foo(&self) -> &T;
+                }
+            ),
+        ),
+        (
+            "cgp_type",
+            crate::macro_lib::cgp_type,
+            quote!(
+                pub trait CanFoo<T> {
+                    type Foo;
+                }
+            ),
+        ),
+    ];
+
+    for (name, entrypoint, body) in cases {
+        let error = entrypoint(
+            quote!(provider: FooProvider, name: FooComponent<T, A, B>),
+            body,
+        )
+        .expect_err(name);
+        assert_eq!(messages(error), expected, "{name}");
+    }
+}
+
+#[test]
+fn derive_provider_validates_the_inner_component() {
+    let error = crate::macro_lib::derive_provider(
+        quote!(WithProvider),
+        quote! {
+            #[cgp_component { provider: FooTypeProvider, name: FooComponent<X> }]
+            pub trait CanFoo { type Foo; }
+        },
+    )
+    .expect_err("undeclared parameter");
+    assert_eq!(
+        messages(error),
+        ["the component name's parameter `X` is not a generic parameter of the trait `CanFoo`"]
+    );
 }

@@ -14,9 +14,9 @@ pub struct ItemCgpComponent {
 
 impl ItemCgpComponent {
     /// Split the CGP modifier attributes off the trait, yielding the next stage.
+    ///
+    /// Callers run [`ItemCgpComponent::validate`] first (the pipeline driver does).
     pub fn preprocess(&self) -> syn::Result<PreprocessedCgpComponent> {
-        self.check_component_name_params()?;
-
         let (attributes, item_trait) = CgpComponentAttributes::preprocess(&self.item_trait)?;
 
         Ok(PreprocessedCgpComponent {
@@ -29,13 +29,14 @@ impl ItemCgpComponent {
     /// The validate stage of every component pipeline: records each semantic error of
     /// the arguments against the trait.
     pub fn validate(&self, diagnostics: &mut Diagnostics) {
-        diagnostics.check(self.check_component_name_params());
+        self.check_component_name_params(diagnostics);
     }
 
     /// Reject a `name:` parameter the trait does not declare. The marker struct is
     /// declared with the name's parameters and the generated impls name it with the
     /// trait's, so an undeclared one would otherwise fail downstream with `E0425`.
-    fn check_component_name_params(&self) -> syn::Result<()> {
+    /// Every undeclared parameter is reported.
+    fn check_component_name_params(&self, diagnostics: &mut Diagnostics) {
         let trait_generics = &self.item_trait.generics;
 
         for param in &self.args.component_name.type_generics.params {
@@ -63,7 +64,7 @@ impl ItemCgpComponent {
             };
 
             if !declared {
-                return Err(Error::new_spanned(
+                diagnostics.push(Error::new_spanned(
                     param,
                     format!(
                         "the component name's parameter `{name}` is not a generic parameter of the trait `{}`",
@@ -72,7 +73,5 @@ impl ItemCgpComponent {
                 ));
             }
         }
-
-        Ok(())
     }
 }
