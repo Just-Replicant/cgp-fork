@@ -1,0 +1,47 @@
+error[E0277]: `__PartialShape<IsVoid, IsPresent>` still has a variant left: not every variant of the enum is handled
+  --> tests/ui/match_with_missing_variant.rs:24:13
+   |
+24 |     let _ = OnlyCircle::handle(&(), NoCode, Shape::Square(1.0));
+   |             ^^^^^^^^^^ a variant of the matched enum has no handler
+   |
+help: the trait `FinalizeExtract` is not implemented for `__PartialShape<IsVoid, IsPresent>`
+  --> tests/ui/match_with_missing_variant.rs:7:1
+   |
+ 7 | pub enum Shape {
+   | ^^^^^^^^^^^^^^
+   = note: a partial enum marks each variant `IsPresent` or `IsVoid`; give each `IsPresent` variant a handler in the list
+help: the trait `FinalizeExtract` is implemented for `__PartialShape<IsVoid, IsVoid>`
+  --> tests/ui/match_with_missing_variant.rs:7:10
+   |
+ 7 | pub enum Shape {
+   |          ^^^^^
+   = note: required for `cgp_fork::handler::MatchWith<Cons<cgp_fork::handler::OnField<cgp_fork::prelude::Symbol<6, cgp_fork::prelude::Chars<'C', cgp_fork::prelude::Chars<'i', cgp_fork::prelude::Chars<'r', cgp_fork::prelude::Chars<'c', cgp_fork::prelude::Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>, cgp_fork::handler::FieldValue<Area>>, Nil>>` to implement `cgp_fork::handler::Handler<(), (), Shape>`
+
+error[E0277]: `cgp_fork::handler::MatchWith<Cons<cgp_fork::handler::OnField<cgp_fork::prelude::Symbol<6, cgp_fork::prelude::Chars<'C', cgp_fork::prelude::Chars<'i', cgp_fork::prelude::Chars<'r', cgp_fork::prelude::Chars<'c', cgp_fork::prelude::Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>, cgp_fork::handler::FieldValue<Area>>, Nil>>` does not provide `HandlerComponent` for `()`
+  --> tests/ui/match_with_missing_variant.rs:24:13
+   |
+24 |     let _ = OnlyCircle::handle(&(), NoCode, Shape::Square(1.0));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `cgp_fork::handler::MatchWith<Cons<cgp_fork::handler::OnField<cgp_fork::prelude::Symbol<6, cgp_fork::prelude::Chars<'C', cgp_fork::prelude::Chars<'i', cgp_fork::prelude::Chars<'r', cgp_fork::prelude::Chars<'c', cgp_fork::prelude::Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>, cgp_fork::handler::FieldValue<Area>>, Nil>>` neither implements `Handler` nor wires `HandlerComponent`
+   |
+   = help: the trait `cgp_fork::handler::Handler<(), (), Shape>` is not implemented for `cgp_fork::handler::MatchWith<Cons<cgp_fork::handler::OnField<cgp_fork::prelude::Symbol<6, cgp_fork::prelude::Chars<'C', cgp_fork::prelude::Chars<'i', cgp_fork::prelude::Chars<'r', cgp_fork::prelude::Chars<'c', cgp_fork::prelude::Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>, cgp_fork::handler::FieldValue<Area>>, Nil>>`
+   = note: if `cgp_fork::handler::MatchWith<Cons<cgp_fork::handler::OnField<cgp_fork::prelude::Symbol<6, cgp_fork::prelude::Chars<'C', cgp_fork::prelude::Chars<'i', cgp_fork::prelude::Chars<'r', cgp_fork::prelude::Chars<'c', cgp_fork::prelude::Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>, cgp_fork::handler::FieldValue<Area>>, Nil>>` is a context or a wiring table, add `HandlerComponent: SomeProvider` to its `delegate_components!` table
+   = note: if `cgp_fork::handler::MatchWith<Cons<cgp_fork::handler::OnField<cgp_fork::prelude::Symbol<6, cgp_fork::prelude::Chars<'C', cgp_fork::prelude::Chars<'i', cgp_fork::prelude::Chars<'r', cgp_fork::prelude::Chars<'c', cgp_fork::prelude::Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>, cgp_fork::handler::FieldValue<Area>>, Nil>>` is a provider, implement `Handler` for it with `#[cgp_impl]` or `#[cgp_provider(HandlerComponent)]`
+help: the following other types implement trait `cgp_fork::handler::Handler<__Context__, Code, Input>`
+  --> src/handler/dispatch.rs
+   |
+   | / impl<Context, Code, Input, Handlers, M, Output, Remainder> Handler<Context, Code, Input>
+   | |     for MatchWith<Handlers, All, M>
+   | | where
+   | |     M: Mode + ModeExtractor<Input>,
+   | |     Handlers: MatchHandlers<Context, Code, M::Extractor, Output = Output, Remainder = Remainder>,
+   | |     Remainder: FinalizeExtract,
+   | |_______________________________^ `cgp_fork::handler::MatchWith<Handlers, All, M>` implements `cgp_fork::handler::Handler<Context, Code, Input>`
+...
+   | / impl<Context, Code, Input, Args, Handlers, M, Output, Remainder>
+   | |     Handler<Context, Code, (Input, Args)> for MatchWith<Handlers, First, M>
+   | | where
+   | |     M: Mode + ModeExtractor<Input>,
+   | |     Handlers:
+   | |         MatchHandlers<Context, Code, (M::Extractor, Args), Output = Output, Remainder = Remainder>,
+   | |     Remainder: FinalizeExtract,
+   | |_______________________________^ `cgp_fork::handler::MatchWith<Handlers, First, M>` implements `cgp_fork::handler::Handler<Context, Code, (Input, Args)>`
