@@ -40,3 +40,9 @@ delegate_and_check_components! {
         GreeterComponent: GreetHello,
     }
 }
+
+cgp_preset! {
+    GreeterPreset {
+        GreeterComponent: GreetHello,
+    }
+}
