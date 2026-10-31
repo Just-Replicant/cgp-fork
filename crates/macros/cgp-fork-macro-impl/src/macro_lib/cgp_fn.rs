@@ -1,17 +1,16 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 use syn::{Ident, ItemFn, parse2};
 
-use crate::ir::{IrFamily, Pipeline, run};
+use crate::ir::{ComponentDef, Diagnostics, FamilyIr, IrFamily, Pipeline, run};
 use crate::macro_core::types::cgp_fn::ItemCgpFn;
 
-/// `#[cgp_fn]`: a function becomes a component with one provider.
+/// `#[cgp_fn]`: a function becomes a trait with one blanket implementation.
 pub struct CgpFnMacro;
 
 impl Pipeline for CgpFnMacro {
     const NAME: &'static str = "cgp_fn";
-    const FAMILY: IrFamily = IrFamily::ComponentDef;
-    type Ir = ItemCgpFn;
+    const FAMILY: IrFamily = ComponentDef::FAMILY;
+    type Ir = ComponentDef;
 
     /// The attribute optionally names the generated trait.
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
@@ -19,15 +18,15 @@ impl Pipeline for CgpFnMacro {
 
         let ident: Option<Ident> = parse2(attr)?;
 
-        Ok(ItemCgpFn { ident, item_fn })
+        Ok(ComponentDef::Function(ItemCgpFn { ident, item_fn }))
+    }
+
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.preprocess()?.to_items()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 
