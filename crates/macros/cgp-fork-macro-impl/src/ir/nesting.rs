@@ -7,11 +7,14 @@
 //! rustc on its own accepts 2000). Checking the depth first turns that crash into a normal
 //! compile error.
 //!
-//! The depth counts delimited groups (`( )`, `[ ]`, `{ }`) plus open angle brackets. A `<`
-//! opens and a `>` closes; `->`, `=>`, `<=` and `>=` are skipped, and the angle count goes back
-//! to its value at the start of the enclosing group when the group ends and at every `;`, so
-//! comparisons in a function body do not add up. Other recursive syntax (a long chain of
-//! unary operators, say) is not counted; it is a `syn` limit shared by every `syn`-based macro.
+//! The depth counts delimited groups (`( )`, `[ ]`, `{ }`), open angle brackets, and the
+//! current run of prefix operators. A `<` opens and a `>` closes; `->`, `=>`, `<=` and `>=` are
+//! skipped, and the angle count goes back to its value at the start of the enclosing group when
+//! the group ends and at every `;`, so comparisons in a function body do not add up. A run of
+//! prefix operators (`&&&&T`, `&'a mut &'a mut T`, `*const *const T`, `!!!x`, `--x`) is
+//! parsed recursively too, so each `&`, `*`, `!` or `-` in a row adds a level; `mut`, `const`
+//! and lifetimes inside the run do not end it, anything else does. Other recursive syntax
+//! is a `syn` limit shared by every `syn`-based macro.
 
 use proc_macro2::{Spacing, Span, TokenStream, TokenTree};
 use syn::Error;
@@ -37,10 +40,11 @@ pub fn check_nesting_depth(tokens: &TokenStream) -> syn::Result<()> {
 /// Walks `tokens` starting at `depth` and returns the span of the first token past the limit.
 fn deepest(tokens: TokenStream, depth: usize) -> Option<Span> {
     let mut angles = 0usize;
+    let mut prefix = 0usize;
     let mut previous: Option<(char, Spacing)> = None;
 
     for tree in tokens {
-        let current = depth + angles;
+        let current = depth + angles + prefix;
         if current > MAX_NESTING_DEPTH {
             return Some(tree.span());
         }
@@ -51,6 +55,7 @@ fn deepest(tokens: TokenStream, depth: usize) -> Option<Span> {
                 if let Some(span) = deepest(group.stream(), current + 1) {
                     return Some(span);
                 }
+                prefix = 0;
             }
             TokenTree::Punct(punct) => {
                 let ch = punct.as_char();
@@ -68,9 +73,21 @@ fn deepest(tokens: TokenStream, depth: usize) -> Option<Span> {
                     ';' => angles = 0,
                     _ => {}
                 }
+                match ch {
+                    '&' | '*' | '!' | '-' => prefix += 1,
+                    '\'' => {}
+                    _ => prefix = 0,
+                }
                 this = Some((ch, punct.spacing()));
             }
-            TokenTree::Ident(_) | TokenTree::Literal(_) => {}
+            TokenTree::Ident(ident) => {
+                let in_prefix_run =
+                    ident == "mut" || ident == "const" || matches!(previous, Some(('\'', _)));
+                if !in_prefix_run {
+                    prefix = 0;
+                }
+            }
+            TokenTree::Literal(_) => prefix = 0,
         }
         previous = this;
     }

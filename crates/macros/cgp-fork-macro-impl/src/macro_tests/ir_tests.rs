@@ -266,6 +266,19 @@ fn deep_groups_are_rejected_before_parsing() {
 }
 
 #[test]
+fn long_reference_chains_are_rejected_before_parsing() {
+    // Found by the second fuzz round: `&&&&…T` also recurses in `syn`.
+    for chain in ["&&", "&'a mut ", "*const ", "!"] {
+        let source = format!(
+            "pub trait HasN {{ fn n(&self) -> {}u8; }}",
+            chain.repeat(3_000)
+        );
+        let result = crate::macro_lib::cgp_auto_getter(TokenStream::new(), source.parse().unwrap());
+        assert!(result.is_err(), "`{chain}` chain was not rejected");
+    }
+}
+
+#[test]
 fn nesting_up_to_the_limit_is_accepted() {
     // rustc runs proc macros on its 8 MiB compiler thread; the default 2 MiB test thread is
     // too small to parse 126 levels in a debug build, so give the check the compiler's stack.
@@ -294,6 +307,12 @@ fn comparisons_and_arrows_do_not_count_as_generics() {
     assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
 
     let tokens: TokenStream = "fn f() -> A<B<C>> where X: Fn() -> Y, Z: PartialOrd<W> {}"
+        .parse()
+        .unwrap();
+    assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
+
+    let conditions = vec!["a"; 500].join(" && ");
+    let tokens: TokenStream = format!("fn f() -> bool {{ {conditions} }}")
         .parse()
         .unwrap();
     assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
