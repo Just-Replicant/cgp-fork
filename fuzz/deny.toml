@@ -1,0 +1,33 @@
+# cargo-deny policy for the fuzz harness: `cargo deny --manifest-path fuzz/Cargo.toml check`.
+#
+# Same as the workspace `deny.toml`, except that the harness is never published and links
+# libFuzzer, whose LLVM runtime is under the NCSA licence. Neither reaches users of `cgp-fork`.
+
+[graph]
+all-features = true
+
+[advisories]
+yanked = "deny"
+ignore = []
+
+[licenses]
+allow = [
+    "Apache-2.0",
+    "MIT",
+    "NCSA",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.9
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
