@@ -7,40 +7,47 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::Error;
 
-use crate::ir::{Diagnostics, IrFamily, Pipeline, parse_body_without_args, run};
+use crate::ir::{Diagnostics, FamilyIr, IrFamily, Pipeline, parse_body_without_args, run};
 use crate::registry::EntrypointFn;
 
 thread_local! {
     static EMITTED: Cell<bool> = const { Cell::new(false) };
 }
 
-/// Accepts an identifier and rejects the names `bad` and `worse` in validation.
+/// Accepts identifiers and rejects the names `bad` and `worse` in validation.
 struct Probe;
 
-impl Pipeline for Probe {
-    const NAME: &'static str = "probe";
+/// The IR of [`Probe`]: the identifiers, emitted as unit structs.
+struct ProbeIr(Vec<syn::Ident>);
+
+impl FamilyIr for ProbeIr {
     const FAMILY: IrFamily = IrFamily::DataShape;
-    type Ir = Vec<syn::Ident>;
 
-    fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
-        let idents = syn::parse::Parser::parse2(
-            syn::punctuated::Punctuated::<syn::Ident, syn::Token![,]>::parse_terminated,
-            body,
-        )?;
-        Ok(idents.into_iter().collect())
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        for ident in ir {
+    fn validate(&self, diagnostics: &mut Diagnostics) {
+        for ident in &self.0 {
             if ident == "bad" || ident == "worse" {
                 diagnostics.push(Error::new(ident.span(), format!("`{ident}` is rejected")));
             }
         }
     }
 
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
+    fn emit(self) -> syn::Result<TokenStream> {
         EMITTED.with(|emitted| emitted.set(true));
-        Ok(quote!( #( struct #ir; )* ))
+        let idents = self.0;
+        Ok(quote!( #( struct #idents; )* ))
+    }
+}
+
+impl Pipeline for Probe {
+    const NAME: &'static str = "probe";
+    type Ir = ProbeIr;
+
+    fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
+        let idents = syn::parse::Parser::parse2(
+            syn::punctuated::Punctuated::<syn::Ident, syn::Token![,]>::parse_terminated,
+            body,
+        )?;
+        Ok(ProbeIr(idents.into_iter().collect()))
     }
 }
 

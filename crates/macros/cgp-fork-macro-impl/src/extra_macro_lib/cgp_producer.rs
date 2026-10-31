@@ -2,14 +2,13 @@ use proc_macro2::TokenStream;
 use syn::{Ident, ItemFn, parse2};
 
 use crate::extra_macro_core::types::cgp_producer::ItemCgpProducer;
-use crate::ir::{Diagnostics, FamilyIr, IrFamily, Pipeline, ProviderImpl, run};
+use crate::ir::{Pipeline, ProviderImpl, run};
 
 /// `#[cgp_producer]`: a function becomes a `Producer` provider with its promotions.
 pub struct CgpProducerMacro;
 
 impl Pipeline for CgpProducerMacro {
     const NAME: &'static str = "cgp_producer";
-    const FAMILY: IrFamily = ProviderImpl::FAMILY;
     type Ir = ProviderImpl;
 
     /// The attribute optionally names the provider.
@@ -22,14 +21,6 @@ impl Pipeline for CgpProducerMacro {
             ident,
             item_fn,
         })))
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

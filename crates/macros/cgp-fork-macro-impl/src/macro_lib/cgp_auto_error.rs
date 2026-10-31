@@ -1,9 +1,7 @@
 use proc_macro2::TokenStream;
 use syn::ItemImpl;
 
-use crate::ir::{
-    Diagnostics, FamilyIr, IrFamily, Pipeline, ProviderImpl, parse_body_without_args, run,
-};
+use crate::ir::{Pipeline, ProviderImpl, parse_body_without_args, run};
 use crate::macro_core::types::cgp_auto_error::ItemCgpAutoError;
 
 /// `#[cgp_auto_error]`: error-raising methods on a context become error providers.
@@ -11,21 +9,12 @@ pub struct CgpAutoErrorMacro;
 
 impl Pipeline for CgpAutoErrorMacro {
     const NAME: &'static str = "cgp_auto_error";
-    const FAMILY: IrFamily = ProviderImpl::FAMILY;
     type Ir = ProviderImpl;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
         let item_impl: ItemImpl = parse_body_without_args(Self::NAME, attr, body)?;
 
         ItemCgpAutoError::parse(&item_impl).map(|item| ProviderImpl::AutoError(Box::new(item)))
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

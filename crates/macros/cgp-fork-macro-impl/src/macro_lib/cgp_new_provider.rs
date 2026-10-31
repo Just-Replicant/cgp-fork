@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use syn::{ItemImpl, parse2};
 
-use crate::ir::{Diagnostics, FamilyIr, IrFamily, Pipeline, ProviderImpl, run};
+use crate::ir::{Pipeline, ProviderImpl, run};
 use crate::macro_core::types::cgp_provider::{ItemCgpProvider, ProviderArgs};
 use crate::macro_core::types::keyword::Keyword;
 
@@ -10,7 +10,6 @@ pub struct CgpNewProviderMacro;
 
 impl Pipeline for CgpNewProviderMacro {
     const NAME: &'static str = "cgp_new_provider";
-    const FAMILY: IrFamily = ProviderImpl::FAMILY;
     type Ir = ProviderImpl;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
@@ -22,14 +21,6 @@ impl Pipeline for CgpNewProviderMacro {
             args,
             item_impl,
         })))
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

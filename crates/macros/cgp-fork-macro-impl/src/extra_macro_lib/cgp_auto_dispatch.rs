@@ -2,14 +2,13 @@ use proc_macro2::TokenStream;
 use syn::{Error, ItemTrait, parse2};
 
 use crate::extra_macro_core::types::cgp_auto_dispatch::ItemCgpAutoDispatch;
-use crate::ir::{ComponentDef, Diagnostics, FamilyIr, IrFamily, Pipeline, run};
+use crate::ir::{ComponentDef, Pipeline, run};
 
 /// `#[cgp_auto_dispatch]`: a trait implemented for enums by dispatching to each variant.
 pub struct CgpAutoDispatchMacro;
 
 impl Pipeline for CgpAutoDispatchMacro {
     const NAME: &'static str = "cgp_auto_dispatch";
-    const FAMILY: IrFamily = ComponentDef::FAMILY;
     type Ir = ComponentDef;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
@@ -25,14 +24,6 @@ impl Pipeline for CgpAutoDispatchMacro {
         Ok(ComponentDef::AutoDispatch(ItemCgpAutoDispatch {
             item_trait,
         }))
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use syn::ItemTrait;
 
-use crate::ir::{Diagnostics, FamilyIr, IrFamily, Pipeline, TraitRewrite, run};
+use crate::ir::{Pipeline, TraitRewrite, run};
 
 /// `#[async_trait]`: desugars every `async fn` in a trait into a method returning
 /// `impl Future`.
@@ -16,7 +16,6 @@ pub struct AsyncTraitMacro;
 
 impl Pipeline for AsyncTraitMacro {
     const NAME: &'static str = "async_trait";
-    const FAMILY: IrFamily = TraitRewrite::FAMILY;
     type Ir = TraitRewrite;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
@@ -32,14 +31,6 @@ impl Pipeline for AsyncTraitMacro {
             Ok(item_trait) => TraitRewrite::AsyncTrait(Box::new(item_trait)),
             Err(_) => TraitRewrite::Passthrough(body),
         })
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

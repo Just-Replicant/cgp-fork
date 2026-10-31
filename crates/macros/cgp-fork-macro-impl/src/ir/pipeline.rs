@@ -4,36 +4,24 @@ use proc_macro2::{Span, TokenStream};
 use syn::Error;
 use syn::parse::Parse;
 
-use crate::ir::{Diagnostics, IrFamily};
+use crate::ir::{Diagnostics, FamilyIr};
 
-/// One macro entrypoint, split into `parse → validate → emit`.
+/// One macro entrypoint: a parser into the IR of its family.
 ///
-/// Implementors are zero-sized marker types; call them through [`run`].
+/// Implementors are zero-sized marker types; call them through [`run`]. Validation and code
+/// generation belong to the family IR ([`FamilyIr`]), so every entrypoint of a family shares
+/// them.
 pub trait Pipeline {
     /// The macro's name as users write it (`"cgp_component"`, `"Symbol"`, …). Matches the
     /// name in [`crate::registry::entrypoints`].
     const NAME: &'static str;
 
-    /// The kind of IR this entrypoint produces.
-    const FAMILY: IrFamily;
-
-    /// The typed description of the macro input.
-    type Ir;
+    /// The family IR this entrypoint parses into.
+    type Ir: FamilyIr;
 
     /// Parses the attribute arguments (empty for function-like and derive macros) and the
     /// annotated item or macro body into the IR. Grammar errors are returned here.
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir>;
-
-    /// Checks the IR and records every semantic error in `diagnostics`.
-    ///
-    /// The default accepts everything: most checks still run while emitting, inside the
-    /// per-entrypoint types under `macro_core`, and move here as the IR is shared.
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        let _ = (ir, diagnostics);
-    }
-
-    /// Generates the output tokens from a validated IR.
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream>;
 }
 
 /// Runs `P` over one macro invocation: parse, then validate (reporting every error at
@@ -42,10 +30,10 @@ pub fn run<P: Pipeline>(attr: TokenStream, body: TokenStream) -> syn::Result<Tok
     let ir = P::parse(attr, body)?;
 
     let mut diagnostics = Diagnostics::new();
-    P::validate(&ir, &mut diagnostics);
+    ir.validate(&mut diagnostics);
     diagnostics.finish()?;
 
-    P::emit(ir)
+    ir.emit()
 }
 
 /// Parses `body` as `T` for an attribute macro that takes no arguments.

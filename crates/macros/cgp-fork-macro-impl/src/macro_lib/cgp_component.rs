@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use syn::{ItemTrait, parse2};
 
-use crate::ir::{ComponentDef, Diagnostics, FamilyIr, IrFamily, Pipeline, run};
+use crate::ir::{ComponentDef, Pipeline, run};
 use crate::macro_core::types::cgp_component::{CgpComponentArgs, ItemCgpComponent};
 
 /// `#[cgp_component]`: a trait becomes a component (consumer trait, provider trait,
@@ -10,7 +10,6 @@ pub struct CgpComponentMacro;
 
 impl Pipeline for CgpComponentMacro {
     const NAME: &'static str = "cgp_component";
-    const FAMILY: IrFamily = ComponentDef::FAMILY;
     type Ir = ComponentDef;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
@@ -21,14 +20,6 @@ impl Pipeline for CgpComponentMacro {
             args,
             item_trait,
         }))
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

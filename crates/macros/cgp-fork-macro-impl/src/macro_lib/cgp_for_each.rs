@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use syn::parse2;
 
-use crate::ir::{Diagnostics, FamilyIr, IrFamily, Pipeline, WiringTable, run};
+use crate::ir::{Pipeline, WiringTable, run};
 
 /// Repeat a token body once per component type. Preset `with_components!`
 /// macros expand through this so one preset entry becomes many impls.
@@ -9,19 +9,10 @@ pub struct CgpForEachMacro;
 
 impl Pipeline for CgpForEachMacro {
     const NAME: &'static str = "cgp_for_each";
-    const FAMILY: IrFamily = WiringTable::FAMILY;
     type Ir = WiringTable;
 
     fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
         parse2(body).map(WiringTable::ForEach)
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

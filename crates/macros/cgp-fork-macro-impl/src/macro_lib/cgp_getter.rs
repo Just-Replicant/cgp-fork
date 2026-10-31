@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use syn::{Ident, ItemTrait, TraitItem, parse2};
 
-use crate::ir::{Diagnostics, FamilyIr, Getter, IrFamily, Pipeline, run};
+use crate::ir::{Getter, Pipeline, run};
 use crate::macro_core::types::cgp_component::{CgpComponentRawArgs, ItemCgpComponent};
 use crate::macro_lib::cgp_type::parse_abstract_type;
 
@@ -10,7 +10,6 @@ pub struct CgpGetterMacro;
 
 impl Pipeline for CgpGetterMacro {
     const NAME: &'static str = "cgp_getter";
-    const FAMILY: IrFamily = Getter::FAMILY;
     type Ir = Getter;
 
     /// Parses the component, naming the provider `{Field}Getter` (from `Has{Field}`) by
@@ -38,14 +37,6 @@ impl Pipeline for CgpGetterMacro {
             args: raw_args.try_into()?,
             item_trait,
         }))
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

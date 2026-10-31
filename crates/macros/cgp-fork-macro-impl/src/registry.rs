@@ -8,7 +8,7 @@
 
 use proc_macro2::TokenStream;
 
-use crate::ir::{IrFamily, Pipeline, run};
+use crate::ir::{FamilyIr, IrFamily, Pipeline, run};
 
 /// A macro expansion function over `(attr, body)` token streams.
 pub type EntrypointFn = fn(TokenStream, TokenStream) -> syn::Result<TokenStream>;
@@ -23,7 +23,7 @@ macro_rules! pipelines {
         vec![$(
             (
                 <$pipeline as Pipeline>::NAME,
-                <$pipeline as Pipeline>::FAMILY,
+                <<$pipeline as Pipeline>::Ir as FamilyIr>::FAMILY,
                 run::<$pipeline> as EntrypointFn,
             ),
         )*]

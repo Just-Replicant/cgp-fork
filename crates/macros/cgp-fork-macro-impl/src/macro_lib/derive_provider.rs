@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use syn::spanned::Spanned;
 use syn::{Error, Ident, ItemTrait, parse2};
 
-use crate::ir::{ComponentDef, Diagnostics, FamilyIr, IrFamily, Pipeline, run};
+use crate::ir::{ComponentDef, Pipeline, run};
 use crate::macro_core::types::cgp_component::{CgpComponentArgs, ItemCgpComponent};
 
 /// `#[derive_provider(WithProvider)]` emits the `WithProvider` impl for a
@@ -12,7 +12,6 @@ pub struct DeriveProviderMacro;
 
 impl Pipeline for DeriveProviderMacro {
     const NAME: &'static str = "derive_provider";
-    const FAMILY: IrFamily = ComponentDef::FAMILY;
     type Ir = ComponentDef;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
@@ -51,14 +50,6 @@ impl Pipeline for DeriveProviderMacro {
                 item_trait: trait_for_pipeline,
             },
         })
-    }
-
-    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
-        ir.validate(diagnostics);
-    }
-
-    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        ir.emit()
     }
 }
 

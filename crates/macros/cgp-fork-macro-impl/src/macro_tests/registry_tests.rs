@@ -137,3 +137,86 @@ fn every_ir_family_is_used() {
     let all: BTreeSet<_> = crate::ir::IrFamily::ALL.into_iter().collect();
     assert_eq!(used, all);
 }
+
+/// Each entrypoint parses into the family ADR 0004 assigns it.
+#[test]
+fn entrypoints_parse_into_their_documented_family() {
+    use crate::ir::IrFamily::*;
+
+    let expected = [
+        (
+            ComponentDef,
+            &[
+                "cgp_component",
+                "cgp_type",
+                "derive_provider",
+                "cgp_fn",
+                "cgp_auto_dispatch",
+            ][..],
+        ),
+        (Getter, &["cgp_getter", "cgp_auto_getter"]),
+        (
+            ProviderImpl,
+            &[
+                "cgp_impl",
+                "cgp_provider",
+                "cgp_new_provider",
+                "cgp_computer",
+                "cgp_producer",
+                "cgp_auto_error",
+            ],
+        ),
+        (
+            WiringTable,
+            &[
+                "delegate_components",
+                "delegate_and_check_components",
+                "check_components",
+                "cgp_for_each",
+                "cgp_preset",
+            ],
+        ),
+        (Namespace, &["cgp_namespace", "Path"]),
+        (
+            DataShape,
+            &[
+                "derive_has_field",
+                "derive_has_fields",
+                "derive_build_field",
+                "derive_extract_field",
+                "derive_from_variant",
+                "derive_cgp_data",
+                "derive_cgp_record",
+                "derive_cgp_variant",
+                "Symbol",
+                "Product",
+                "product",
+                "Sum",
+                "Struct",
+                "Enum",
+            ],
+        ),
+        (
+            TraitRewrite,
+            &[
+                "async_trait",
+                "blanket_trait",
+                "cgp_auto_impl",
+                "cgp_auto_log",
+            ],
+        ),
+    ];
+
+    let actual: std::collections::BTreeMap<_, _> = pipelines()
+        .into_iter()
+        .map(|(name, family, _)| (name, family))
+        .collect();
+    let mut listed = 0;
+    for (family, names) in expected {
+        for name in names {
+            assert_eq!(actual.get(name), Some(&family), "{name}");
+            listed += 1;
+        }
+    }
+    assert_eq!(listed, actual.len());
+}
