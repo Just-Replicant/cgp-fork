@@ -57,6 +57,7 @@ snapshot_delegate_components! {
 
     expand_open_later_param(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<DescriberComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<DescriberComponent, Nil>>;
         }
@@ -70,6 +71,7 @@ snapshot_delegate_components! {
                 PathCons<DescriberComponent, Nil>,
             >: IsProviderFor<DescriberComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             Code,
             __Wildcard__,
@@ -95,6 +97,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             Code,
             __Wildcard__,

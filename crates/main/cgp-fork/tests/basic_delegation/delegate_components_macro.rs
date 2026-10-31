@@ -22,6 +22,7 @@ snapshot_delegate_components! {
     expand_foo_component(output) {
         insta::assert_snapshot!(output, @"
         pub struct FooComponents;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<Index<0>> for FooComponents {
             type Delegate = u64;
         }
@@ -30,6 +31,7 @@ snapshot_delegate_components! {
         where
             u64: IsProviderFor<Index<0>, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<Index<1>> for FooComponents {
             type Delegate = String;
         }
@@ -57,6 +59,7 @@ snapshot_delegate_components! {
     expand_bar_component(output) {
         insta::assert_snapshot!(output, @"
         pub struct BarComponents;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<Index<0>> for BarComponents {
             type Delegate = FooComponents;
         }
@@ -65,6 +68,7 @@ snapshot_delegate_components! {
         where
             FooComponents: IsProviderFor<Index<0>, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<Index<1>> for BarComponents
         where
             FooComponents: DelegateComponent<Index<1>>,

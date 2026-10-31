@@ -56,6 +56,7 @@ snapshot_cgp_namespace! {
         impl<__Table__> NestedNs<__Table__> for FooProviderComponent {
             type Delegate = UseDelegate<FooTable>;
         }
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<String> for FooTable {
             type Delegate = DummyFoo;
         }
@@ -64,6 +65,7 @@ snapshot_cgp_namespace! {
         where
             DummyFoo: IsProviderFor<String, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<u64> for FooTable {
             type Delegate = DummyFoo;
         }

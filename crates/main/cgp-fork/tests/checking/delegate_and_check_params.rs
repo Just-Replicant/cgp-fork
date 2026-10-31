@@ -74,6 +74,7 @@ snapshot_delegate_and_check_components! {
 
     expand_context(output) {
         insta::assert_snapshot!(output, @r#"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooTypeProviderComponent> for Context {
             type Delegate = UseType<()>;
         }
@@ -84,6 +85,7 @@ snapshot_delegate_and_check_components! {
         where
             UseType<()>: IsProviderFor<FooTypeProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BarTypeProviderComponent> for Context {
             type Delegate = UseType<()>;
         }
@@ -94,6 +96,7 @@ snapshot_delegate_and_check_components! {
         where
             UseType<()>: IsProviderFor<BarTypeProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooGetterAtComponent> for Context {
             type Delegate = UseField<Symbol!("dummy")>;
         }
@@ -106,6 +109,7 @@ snapshot_delegate_and_check_components! {
                 Symbol!("dummy"),
             >: IsProviderFor<FooGetterAtComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BarGetterAtComponent> for Context {
             type Delegate = UseField<Symbol!("dummy")>;
         }

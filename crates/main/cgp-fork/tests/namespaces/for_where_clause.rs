@@ -39,6 +39,7 @@ snapshot_delegate_components! {
 
     expand_for_where(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
             T,

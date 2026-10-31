@@ -44,6 +44,7 @@ snapshot_delegate_components! {
 
     expand_extended_ns_app(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for App
         where
             __Key__: ExtendedNamespace<App, Delegate = __Value__>,
@@ -60,6 +61,7 @@ snapshot_delegate_components! {
             __Key__: ExtendedNamespace<App, Delegate = __Value__>,
             __Value__: IsProviderFor<__Key__, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<
@@ -94,6 +96,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<
@@ -126,6 +129,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<
@@ -158,6 +162,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<
@@ -190,6 +195,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<

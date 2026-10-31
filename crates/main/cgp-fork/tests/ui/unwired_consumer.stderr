@@ -13,16 +13,6 @@ help: the trait `DelegateComponent<GreeterComponent>` is not implemented for `Ap
    | ^^^^^^^^^^^^^^
    = note: `CanGreet` is implemented through the component `GreeterComponent`: wire a provider for `GreeterComponent` in the `delegate_components!` table of `App`
    = note: if a provider is wired, `check_components!` on `App` with `GreeterComponent` names the requirement it is missing
-   = help: the following other types implement trait `DelegateComponent<Key>`:
-             `BuildAndMergeOutputs<Output, Handlers>` implements `DelegateComponent<ComputerComponent>`
-             `BuildAndMergeOutputs<Output, Handlers>` implements `DelegateComponent<ComputerRefComponent>`
-             `BuildAndMergeOutputs<Output, Handlers>` implements `DelegateComponent<HandlerComponent>`
-             `BuildAndMergeOutputs<Output, Handlers>` implements `DelegateComponent<HandlerRefComponent>`
-             `BuildAndMergeOutputs<Output, Handlers>` implements `DelegateComponent<TryComputerComponent>`
-             `BuildAndMergeOutputs<Output, Handlers>` implements `DelegateComponent<TryComputerRefComponent>`
-             `MatchFirstWithFieldHandlersInputs<Provider>` implements `DelegateComponent<(Input, Args)>`
-             `MatchFirstWithFieldHandlersInputsMut<Provider>` implements `DelegateComponent<(&'a mut Input, Args)>`
-           and $N others
 note: required for `App` to implement `Greeter<App>`
   --> tests/ui/unwired_consumer.rs:5:1
    |

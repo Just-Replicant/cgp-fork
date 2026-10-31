@@ -120,6 +120,7 @@ snapshot_delegate_components! {
 
     expand_combined_forms_app(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AreaCalculatorComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<AreaCalculatorComponent, Nil>>;
         }
@@ -133,6 +134,7 @@ snapshot_delegate_components! {
                 PathCons<AreaCalculatorComponent, Nil>,
             >: IsProviderFor<AreaCalculatorComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BarProviderComponent> for App
         where
             Bundle: DelegateComponent<BarProviderComponent>,
@@ -149,6 +151,7 @@ snapshot_delegate_components! {
                 BarProviderComponent,
             >>::Delegate: IsProviderFor<BarProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BazProviderComponent> for App {
             type Delegate = DummyBaz;
         }
@@ -159,6 +162,7 @@ snapshot_delegate_components! {
         where
             DummyBaz: IsProviderFor<BazProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<QuuxProviderComponent> for App {
             type Delegate = DummyBaz;
         }
@@ -169,6 +173,7 @@ snapshot_delegate_components! {
         where
             DummyBaz: IsProviderFor<QuuxProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<AreaCalculatorComponent, PathCons<Rectangle, __Wildcard__>>>
@@ -191,6 +196,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<AreaCalculatorComponent, PathCons<Circle, __Wildcard__>>>
@@ -213,6 +219,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<AreaCalculatorComponent, PathCons<Square, __Wildcard__>>>
@@ -235,6 +242,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<AreaCalculatorComponent, PathCons<Triangle, __Wildcard__>>>
@@ -257,6 +265,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             'a,
             T,

@@ -38,6 +38,7 @@ snapshot_delegate_components! {
     expand_shorthand(output) {
         insta::assert_snapshot!(output, @"
         pub struct PersonComponents;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameTypeProviderComponent> for PersonComponents {
             type Delegate = UseType<String>;
         }
@@ -48,6 +49,7 @@ snapshot_delegate_components! {
         where
             UseType<String>: IsProviderFor<NameTypeProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameGetterComponent> for PersonComponents {
             type Delegate = UseField<
                 Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
@@ -62,6 +64,7 @@ snapshot_delegate_components! {
                 Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
             >: IsProviderFor<NameGetterComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<GreeterComponent> for PersonComponents {
             type Delegate = GreetHello;
         }
@@ -88,6 +91,7 @@ snapshot_delegate_components! {
     expand_explicit(output) {
         insta::assert_snapshot!(output, @r#"
         pub struct ExplicitComponents;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameTypeProviderComponent> for ExplicitComponents {
             type Delegate = UseType<String>;
         }
@@ -99,6 +103,7 @@ snapshot_delegate_components! {
         where
             UseType<String>: IsProviderFor<NameTypeProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameGetterComponent> for ExplicitComponents {
             type Delegate = UseField<Symbol!("name")>;
         }
@@ -111,6 +116,7 @@ snapshot_delegate_components! {
                 Symbol!("name"),
             >: IsProviderFor<NameGetterComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<GreeterComponent> for ExplicitComponents {
             type Delegate = GreetHello;
         }

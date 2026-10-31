@@ -523,6 +523,7 @@ mod derive_delegate {
             insta::assert_snapshot!(output, @r#"
             pub struct FooTypes;
             pub struct FooGetters;
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<FooTypeProviderAtComponent> for MyContext {
                 type Delegate = UseDelegate<FooTypes>;
             }
@@ -535,6 +536,7 @@ mod derive_delegate {
                     FooTypes,
                 >: IsProviderFor<FooTypeProviderAtComponent, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<FooGetterAtComponent> for MyContext {
                 type Delegate = UseDelegate<FooGetters>;
             }
@@ -547,6 +549,7 @@ mod derive_delegate {
                     FooGetters,
                 >: IsProviderFor<FooGetterAtComponent, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<Index<1>> for FooTypes {
                 type Delegate = UseType<u64>;
             }
@@ -555,6 +558,7 @@ mod derive_delegate {
             where
                 UseType<u64>: IsProviderFor<Index<1>, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<Index<0>> for FooTypes {
                 type Delegate = UseType<String>;
             }
@@ -563,6 +567,7 @@ mod derive_delegate {
             where
                 UseType<String>: IsProviderFor<Index<0>, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<Index<1>> for FooGetters {
                 type Delegate = UseField<Symbol!("foo")>;
             }
@@ -571,6 +576,7 @@ mod derive_delegate {
             where
                 UseField<Symbol!("foo")>: IsProviderFor<Index<1>, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<Index<0>> for FooGetters {
                 type Delegate = UseField<Symbol!("bar")>;
             }
@@ -649,6 +655,7 @@ mod derive_delegate2 {
             insta::assert_snapshot!(output, @r#"
             pub struct FooTypes;
             pub struct FooGetters;
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<FooTypeProviderAtComponent> for MyContext {
                 type Delegate = UseDelegate2<FooTypes>;
             }
@@ -661,6 +668,7 @@ mod derive_delegate2 {
                     FooTypes,
                 >: IsProviderFor<FooTypeProviderAtComponent, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<FooGetterAtComponent> for MyContext {
                 type Delegate = UseDelegate2<FooGetters>;
             }
@@ -673,6 +681,7 @@ mod derive_delegate2 {
                     FooGetters,
                 >: IsProviderFor<FooGetterAtComponent, __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<(Index<1>, Index<0>)> for FooTypes {
                 type Delegate = UseType<u64>;
             }
@@ -683,6 +692,7 @@ mod derive_delegate2 {
             where
                 UseType<u64>: IsProviderFor<(Index<1>, Index<0>), __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<(Index<0>, Index<1>)> for FooTypes {
                 type Delegate = UseType<String>;
             }
@@ -693,6 +703,7 @@ mod derive_delegate2 {
             where
                 UseType<String>: IsProviderFor<(Index<0>, Index<1>), __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<(Index<1>, Index<0>)> for FooGetters {
                 type Delegate = UseField<Symbol!("foo")>;
             }
@@ -705,6 +716,7 @@ mod derive_delegate2 {
                     Symbol!("foo"),
                 >: IsProviderFor<(Index<1>, Index<0>), __Context__, __Params__>,
             {}
+            #[diagnostic::do_not_recommend]
             impl DelegateComponent<(Index<0>, Index<1>)> for FooGetters {
                 type Delegate = UseField<Symbol!("bar")>;
             }

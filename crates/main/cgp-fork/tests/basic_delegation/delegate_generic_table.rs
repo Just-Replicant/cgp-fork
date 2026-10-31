@@ -39,6 +39,7 @@ snapshot_delegate_components! {
     }
     expand_components(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl<'a, T1: Clone> DelegateComponent<FooKey<T1>> for Components {
             type Delegate = FooValue;
         }
@@ -51,6 +52,7 @@ snapshot_delegate_components! {
         where
             FooValue: IsProviderFor<FooKey<T1>, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<'a, T1: Clone> DelegateComponent<BarKey<'a, T1>> for Components {
             type Delegate = BarValue<T1>;
         }
@@ -63,6 +65,7 @@ snapshot_delegate_components! {
         where
             BarValue<T1>: IsProviderFor<BarKey<'a, T1>, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<'a, T1: Clone, T2> DelegateComponent<BazKey<T1, T2>> for Components {
             type Delegate = BarValue<T1>;
         }

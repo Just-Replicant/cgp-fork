@@ -59,6 +59,7 @@ snapshot_delegate_components! {
 
     expand_open_app(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<FooProviderComponent, Nil>>;
         }
@@ -72,6 +73,7 @@ snapshot_delegate_components! {
                 PathCons<FooProviderComponent, Nil>,
             >: IsProviderFor<FooProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BarProviderComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<BarProviderComponent, Nil>>;
         }
@@ -85,6 +87,7 @@ snapshot_delegate_components! {
                 PathCons<BarProviderComponent, Nil>,
             >: IsProviderFor<BarProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<FooProviderComponent, PathCons<String, __Wildcard__>>>
@@ -107,6 +110,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<BarProviderComponent, PathCons<u32, __Wildcard__>>>
@@ -129,6 +133,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<BarProviderComponent, PathCons<u64, __Wildcard__>>>
@@ -151,6 +156,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<BarProviderComponent, PathCons<bool, __Wildcard__>>>
@@ -173,6 +179,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<BarProviderComponent, PathCons<usize, __Wildcard__>>>
@@ -195,6 +202,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<BarProviderComponent, PathCons<isize, __Wildcard__>>>

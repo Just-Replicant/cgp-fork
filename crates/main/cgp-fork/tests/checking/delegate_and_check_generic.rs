@@ -35,6 +35,7 @@ snapshot_delegate_and_check_components! {
 
     expand_my_context(output) {
         insta::assert_snapshot!(output, @r#"
+        #[diagnostic::do_not_recommend]
         impl<T> DelegateComponent<NameTypeProviderComponent> for MyContext<T> {
             type Delegate = UseType<T>;
         }
@@ -46,6 +47,7 @@ snapshot_delegate_and_check_components! {
         where
             UseType<T>: IsProviderFor<NameTypeProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<T> DelegateComponent<NameGetterComponent> for MyContext<T> {
             type Delegate = UseField<Symbol!("name")>;
         }

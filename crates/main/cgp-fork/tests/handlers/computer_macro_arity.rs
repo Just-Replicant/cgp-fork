@@ -37,6 +37,7 @@ snapshot_cgp_computer! {
         impl<__Context__, __Code__> IsProviderFor<ComputerComponent, __Context__, (__Code__, ())>
         for Zero {}
         pub struct Zero;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<ComputerRefComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -57,6 +58,7 @@ snapshot_cgp_computer! {
                 ComputerRefComponent,
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -77,6 +79,7 @@ snapshot_cgp_computer! {
                 TryComputerComponent,
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerRefComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -97,6 +100,7 @@ snapshot_cgp_computer! {
                 TryComputerRefComponent,
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -117,6 +121,7 @@ snapshot_cgp_computer! {
                 AsyncComputerComponent,
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerRefComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -137,6 +142,7 @@ snapshot_cgp_computer! {
                 AsyncComputerRefComponent,
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -157,6 +163,7 @@ snapshot_cgp_computer! {
                 HandlerComponent,
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerRefComponent> for Zero
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,
@@ -207,6 +214,7 @@ snapshot_cgp_computer! {
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (u64))> for Increment {}
         pub struct Increment;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<ComputerRefComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -227,6 +235,7 @@ snapshot_cgp_computer! {
                 ComputerRefComponent,
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -247,6 +256,7 @@ snapshot_cgp_computer! {
                 TryComputerComponent,
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerRefComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -267,6 +277,7 @@ snapshot_cgp_computer! {
                 TryComputerRefComponent,
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -287,6 +298,7 @@ snapshot_cgp_computer! {
                 AsyncComputerComponent,
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerRefComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -307,6 +319,7 @@ snapshot_cgp_computer! {
                 AsyncComputerRefComponent,
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -327,6 +340,7 @@ snapshot_cgp_computer! {
                 HandlerComponent,
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerRefComponent> for Increment
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,

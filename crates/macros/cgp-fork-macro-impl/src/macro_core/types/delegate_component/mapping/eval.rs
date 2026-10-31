@@ -1,5 +1,6 @@
 use proc_macro2::Span;
-use syn::{Generics, ItemImpl, Type};
+use syn::token::Bracket;
+use syn::{Attribute, Generics, ItemImpl, Type, parse_quote};
 
 use crate::macro_core::exports::{DelegateComponent, IsProviderFor};
 use crate::macro_core::functions::{merge_generics, override_item_span, parse_internal};
@@ -53,7 +54,18 @@ impl EvaluatedDelegateEntry {
             }
         };
 
-        self.respan_impl(item_impl)
+        let mut item_impl = self.respan_impl(item_impl)?;
+
+        // Keep the other entries of a table out of rustc's "the following other types
+        // implement" list when a key is missing (ADR 0005). The attribute's `#` and `[ ]`
+        // take the entry's span, like the impl's own boundary tokens, so an error on the
+        // impl still points at the entry; the path inside stays at `call_site`.
+        let mut do_not_recommend: Attribute = parse_quote!(#[diagnostic::do_not_recommend]);
+        do_not_recommend.pound_token.span = self.span;
+        do_not_recommend.bracket_token = Bracket(self.span);
+        item_impl.attrs.insert(0, do_not_recommend);
+
+        Ok(item_impl)
     }
 
     /// Emit the forwarding `IsProviderFor<Key, __Context__, __Params__>` impl,

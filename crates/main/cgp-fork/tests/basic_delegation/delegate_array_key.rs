@@ -31,6 +31,7 @@ snapshot_delegate_components! {
 
     expand_components(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooKey> for Components {
             type Delegate = FooValue;
         }
@@ -39,6 +40,7 @@ snapshot_delegate_components! {
         where
             FooValue: IsProviderFor<FooKey, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BarKey> for Components {
             type Delegate = BarValue;
         }
@@ -47,6 +49,7 @@ snapshot_delegate_components! {
         where
             BarValue: IsProviderFor<BarKey, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BazKey> for Components {
             type Delegate = BarValue;
         }

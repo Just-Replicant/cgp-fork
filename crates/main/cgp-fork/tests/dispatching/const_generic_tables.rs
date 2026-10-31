@@ -32,6 +32,7 @@ snapshot_delegate_components! {
     expand_constant_table(output) {
         insta::assert_snapshot!(output, @"
         pub struct ConstantTable<const N: u64>(pub ::core::marker::PhantomData<()>);
+        #[diagnostic::do_not_recommend]
         impl<const N: u64> DelegateComponent<ConstantGetterComponent> for ConstantTable<N> {
             type Delegate = UseConstant<N>;
         }
@@ -90,6 +91,7 @@ snapshot_delegate_components! {
     expand_count_table(output) {
         insta::assert_snapshot!(output, @"
         pub struct CountTable<const N: usize>(pub ::core::marker::PhantomData<()>);
+        #[diagnostic::do_not_recommend]
         impl<const N: usize> DelegateComponent<CounterComponent> for Wrapper<N> {
             type Delegate = UseDelegate<CountTable<N>>;
         }
@@ -101,6 +103,7 @@ snapshot_delegate_components! {
         where
             UseDelegate<CountTable<N>>: IsProviderFor<CounterComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<const N: usize> DelegateComponent<String> for CountTable<N> {
             type Delegate = TimesN<N>;
         }

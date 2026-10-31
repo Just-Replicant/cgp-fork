@@ -37,6 +37,7 @@ snapshot_cgp_producer! {
         impl<__Context__, __Code__> IsProviderFor<ProducerComponent, __Context__, (__Code__)>
         for TheAnswer {}
         pub struct TheAnswer;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<ComputerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -47,6 +48,7 @@ snapshot_cgp_producer! {
         where
             PromoteProducer<Self>: IsProviderFor<ComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<ComputerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -57,6 +59,7 @@ snapshot_cgp_producer! {
         where
             PromoteProducer<Self>: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -67,6 +70,7 @@ snapshot_cgp_producer! {
         where
             PromoteProducer<Self>: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -79,6 +83,7 @@ snapshot_cgp_producer! {
                 Self,
             >: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -91,6 +96,7 @@ snapshot_cgp_producer! {
                 Self,
             >: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -103,6 +109,7 @@ snapshot_cgp_producer! {
                 Self,
             >: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }
@@ -113,6 +120,7 @@ snapshot_cgp_producer! {
         where
             PromoteProducer<Self>: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerRefComponent> for TheAnswer {
             type Delegate = PromoteProducer<Self>;
         }

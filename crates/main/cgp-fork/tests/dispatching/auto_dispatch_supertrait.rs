@@ -78,6 +78,7 @@ snapshot_cgp_auto_dispatch! {
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (&'__a__ __Variants__))>
         for ComputeGreet {}
         pub struct ComputeGreet;
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<ComputerRefComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<ComputerRefComponent>,
@@ -98,6 +99,7 @@ snapshot_cgp_auto_dispatch! {
                 ComputerRefComponent,
             >>::Delegate: IsProviderFor<ComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerComponent>,
@@ -118,6 +120,7 @@ snapshot_cgp_auto_dispatch! {
                 TryComputerComponent,
             >>::Delegate: IsProviderFor<TryComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<TryComputerRefComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<TryComputerRefComponent>,
@@ -138,6 +141,7 @@ snapshot_cgp_auto_dispatch! {
                 TryComputerRefComponent,
             >>::Delegate: IsProviderFor<TryComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerComponent>,
@@ -158,6 +162,7 @@ snapshot_cgp_auto_dispatch! {
                 AsyncComputerComponent,
             >>::Delegate: IsProviderFor<AsyncComputerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<AsyncComputerRefComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<AsyncComputerRefComponent>,
@@ -178,6 +183,7 @@ snapshot_cgp_auto_dispatch! {
                 AsyncComputerRefComponent,
             >>::Delegate: IsProviderFor<AsyncComputerRefComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<HandlerComponent>,
@@ -198,6 +204,7 @@ snapshot_cgp_auto_dispatch! {
                 HandlerComponent,
             >>::Delegate: IsProviderFor<HandlerComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<HandlerRefComponent> for ComputeGreet
         where
             PromoteComputer<Self>: DelegateComponent<HandlerRefComponent>,

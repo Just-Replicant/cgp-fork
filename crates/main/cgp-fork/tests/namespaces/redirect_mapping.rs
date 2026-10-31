@@ -77,6 +77,7 @@ snapshot_delegate_components! {
 
     expand_redirect_mapping_app(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<FooProviderComponent, Nil>>;
         }
@@ -90,6 +91,7 @@ snapshot_delegate_components! {
                 PathCons<FooProviderComponent, Nil>,
             >: IsProviderFor<FooProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<FooProviderComponent, PathCons<String, __Wildcard__>>>
@@ -112,6 +114,7 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BarProviderComponent> for App {
             type Delegate = RedirectLookup<
                 App,
@@ -146,6 +149,7 @@ snapshot_delegate_components! {
                 >,
             >: IsProviderFor<BarProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<BazProviderComponent> for App {
             type Delegate = RedirectLookup<
                 App,
@@ -180,6 +184,7 @@ snapshot_delegate_components! {
                 >,
             >: IsProviderFor<BazProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<
@@ -252,6 +257,7 @@ snapshot_delegate_components! {
 
     expand_redirect_mapping_open_app(output) {
         insta::assert_snapshot!(output, @"
+        #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for OpenApp {
             type Delegate = RedirectLookup<OpenApp, PathCons<FooProviderComponent, Nil>>;
         }
@@ -265,6 +271,7 @@ snapshot_delegate_components! {
                 PathCons<FooProviderComponent, Nil>,
             >: IsProviderFor<FooProviderComponent, __Context__, __Params__>,
         {}
+        #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
         > DelegateComponent<PathCons<FooProviderComponent, PathCons<String, __Wildcard__>>>
