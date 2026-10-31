@@ -8,15 +8,6 @@ pub enum ItemCgpData {
     Variant(ItemCgpVariant),
 }
 
-impl ItemCgpData {
-    pub fn to_items(&self) -> syn::Result<Vec<Item>> {
-        match self {
-            ItemCgpData::Record(record) => record.to_items(),
-            ItemCgpData::Variant(variant) => variant.to_items(),
-        }
-    }
-}
-
 impl Parse for ItemCgpData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let item: Item = input.parse()?;

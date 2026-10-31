@@ -3,7 +3,7 @@
 
 use quote::quote;
 
-use super::assert_macro_rejects;
+use super::{assert_macro_rejects, assert_macro_rejects_with};
 
 #[test]
 fn rejects_unknown_provider() {
@@ -50,4 +50,24 @@ fn rejects_component_that_is_not_a_type_or_getter() {
             ),
         )
     });
+}
+
+#[test]
+fn rejects_getter_with_several_methods() {
+    assert_macro_rejects_with(
+        "derive_provider on a getter with two methods",
+        "`#[derive_provider(WithProvider)]` supports a getter with a single method",
+        || {
+            crate::macro_lib::derive_provider(
+                quote!(WithProvider),
+                quote!(
+                    #[cgp_component(NameGetter)]
+                    pub trait HasNames {
+                        fn first_name(&self) -> &str;
+                        fn last_name(&self) -> &str;
+                    }
+                ),
+            )
+        },
+    );
 }
