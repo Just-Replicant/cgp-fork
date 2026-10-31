@@ -23,8 +23,10 @@ emits. It also holds the `crate_path` tests (how generated code names the facade
 
 **`crates/tests/renamed-dep`** imports `cgp-fork` under the name `cgp` and compiles copies of
 representative behavior tests with every `cgp_fork` path renamed, so every macro must generate
-paths through the caller's own name for the facade (ADR 0003). When a macro starts naming a new
-facade item, add a test here that uses it.
+paths through the caller's own name for the facade (ADR 0003). `tests/copies_match.rs` fails when
+a copy drifts from its source. When a macro starts naming a new facade item, add a test here that
+uses it. **`crates/tests/preset-consumer`** uses a preset defined in that crate while importing
+the facade as `cgp_fork`.
 
 **`crates/tests/doctests`** compiles the repository README and the macro-crate examples.
 
