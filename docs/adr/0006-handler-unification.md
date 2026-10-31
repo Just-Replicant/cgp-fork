@@ -53,13 +53,33 @@ the change is additive and keeps the 0.10 API.
 - Every 0.10 test still passes with `compat-0.10`; without it the 0.10 tests are compiled out.
   The ported tests are in `tests/unified_handlers/` and run with and without the feature
   (the `compat_bridge` cases need it).
+- Follow-up (0.11.0 deprecations):
+  - The 0.10 names are `#[deprecated(since = "0.11.0")]`, each note naming its replacement
+    (see the CHANGELOG). The macro blocker is resolved: `#[cgp_handler]` replaces
+    `#[cgp_computer]`/`#[cgp_producer]`, `#[derive_handler]` replaces `#[derive_promote]`, and
+    `#[cgp_auto_dispatch]` generates the unified API (its 0.10 wiring through `Compat` is
+    emitted inside `__cgp_compat_0_10!`, which expands to nothing without `compat-0.10`). The
+    deprecated macros stay and their expansions carry `#[allow(deprecated)]`, so a user is
+    warned once, at the attribute. `#[derive_promote]` is an attribute inside
+    `#[cgp_component]`, which `#[deprecated]` cannot reach; the expansion names the hidden
+    deprecated constant `macro_prelude::DERIVE_PROMOTE` with the attribute's span instead.
+  - The 0.10 modules, `compat` and the 0.10 tests allow `deprecated` locally (module or file
+    level), never crate-wide. `tests/ui/deprecated_*.rs` pin the warnings and
+    `tests/ui_pass/` checks the replacements compile under `deny(warnings)`.
+  - `MapTypeRef` is merged into `Mode`: the access-mode trait carries the borrow-aware
+    `type Map<'a, T: 'a>`, `Owned`/`Ref`/`Mut` implement it, and the derived extractors use it.
+    `MapTypeRef` remains as a deprecated trait implemented for every `Mode`, and
+    `IsRef`/`IsMut`/`IsOwned` as deprecated aliases. `MapType` (`type Map<T>`) cannot be merged
+    with it: a GAT without a lifetime cannot be `&'a T` in an impl (E0309), and `MapType` serves
+    the state and type-function maps (`MapFields`, `ToMerge`), not access modes.
+  - The unified items the generated code names are in the hidden `macro_prelude::unified`
+    module, not renamed re-exports, so diagnostics keep the public paths
+    (`cgp_fork::handler::Handler`).
 - Not done, deliberately:
-  - `#[deprecated]` on the 0.10 names. The macros above and `#[derive_promote]` still generate
-    0.10 code, so a deprecation would warn in code that has no replacement yet. It comes with
-    the macro port.
-  - The monad layer is not behind its own `unstable-monad` feature: the 0.10 dispatchers are
-    built on it, so it shares `compat-0.10`.
-  - `MapType`/`MapTypeRef` are not merged, and the components stay in the facade crate; the
-    `cgp-fork-handler` crate split belongs with the crate layout of the hard fork.
+  - The monad layer is neither deprecated nor behind its own `unstable-monad` feature: the
+    unified family has no monadic replacement, and the 0.10 dispatchers are built on it, so it
+    shares `compat-0.10`.
+  - The components stay in the facade crate; the `cgp-fork-handler` crate split belongs with
+    the crate layout of the hard fork.
   - The async method is `handle_async`, not `handle`, so a type can implement both components
     and be called without naming the trait.

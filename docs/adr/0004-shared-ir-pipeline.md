@@ -23,7 +23,7 @@ structs in the same step would touch most of the 25k-line crate at once, and cou
   `parse`, `validate`, `emit`. `ir::run::<P>` drives the stages; validation errors go to a
   `Diagnostics` accumulator and are reported together (`syn::Error::combine`), and `emit` never
   runs on an IR that failed validation.
-- Every one of the 38 entrypoints is a zero-sized `…Macro` type implementing `Pipeline`. The
+- Every one of the 39 entrypoints (38 at the time; `cgp_handler` came with the 0.11 deprecations) is a zero-sized `…Macro` type implementing `Pipeline`. The
   existing public functions (`macro_lib::cgp_component`, …) stay and call `run`, so the proc-macro
   shim, the fuzzers and the tests are unchanged.
 - Each entrypoint's `Ir` is, for now, the typed input it already had (for example
@@ -47,7 +47,7 @@ structs in the same step would touch most of the 25k-line crate at once, and cou
 - Every expansion snapshot passed unchanged after each ported entrypoint; each port is its own
   commit and every commit builds.
 - A new entrypoint implements `Pipeline` and is added to the list in `registry.rs`; the
-  `registry_tests` pin the 38 names and check every family is used.
+  `registry_tests` pin the entrypoint names and check every family is used.
 - Error output changes only when an input has several errors: more of them are reported, and the
   first one is the one reported before.
 - Left for later: moving the remaining checks that still run during `emit` into `validate`, and the JSON wiring
