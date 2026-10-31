@@ -3,40 +3,8 @@
 */
 #![deny(missing_docs)]
 
+use cgp_fork_macro_impl::{async_impl, extra_macro_lib, macro_lib};
 use proc_macro::TokenStream;
-
-// `macro_tests` calls the parsers directly. `test_util_lib` and the `snapshot_*`
-// macros compile for this crate's tests and when the `snapshot` feature is on,
-// which the behavior tests enable.
-mod async_impl;
-mod extra_macro_core;
-mod extra_macro_lib;
-mod macro_core;
-mod macro_lib;
-#[cfg(any(test, feature = "snapshot"))]
-mod test_util_lib;
-
-#[cfg(test)]
-#[path = "macro_tests/ident_with_type_params_tests.rs"]
-mod ident_with_type_params_tests;
-#[cfg(test)]
-#[path = "macro_tests/invalid_expansion_tests.rs"]
-mod invalid_expansion_tests;
-#[cfg(test)]
-#[path = "macro_tests/parser_rejections_tests.rs"]
-mod parser_rejections_tests;
-#[cfg(test)]
-#[path = "macro_tests/raw_ident_tests.rs"]
-mod raw_ident_tests;
-#[cfg(test)]
-#[path = "macro_tests/robustness_tests.rs"]
-mod robustness_tests;
-#[cfg(test)]
-#[path = "macro_tests/shape_macro_parsing_tests.rs"]
-mod shape_macro_parsing_tests;
-#[cfg(test)]
-#[path = "macro_tests/token_rewrite_tests.rs"]
-mod token_rewrite_tests;
 
 /**
     `#[cgp_component]` is the most basic macro used to define a CGP component.
@@ -141,7 +109,7 @@ mod token_rewrite_tests;
 */
 #[proc_macro_attribute]
 pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_component(attr.into(), item.into())
+    macro_lib::cgp_component(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -228,7 +196,7 @@ pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_provider(attr.into(), item.into())
+    macro_lib::cgp_provider(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -309,7 +277,7 @@ pub fn cgp_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_impl(attr.into(), item.into())
+    macro_lib::cgp_impl(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -332,7 +300,7 @@ pub fn cgp_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_fn(attr.into(), item.into())
+    macro_lib::cgp_fn(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -379,7 +347,7 @@ pub fn cgp_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_new_provider(attr.into(), item.into())
+    macro_lib::cgp_new_provider(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -448,7 +416,7 @@ pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_getter(attr.into(), item.into())
+    macro_lib::cgp_getter(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -506,7 +474,7 @@ pub fn cgp_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_auto_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_auto_getter(attr.into(), item.into())
+    macro_lib::cgp_auto_getter(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -534,7 +502,7 @@ pub fn cgp_auto_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_auto_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_auto_impl(attr.into(), item.into())
+    macro_lib::cgp_auto_impl(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -576,7 +544,7 @@ pub fn cgp_auto_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_auto_error(attr.into(), item.into())
+    macro_lib::cgp_auto_error(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -776,7 +744,7 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn delegate_components(body: TokenStream) -> TokenStream {
-    crate::macro_lib::delegate_components(body.into())
+    macro_lib::delegate_components(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -806,7 +774,7 @@ pub fn delegate_components(body: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn cgp_for_each(body: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_for_each(body.into())
+    macro_lib::cgp_for_each(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -854,7 +822,7 @@ pub fn cgp_for_each(body: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn cgp_preset(body: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_preset(body.into())
+    macro_lib::cgp_preset(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -878,7 +846,7 @@ pub fn cgp_preset(body: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn derive_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_provider(attr.into(), item.into())
+    macro_lib::derive_provider(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -903,7 +871,7 @@ pub fn derive_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn cgp_namespace(body: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_namespace(body.into())
+    macro_lib::cgp_namespace(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -944,7 +912,7 @@ pub fn cgp_namespace(body: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn check_components(body: TokenStream) -> TokenStream {
-    crate::macro_lib::check_components(body.into())
+    macro_lib::check_components(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1003,7 +971,7 @@ pub fn check_components(body: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn delegate_and_check_components(body: TokenStream) -> TokenStream {
-    crate::macro_lib::delegate_and_check_components(body.into())
+    macro_lib::delegate_and_check_components(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1079,7 +1047,7 @@ pub fn delegate_and_check_components(body: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_type(attrs: TokenStream, body: TokenStream) -> TokenStream {
-    crate::macro_lib::cgp_type(attrs.into(), body.into())
+    macro_lib::cgp_type(attrs.into(), body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1112,7 +1080,7 @@ pub fn cgp_type(attrs: TokenStream, body: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn blanket_trait(attr: TokenStream, item: TokenStream) -> TokenStream {
-    crate::macro_lib::blanket_trait(attr.into(), item.into())
+    macro_lib::blanket_trait(attr.into(), item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1145,7 +1113,7 @@ pub fn blanket_trait(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Symbol(body: TokenStream) -> TokenStream {
-    crate::macro_lib::Symbol(body.into())
+    macro_lib::Symbol(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1175,7 +1143,7 @@ pub fn Symbol(body: TokenStream) -> TokenStream {
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Product(body: TokenStream) -> TokenStream {
-    crate::macro_lib::Product(body.into())
+    macro_lib::Product(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1192,7 +1160,7 @@ pub fn Product(body: TokenStream) -> TokenStream {
 */
 #[proc_macro]
 pub fn product(body: TokenStream) -> TokenStream {
-    crate::macro_lib::product(body.into())
+    macro_lib::product(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1223,7 +1191,7 @@ pub fn product(body: TokenStream) -> TokenStream {
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Sum(body: TokenStream) -> TokenStream {
-    crate::macro_lib::Sum(body.into())
+    macro_lib::Sum(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1258,7 +1226,7 @@ pub fn Sum(body: TokenStream) -> TokenStream {
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Struct(body: TokenStream) -> TokenStream {
-    crate::macro_lib::Struct(body.into())
+    macro_lib::Struct(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1292,7 +1260,7 @@ pub fn Struct(body: TokenStream) -> TokenStream {
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Enum(body: TokenStream) -> TokenStream {
-    crate::macro_lib::Enum(body.into())
+    macro_lib::Enum(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1311,7 +1279,7 @@ pub fn Enum(body: TokenStream) -> TokenStream {
 #[proc_macro]
 #[allow(non_snake_case)]
 pub fn Path(body: TokenStream) -> TokenStream {
-    crate::macro_lib::Path(body.into())
+    macro_lib::Path(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1321,7 +1289,7 @@ pub fn Path(body: TokenStream) -> TokenStream {
 /// Named fields are keyed by `Symbol!("field")`. Positional fields are keyed by `Index<N>`.
 #[proc_macro_derive(HasField)]
 pub fn derive_fields(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_has_field(item.into())
+    macro_lib::derive_has_field(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1329,7 +1297,7 @@ pub fn derive_fields(item: TokenStream) -> TokenStream {
 /// Derives `HasFields`: the type-level [`Struct!`](macro@Struct) or [`Enum!`](macro@Enum) shape.
 #[proc_macro_derive(HasFields)]
 pub fn derive_has_fields(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_has_fields(item.into())
+    macro_lib::derive_has_fields(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1337,7 +1305,7 @@ pub fn derive_has_fields(item: TokenStream) -> TokenStream {
 /// Derives the partial builder: `HasBuilder`, `BuildField`, and `FinalizeBuild`.
 #[proc_macro_derive(BuildField)]
 pub fn derive_builder(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_build_field(item.into())
+    macro_lib::derive_build_field(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1345,7 +1313,7 @@ pub fn derive_builder(item: TokenStream) -> TokenStream {
 /// Derives the extractor that pulls one field out of a struct or one variant out of an enum.
 #[proc_macro_derive(ExtractField)]
 pub fn derive_extractor(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_extract_field(item.into())
+    macro_lib::derive_extract_field(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1353,7 +1321,7 @@ pub fn derive_extractor(item: TokenStream) -> TokenStream {
 /// Derives `FromVariant` for each variant, wrapping a payload in that variant.
 #[proc_macro_derive(FromVariant)]
 pub fn derive_from_variant(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_from_variant(item.into())
+    macro_lib::derive_from_variant(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1361,7 +1329,7 @@ pub fn derive_from_variant(item: TokenStream) -> TokenStream {
 /// Derives the extensible-variant spine: fields, extraction, and `FromVariant` for an enum.
 #[proc_macro_derive(CgpVariant)]
 pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_cgp_variant(item.into())
+    macro_lib::derive_cgp_variant(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1369,7 +1337,7 @@ pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
 /// Derives the extensible-record spine: field access, the field list, conversions, and the partial builder.
 #[proc_macro_derive(CgpRecord)]
 pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_cgp_record(item.into())
+    macro_lib::derive_cgp_record(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1377,7 +1345,7 @@ pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
 /// Derives [`CgpRecord`](derive@CgpRecord) for a struct and [`CgpVariant`](derive@CgpVariant) for an enum.
 #[proc_macro_derive(CgpData)]
 pub fn derive_cgp_data(item: TokenStream) -> TokenStream {
-    crate::macro_lib::derive_cgp_data(item.into())
+    macro_lib::derive_cgp_data(item.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1407,7 +1375,7 @@ pub fn derive_cgp_data(item: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_producer(attr: TokenStream, body: TokenStream) -> TokenStream {
-    crate::extra_macro_lib::cgp_producer(attr.into(), body.into())
+    extra_macro_lib::cgp_producer(attr.into(), body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1439,7 +1407,7 @@ pub fn cgp_producer(attr: TokenStream, body: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_computer(attr: TokenStream, body: TokenStream) -> TokenStream {
-    crate::extra_macro_lib::cgp_computer(attr.into(), body.into())
+    extra_macro_lib::cgp_computer(attr.into(), body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1483,7 +1451,7 @@ pub fn cgp_computer(attr: TokenStream, body: TokenStream) -> TokenStream {
 */
 #[proc_macro_attribute]
 pub fn cgp_auto_dispatch(attr: TokenStream, body: TokenStream) -> TokenStream {
-    crate::extra_macro_lib::cgp_auto_dispatch(attr.into(), body.into())
+    extra_macro_lib::cgp_auto_dispatch(attr.into(), body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1504,7 +1472,7 @@ pub fn cgp_auto_dispatch(attr: TokenStream, body: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute]
 pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
-    crate::extra_macro_lib::cgp_auto_log(attr.into(), body.into())
+    extra_macro_lib::cgp_auto_log(attr.into(), body.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
@@ -1522,5 +1490,5 @@ pub fn async_trait(attr: TokenStream, stream: TokenStream) -> TokenStream {
         .into()
 }
 
-#[cfg(any(test, feature = "snapshot"))]
+#[cfg(feature = "snapshot")]
 include!("snapshot_macros.rs");

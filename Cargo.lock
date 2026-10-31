@@ -52,11 +52,35 @@ dependencies = [
 name = "cgp-fork-macro"
 version = "0.10.1"
 dependencies = [
+ "cgp-fork-macro-impl",
+ "syn",
+]
+
+[[package]]
+name = "cgp-fork-macro-impl"
+version = "0.10.1"
+dependencies = [
  "insta",
  "prettyplease",
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "cgp-fork-preset-consumer"
+version = "0.0.0"
+dependencies = [
+ "cgp-fork",
+ "cgp-fork-renamed-dep",
+]
+
+[[package]]
+name = "cgp-fork-renamed-dep"
+version = "0.0.0"
+dependencies = [
+ "cgp-fork",
+ "futures",
 ]
 
 [[package]]

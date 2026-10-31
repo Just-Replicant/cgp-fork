@@ -7,9 +7,13 @@
 | `crates/main/cgp-fork` | The facade library users depend on (`no_std`). `src/core`, `src/extra`, and the error backends `src/{anyhow,eyre,std_error}` behind features. |
 | `crates/main/cgp-fork/tests` | The behaviour suite, one integration target per CGP concept, plus `tests/ui` (trybuild diagnostics). |
 | `crates/main/cgp-fork/examples` | Runnable programs, built in CI. |
-| `crates/macros/cgp-fork-macro` | Every procedural macro. `src/macro_core` (AST types, parsers, codegen), `src/macro_lib` and `src/extra_macro_lib` (entrypoints), `src/test_util_lib` (the `snapshot_*` macros, feature `snapshot`). |
-| `crates/macros/cgp-fork-macro/src/macro_tests` | Parser unit tests, rejection cases, and the panic fuzzer. |
+| `crates/macros/cgp-fork-macro` | The proc-macro shim: the user-facing macro docs and one `#[proc_macro*]` function per macro, each calling into `cgp-fork-macro-impl`. |
+| `crates/macros/cgp-fork-macro-impl` | The macro implementation as an ordinary library (ADR 0002). `src/macro_core` (AST types, parsers, codegen), `src/macro_lib` and `src/extra_macro_lib` (entrypoints), `src/registry.rs` (the entrypoint list the fuzzers share), `src/test_util_lib` (the `snapshot_*` entrypoints, feature `snapshot`). |
+| `crates/macros/cgp-fork-macro-impl/src/macro_tests` | Parser unit tests, rejection cases, and the panic fuzzer. |
+| `crates/tests/renamed-dep` | Workspace-only crate that imports `cgp-fork` as `cgp` and checks every macro still expands (ADR 0003). `tests/copies_match.rs` checks those copies still match the facade tests. |
+| `crates/tests/preset-consumer` | Workspace-only crate that uses a preset from `renamed-dep` while importing `cgp-fork` under its own name. |
 | `crates/tests/README.md` | The map of the test suite and where a new test belongs. |
+| `docs/rewrite-plan.md`, `docs/adr/`, `docs/baseline/` | The 1.0 rewrite plan, its architecture decision records, and the measured baselines (`bash scripts/baseline.sh`). |
 | `scripts/` | Maintenance scripts (below). |
 
 Deeper documentation (construct reference, macro internals, error catalog) lives in the
@@ -78,7 +82,7 @@ TRYBUILD=overwrite cargo test -p cgp-fork --all-features --test ui_tests
 if one panics. Run a deeper pass, or reproduce a CI failure with its printed seed:
 
 ```sh
-CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=<seed> cargo test --release -p cgp-fork-macro robustness
+CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=<seed> cargo test --release -p cgp-fork-macro-impl robustness
 ```
 
 ## Commits, changelog, and releases
@@ -142,9 +146,10 @@ goes into `UPSTREAM_REVIEWED` with a one-line reason, so it is reported as revie
 pending. The weekly `Upstream sync check` workflow runs `--check` and opens or updates one issue
 when upstream has commits that are neither merged nor reviewed.
 
-Upstream is split into many crates, while the fork has two, so a merge usually needs its paths
-mapped by hand: upstream `crates/*/cgp-*/src` corresponds to a module of `cgp-fork`, and upstream's
-macro crates to `crates/macros/cgp-fork-macro/src/{macro_core,macro_lib,…}`. After merging, update
+Upstream is split into many crates, while the fork has a facade and two macro crates, so a merge
+usually needs its paths mapped by hand: upstream `crates/*/cgp-*/src` corresponds to a module of
+`cgp-fork`, and upstream's macro crates to `crates/macros/cgp-fork-macro-impl/src/{macro_core,macro_lib,…}`
+(the `#[proc_macro*]` functions themselves to `crates/macros/cgp-fork-macro/src/lib.rs`). After merging, update
 `UPSTREAM_COMMIT` and the README line, then run the full check list above.
 
 ## Other scripts
@@ -157,9 +162,9 @@ macro crates to `crates/macros/cgp-fork-macro/src/{macro_core,macro_lib,…}`. A
   budget in `scripts/compile-budget.txt`. Invoke it with `bash` so a checkout that dropped the
   executable bit still runs.
 - `fuzz/` is a cargo-fuzz crate for coverage-guided fuzzing of every macro entrypoint
-  (`cargo +nightly fuzz run entrypoints`). It includes the macro modules by path, so a new
-  module under `crates/macros/cgp-fork-macro/src/` needs no change there, but a new top-level
-  module must also be added to `fuzz/src/lib.rs`. See `fuzz/README.md`.
+  (`cargo +nightly fuzz run entrypoints`). It depends on `cgp-fork-macro-impl` and takes the
+  entrypoint list from its `registry` module, so a new macro is added to `registry.rs` only.
+  See `fuzz/README.md`.
 - `python3 scripts/compile-time-trend.py --history FILE --value SECS [--record --sha SHA]` compares
   a measurement with the median of the last 10 recorded runs and fails when it is more than 1.5×
   that median and more than 2 s above it. In CI the `Compile-time budget` job keeps the series in

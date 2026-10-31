@@ -5,7 +5,10 @@ resolver = "3"
 members = [
     "crates/main/cgp-fork",
     "crates/macros/cgp-fork-macro",
+    "crates/macros/cgp-fork-macro-impl",
     "crates/tests/doctests",
+    "crates/tests/renamed-dep",
+    "crates/tests/preset-consumer",
 ]
 
 [workspace.package]
@@ -22,6 +25,7 @@ categories      = ["rust-patterns", "no-std"]
 [workspace.dependencies]
 cgp-fork       = { version = "0.10.1", path = "./crates/main/cgp-fork" }
 cgp-fork-macro = { version = "0.10.1", path = "./crates/macros/cgp-fork-macro" }
+cgp-fork-macro-impl = { version = "0.10.1", path = "./crates/macros/cgp-fork-macro-impl" }
 
 # A curated subset of `clippy::pedantic`, enforced by CI's `-D warnings`.
 [workspace.lints.clippy]

@@ -51,8 +51,8 @@
 
 ---
 
-**Repository:** https://github.com/Just-Replicant/cgp-fork (HEAD `58c50861`, v0.9.3, last commit 2026-10-10 21:03 Asia/Tehran)
-**Analysed:** 2026-10-27 (Asia/Tehran). The project code was not changed. Experiments ran in throwaway copies of the repository.
+**Repository:** https://github.com/Just-Replicant/cgp-fork (HEAD `58c50861`, v0.9.3, last commit 2026-10-10 17:33 UTC)
+**Analysed:** 2026-10-27. The project code was not changed. Experiments ran in throwaway copies of the repository.
 
 ---
 

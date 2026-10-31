@@ -1,4 +1,4 @@
-use crate::test_util_lib::entrypoints;
+use cgp_fork_macro_impl::test_util_lib::entrypoints;
 
 #[doc(hidden)]
 #[proc_macro]

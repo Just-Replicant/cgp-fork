@@ -4,7 +4,8 @@
 # release-plz assign that single next version to every crate it releases, then
 # rewrite the path-dependency versions in the root `Cargo.toml` to match.
 # The facade owns the root changelog, the `v<version>` tag, and the GitHub release.
-# `cgp-fork-macro` is published in dependency order under that same version.
+# `cgp-fork-macro-impl` and `cgp-fork-macro` are published in dependency order
+# under that same version.
 
 [workspace]
 # Publish whenever the committed version is newer than crates.io (the release
@@ -47,7 +48,7 @@ name = "cgp-fork"
 version_group = "cgp-fork"
 changelog_update = true
 changelog_path = "CHANGELOG.md"
-changelog_include = ["cgp-fork-macro"]
+changelog_include = ["cgp-fork-macro", "cgp-fork-macro-impl"]
 git_release_enable = true
 git_tag_enable = true
 git_tag_name = "v{{ version }}"
@@ -57,7 +58,21 @@ git_release_name = "v{{ version }}"
 name = "cgp-fork-macro"
 version_group = "cgp-fork"
 
+[[package]]
+name = "cgp-fork-macro-impl"
+version_group = "cgp-fork"
+
 # Workspace-only doctest crate (`publish = false`): never versioned or released.
 [[package]]
 name = "cgp-fork-doctests"
+release = false
+
+# Workspace-only check that renamed dependencies work (`publish = false`).
+[[package]]
+name = "cgp-fork-renamed-dep"
+release = false
+
+# Uses a preset from `cgp-fork-renamed-dep` under the default crate name (`publish = false`).
+[[package]]
+name = "cgp-fork-preset-consumer"
 release = false

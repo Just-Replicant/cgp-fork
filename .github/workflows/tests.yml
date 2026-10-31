@@ -320,8 +320,8 @@ jobs:
         run: |
           seed=${{ github.run_id }}
           echo "CGP_FUZZ_SEED=$seed"
-          CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro robustness
-      # The cargo-fuzz crate includes the macro modules by path; check that it
+          CGP_FUZZ_ITERS=20000 CGP_FUZZ_SEED=$seed cargo test --release -p cgp-fork-macro-impl robustness
+      # The cargo-fuzz crate links cgp-fork-macro-impl; check that it
       # still builds (on the pinned stable toolchain) so a refactor cannot
       # silently break the scheduled coverage-guided run below.
       - name: Check the cargo-fuzz crate builds
@@ -348,9 +348,17 @@ jobs:
       - name: Install cargo-fuzz
         run: command -v cargo-fuzz || cargo install --locked "cargo-fuzz@${CARGO_FUZZ_VERSION}"
       - name: Write the seed corpus
-        run: cargo +nightly run --manifest-path fuzz/Cargo.toml --locked --example write_seeds -- fuzz/corpus/entrypoints
-      - name: Fuzz every macro entrypoint for 30 minutes
-        run: cargo +nightly fuzz run entrypoints -- -max_total_time=1800 -rss_limit_mb=4096
+        run: cargo +nightly run --manifest-path fuzz/Cargo.toml --locked --example write_seeds -- fuzz/corpus
+      - name: Fuzz every macro entrypoint for 15 minutes
+        run: cargo +nightly fuzz run entrypoints -- -max_total_time=900 -rss_limit_mb=4096
+      # One target per entrypoint (see fuzz/README.md), 20 seconds each.
+      - name: Fuzz each entrypoint on its own
+        shell: bash
+        run: |
+          for target in $(cargo +nightly fuzz list); do
+            [ "$target" = entrypoints ] && continue
+            cargo +nightly fuzz run "$target" -- -max_total_time=20 -rss_limit_mb=4096
+          done
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
