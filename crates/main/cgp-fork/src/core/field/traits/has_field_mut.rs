@@ -4,6 +4,12 @@ use core::ops::DerefMut;
 use crate::core::field::traits::{FieldGetter, HasField};
 
 /// Mutable access to the value stored under `Tag`.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` does not have a mutable field that this code writes",
+    label = "missing mutable field on `{Self}`",
+    note = "the field name is spelled out in the tag type `{Tag}`: `Symbol<N, Chars<'a', Chars<'b', ..>>>` reads as \"ab..\"",
+    note = "add the field to `{Self}` and derive it with `#[derive(HasField)]` or `#[derive(CgpData)]`"
+)]
 pub trait HasFieldMut<Tag>: HasField<Tag> {
     /// Mutably borrows the value stored under `Tag`.
     fn get_field_mut(&mut self, tag: PhantomData<Tag>) -> &mut Self::Value;

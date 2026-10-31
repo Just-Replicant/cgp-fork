@@ -55,6 +55,12 @@ use crate::core::component::UseContext;
     }
     ```
 */
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` does not have a field that this code reads",
+    label = "missing field on `{Self}`",
+    note = "the field name is spelled out in the tag type `{Tag}`: `Symbol<N, Chars<'a', Chars<'b', ..>>>` reads as \"ab..\"",
+    note = "add the field to `{Self}` and derive it with `#[derive(HasField)]` or `#[derive(CgpData)]`, or wire a getter provider that does not read a field"
+)]
 pub trait HasField<Tag> {
     /// The type stored under `Tag`.
     type Value;

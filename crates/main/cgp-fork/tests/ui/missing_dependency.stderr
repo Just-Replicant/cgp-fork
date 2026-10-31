@@ -1,9 +1,11 @@
-error[E0277]: the trait bound `App: CanUseComponent<GreeterComponent>` is not satisfied
+error[E0277]: `App` cannot use the component `GreeterComponent`
   --> tests/ui/missing_dependency.rs:38:9
    |
 38 |         GreeterComponent,
-   |         ^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |         ^^^^^^^^^^^^^^^^ `App` cannot use `GreeterComponent`
    |
+   = note: `App` must wire `GreeterComponent` to a provider in `delegate_components!`, and that provider's requirements must hold for `App`
+   = note: the notes below name the missing wiring entry or the unmet requirement
 help: the trait `HasField<Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>>` is not implemented for `App`
       but trait `HasField<Symbol<5, Chars<'t', Chars<'i', Chars<'t', Chars<'l', cgp_fork::prelude::Chars<'e', Nil>>>>>>>` is implemented for it
   --> tests/ui/missing_dependency.rs:27:9

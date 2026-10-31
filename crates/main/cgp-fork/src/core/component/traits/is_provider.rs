@@ -166,4 +166,10 @@
    Rust would follow the implementation path and surface all unsatisfied constraints
    from `GetFooValue`.
 */
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a provider of `{Component}` for `{Context}`",
+    label = "`{Self}` does not provide `{Component}` for `{Context}`",
+    note = "either `{Self}` does not implement the provider trait of `{Component}`, or one of the `where` requirements of its impl does not hold for `{Context}`",
+    note = "implement the provider with `#[cgp_impl]` or `#[cgp_provider]`, or wire a different provider for `{Component}`"
+)]
 pub trait IsProviderFor<Component, Context, Params: ?Sized = ()> {}

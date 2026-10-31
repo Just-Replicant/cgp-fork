@@ -13,6 +13,12 @@ use crate::core::component::{DelegateComponent, IsProviderFor};
     a given `Component` through its provider. When there are unsatisfied constraints,
     Rust would show the error messages from the `IsProviderFor` implementation.
 */
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` cannot use the component `{Component}`",
+    label = "`{Self}` cannot use `{Component}`",
+    note = "`{Self}` must wire `{Component}` to a provider in `delegate_components!`, and that provider's requirements must hold for `{Self}`",
+    note = "the notes below name the missing wiring entry or the unmet requirement"
+)]
 pub trait CanUseComponent<Component, Params: ?Sized = ()> {}
 
 impl<Context, Component, Params: ?Sized> CanUseComponent<Component, Params> for Context

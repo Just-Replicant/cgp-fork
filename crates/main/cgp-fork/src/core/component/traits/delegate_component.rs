@@ -58,6 +58,11 @@
    }
    ```
 */
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` has no wiring entry for `{Key}`",
+    label = "`{Key}` is not wired for `{Self}`",
+    note = "add an entry `{Key}: SomeProvider` to the `delegate_components!` table of `{Self}`"
+)]
 pub trait DelegateComponent<Key: ?Sized> {
     /// The provider (or nested table) stored at `Key`.
     type Delegate;
