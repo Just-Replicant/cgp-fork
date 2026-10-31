@@ -3,7 +3,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::spanned::Spanned;
-use syn::{Error, ItemImpl};
+use syn::{Error, ItemImpl, TraitItem};
 
 use crate::extra_macro_core::types::cgp_auto_dispatch::ItemCgpAutoDispatch;
 use crate::extra_macro_lib::handler_fn::lower_handler_fn;
@@ -36,12 +36,17 @@ pub enum ComponentDef {
 impl FamilyIr for ComponentDef {
     const FAMILY: IrFamily = IrFamily::ComponentDef;
 
-    /// The component-name parameter checks of every component variant.
+    /// The component-name parameter checks of every component variant, and for
+    /// `#[derive_provider(WithProvider)]` the check that a getter has a single method.
     fn validate(&self, diagnostics: &mut Diagnostics) {
         match self {
-            ComponentDef::Component(component)
-            | ComponentDef::AbstractType(component)
-            | ComponentDef::WithProvider { component, .. } => component.validate(diagnostics),
+            ComponentDef::Component(component) | ComponentDef::AbstractType(component) => {
+                component.validate(diagnostics);
+            }
+            ComponentDef::WithProvider { component, .. } => {
+                component.validate(diagnostics);
+                validate_with_provider(component, diagnostics);
+            }
             ComponentDef::Function(_) | ComponentDef::AutoDispatch(_) => {}
         }
     }
@@ -96,8 +101,33 @@ impl FamilyIr for ComponentDef {
     }
 }
 
+/// The error for a `#[derive_provider(WithProvider)]` getter with more than one method.
+fn multi_method_getter_error(component: &ItemCgpComponent) -> Error {
+    Error::new(
+        component.item_trait.span(),
+        "`#[derive_provider(WithProvider)]` supports a getter with a single method",
+    )
+}
+
+/// `WithProvider` reads one field, so a getter it derives for may declare one method.
+/// An abstract type (a lone associated type) has no method and is always accepted; a
+/// trait with other kinds of items is left to the getter parser, which names them.
+fn validate_with_provider(component: &ItemCgpComponent, diagnostics: &mut Diagnostics) {
+    let methods = component
+        .item_trait
+        .items
+        .iter()
+        .filter(|item| matches!(item, TraitItem::Fn(_)))
+        .count();
+
+    if methods > 1 {
+        diagnostics.push(multi_method_getter_error(component));
+    }
+}
+
 fn emit_with_provider(item: TokenStream, component: ItemCgpComponent) -> syn::Result<TokenStream> {
-    let trait_span = component.item_trait.span();
+    // Kept for the error below; validation has already rejected a multi-method getter.
+    let multi_method_error = multi_method_getter_error(&component);
     let evaluated = component.preprocess()?.eval()?;
 
     let provider_impls: Vec<ItemImpl> =
@@ -108,12 +138,7 @@ fn emit_with_provider(item: TokenStream, component: ItemCgpComponent) -> syn::Re
             item.to_with_provider_impl()?.to_item_impls()?
         } else {
             let item = ItemCgpGetter::try_from(evaluated)?;
-            let provider = item.to_with_provider_impl()?.ok_or_else(|| {
-                Error::new(
-                    trait_span,
-                    "`#[derive_provider(WithProvider)]` supports a getter with a single method",
-                )
-            })?;
+            let provider = item.to_with_provider_impl()?.ok_or(multi_method_error)?;
             provider.to_item_impls()?
         };
 
