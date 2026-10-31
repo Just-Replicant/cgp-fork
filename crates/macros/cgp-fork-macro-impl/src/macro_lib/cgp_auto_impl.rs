@@ -1,8 +1,9 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 use syn::ItemTrait;
 
-use crate::ir::{IrFamily, Pipeline, parse_body_without_args, run};
+use crate::ir::{
+    Diagnostics, FamilyIr, IrFamily, Pipeline, TraitRewrite, parse_body_without_args, run,
+};
 use crate::macro_core::types::cgp_auto_impl::ItemCgpAutoImpl;
 
 /// `#[cgp_auto_impl]`: a trait with default methods gets a blanket impl.
@@ -10,21 +11,21 @@ pub struct CgpAutoImplMacro;
 
 impl Pipeline for CgpAutoImplMacro {
     const NAME: &'static str = "cgp_auto_impl";
-    const FAMILY: IrFamily = IrFamily::TraitRewrite;
-    type Ir = ItemCgpAutoImpl;
+    const FAMILY: IrFamily = TraitRewrite::FAMILY;
+    type Ir = TraitRewrite;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
         let item_trait: ItemTrait = parse_body_without_args(Self::NAME, attr, body)?;
 
-        ItemCgpAutoImpl::preprocess(&item_trait)
+        ItemCgpAutoImpl::preprocess(&item_trait).map(TraitRewrite::AutoImpl)
+    }
+
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.to_items()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 
