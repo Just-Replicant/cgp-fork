@@ -16,9 +16,10 @@ What changed from the plan as written:
 
 - The crate path is detected from the caller's `Cargo.toml` (plus a `CGP_FORK_CRATE` override)
   instead of a per-call `crate = …` argument, so renamed projects need no source changes and no
-  new dependency was added (see ADR 0003 for the options).
-- `cgp_preset!` presets still assume the preset's users import `cgp-fork` under the same name as
-  the crate that defines the preset.
+  new dependency was added (see ADR 0003 for the options). Normal dependencies win over
+  dev-dependencies, build-dependencies, and target tables whose `cfg` does not match.
+- `cgp_preset!` passes the expanding crate's facade path into `with_components!`, so a preset and
+  its users may import `cgp-fork` under different names.
 
 ## 1. What the project is
 
