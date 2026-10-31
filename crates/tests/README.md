@@ -18,8 +18,10 @@ where the canonical macro-expansion snapshots live.
 **`cgp-fork-macro-impl` `src/macro_tests/`** tests the macro internals directly (the parsers
 and AST types), and is the home for **rejection cases** — inputs CGP
 refuses during expansion — and for pinning the invalid tokens a macro currently
-emits. It also holds the `crate_path` tests (how generated code names the facade) and the
-`registry` tests that keep the fuzz targets in step with the entrypoints.
+emits. It also holds the `crate_path` tests (how generated code names the facade), the
+`registry` tests that keep the fuzz targets in step with the entrypoints, the `ir` tests of the
+shared pipeline driver, and the `diagnostic_attrs` tests of the `on_unimplemented` messages the
+macros generate.
 
 **`crates/tests/renamed-dep`** imports `cgp-fork` under the name `cgp` and compiles copies of
 representative behavior tests with every `cgp_fork` path renamed, so every macro must generate

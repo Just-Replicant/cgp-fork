@@ -8,7 +8,7 @@
 | `crates/main/cgp-fork/tests` | The behaviour suite, one integration target per CGP concept, plus `tests/ui` (trybuild diagnostics). |
 | `crates/main/cgp-fork/examples` | Runnable programs, built in CI. |
 | `crates/macros/cgp-fork-macro` | The proc-macro shim: the user-facing macro docs and one `#[proc_macro*]` function per macro, each calling into `cgp-fork-macro-impl`. |
-| `crates/macros/cgp-fork-macro-impl` | The macro implementation as an ordinary library (ADR 0002). `src/macro_core` (AST types, parsers, codegen), `src/macro_lib` and `src/extra_macro_lib` (entrypoints), `src/registry.rs` (the entrypoint list the fuzzers share), `src/test_util_lib` (the `snapshot_*` entrypoints, feature `snapshot`). |
+| `crates/macros/cgp-fork-macro-impl` | The macro implementation as an ordinary library (ADR 0002). `src/macro_core` (AST types, parsers, codegen), `src/ir` (the `Pipeline` trait every entrypoint implements, ADR 0004), `src/macro_lib` and `src/extra_macro_lib` (entrypoints), `src/registry.rs` (the entrypoint list the fuzzers share, generated from the pipelines), `src/test_util_lib` (the `snapshot_*` entrypoints, feature `snapshot`). |
 | `crates/macros/cgp-fork-macro-impl/src/macro_tests` | Parser unit tests, rejection cases, and the panic fuzzer. |
 | `crates/tests/renamed-dep` | Workspace-only crate that imports `cgp-fork` as `cgp` and checks every macro still expands (ADR 0003). `tests/copies_match.rs` checks those copies still match the facade tests. |
 | `crates/tests/preset-consumer` | Workspace-only crate that uses a preset from `renamed-dep` while importing `cgp-fork` under its own name. |
@@ -69,7 +69,9 @@ cargo insta test -p cgp-fork --all-features --review
 
 ### Diagnostics (`tests/ui`)
 
-Each case must fail to compile with exactly its `.stderr`. Regenerate after an intended change, and
+Each case must fail to compile with exactly its `.stderr`. The first line of every case must read
+without a type-level string such as `Symbol<4, Chars<…>>`: give a trait that users meet in errors
+a `#[diagnostic::on_unimplemented]` message (ADR 0005). Regenerate after an intended change, and
 review the diff:
 
 ```sh
@@ -163,7 +165,8 @@ usually needs its paths mapped by hand: upstream `crates/*/cgp-*/src` correspond
   executable bit still runs.
 - `fuzz/` is a cargo-fuzz crate for coverage-guided fuzzing of every macro entrypoint
   (`cargo +nightly fuzz run entrypoints`). It depends on `cgp-fork-macro-impl` and takes the
-  entrypoint list from its `registry` module, so a new macro is added to `registry.rs` only.
+  entrypoint list from its `registry` module, so a new macro implements `ir::Pipeline` and is added to
+  the list in `registry.rs` only.
   See `fuzz/README.md`.
 - `python3 scripts/compile-time-trend.py --history FILE --value SECS [--record --sha SHA]` compares
   a measurement with the median of the last 10 recorded runs and fails when it is more than 1.5×

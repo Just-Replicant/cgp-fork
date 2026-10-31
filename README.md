@@ -104,7 +104,9 @@ With `default-features = false` the crate needs only `core`.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the build, test, and release workflow, and for how
 upstream changes are merged.
 
-For readable wiring errors, install [`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp) and run `cargo cgp check`.
+Wiring mistakes produce readable compiler errors that name the component to wire or the field a
+getter reads. For a deeper analysis of a failed check, install
+[`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp) and run `cargo cgp check`.
 
 ## Docs
 

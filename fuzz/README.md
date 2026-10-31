@@ -16,7 +16,8 @@ macros.
   Type-level macros take a `type_` prefix (`type_symbol`, `type_product`), so `Product` and
   `product` stay distinct on case-insensitive file systems. `cargo +nightly fuzz list` shows them.
 
-The single-entrypoint targets are generated. After adding a macro to `registry.rs`, run
+The single-entrypoint targets are generated. After adding a macro's `Pipeline` type to
+`registry.rs`, run
 
 ```sh
 cargo run --manifest-path fuzz/Cargo.toml --example write_targets

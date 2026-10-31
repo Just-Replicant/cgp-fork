@@ -6,6 +6,9 @@
    `extra_macro_lib`, or `async_impl`. Everything that parses or generates code lives here, so
    it can be unit-tested, fuzzed with libFuzzer, and reused by tools.
 
+   Every entrypoint implements [`ir::Pipeline`] (`parse → validate → emit`) and is listed in
+   [`registry`]; see `docs/adr/0004-shared-ir-pipeline.md`.
+
    **This crate is an implementation detail of `cgp-fork`.** Its API has no stability guarantee
    and may change in any release. Depend on `cgp-fork` instead.
 
