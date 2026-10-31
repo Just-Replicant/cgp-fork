@@ -1,8 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 use syn::ItemTrait;
 
-use crate::ir::{IrFamily, Pipeline, parse_body_without_args, run};
+use crate::ir::{Diagnostics, FamilyIr, Getter, IrFamily, Pipeline, parse_body_without_args, run};
 use crate::macro_core::types::cgp_auto_getter::ItemCgpAutoGetter;
 
 /// `#[cgp_auto_getter]`: a getter trait implemented for every context with the fields.
@@ -10,21 +9,21 @@ pub struct CgpAutoGetterMacro;
 
 impl Pipeline for CgpAutoGetterMacro {
     const NAME: &'static str = "cgp_auto_getter";
-    const FAMILY: IrFamily = IrFamily::Getter;
-    type Ir = ItemCgpAutoGetter;
+    const FAMILY: IrFamily = Getter::FAMILY;
+    type Ir = Getter;
 
     fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
         let item_trait: ItemTrait = parse_body_without_args(Self::NAME, attr, body)?;
 
-        ItemCgpAutoGetter::preprocess(&item_trait)
+        ItemCgpAutoGetter::preprocess(&item_trait).map(Getter::Auto)
+    }
+
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.to_items()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 
