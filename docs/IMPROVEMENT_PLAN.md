@@ -23,7 +23,7 @@ All 14 items are implemented on branch `fixes-0.10.1` and released as **0.10.1**
 | I-6 | Done | `634d36c4` | |
 | I-7 | Done | `b560b92e` | The first two runs on `main` only record; the trend check starts with the third. |
 | I-8 | Partial | `d2c825a3` | 45 of 56 macro-crate examples compile, in `cgp-fork-doctests`. The other 11 (6 grammar sketches with `...`, 5 illustrative expansions) opt out with a stated reason. They stay `rust,ignore` in the macro crate itself, because a proc-macro crate cannot depend on its facade. |
-| I-9 | Partial | `ccff5f8d` (found and fixed: `4113e01b`) | One libFuzzer target over every entrypoint, which includes the macro modules by `#[path]`, plus a weekly CI run. Not done: the internal parser crate split, one target per entrypoint, and the one-hour run per target. See `fuzz/README.md`. |
+| I-9 | Partial | `ccff5f8d` (found and fixed: `4113e01b`) | The parser crate is split and there is one cargo-fuzz target per entrypoint (`fuzz/README.md`). The one-hour run per target is deferred on purpose: the weekly job (15 minutes on `entrypoints`, 20 seconds each after that) is the standing check, and a short smoke run is not evidence the parsers are clean. |
 
 Nightly cargo also prints a warning that `homepage` duplicates `repository`
 (`redundant_homepage`). It is cosmetic and left for a later release.
@@ -43,7 +43,7 @@ Nightly cargo also prints a warning that `homepage` duplicates `repository`
 11. [x] I-6 Drop syn `extra-traits` from normal builds
 12. [x] I-7 Track compile time over time
 13. [~] I-8 Give macro-crate docs compiled examples (45/56; the rest opt out with a reason)
-14. [~] I-9 Coverage-guided fuzzing with `cargo-fuzz` (one target; no crate split yet)
+14. [~] I-9 Coverage-guided fuzzing with `cargo-fuzz` (per-entrypoint targets exist; the one-hour run per target is deferred)
 
 Do F-1 to F-2 before the next release. Ship F-1 as **0.10.1**, the first release that waits for CI.
 
