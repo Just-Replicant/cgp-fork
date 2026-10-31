@@ -10,7 +10,8 @@
 | `crates/macros/cgp-fork-macro` | The proc-macro shim: the user-facing macro docs and one `#[proc_macro*]` function per macro, each calling into `cgp-fork-macro-impl`. |
 | `crates/macros/cgp-fork-macro-impl` | The macro implementation as an ordinary library (ADR 0002). `src/macro_core` (AST types, parsers, codegen), `src/macro_lib` and `src/extra_macro_lib` (entrypoints), `src/registry.rs` (the entrypoint list the fuzzers share), `src/test_util_lib` (the `snapshot_*` entrypoints, feature `snapshot`). |
 | `crates/macros/cgp-fork-macro-impl/src/macro_tests` | Parser unit tests, rejection cases, and the panic fuzzer. |
-| `crates/tests/renamed-dep` | Workspace-only crate that imports `cgp-fork` as `cgp` and checks every macro still expands (ADR 0003). |
+| `crates/tests/renamed-dep` | Workspace-only crate that imports `cgp-fork` as `cgp` and checks every macro still expands (ADR 0003). `tests/copies_match.rs` checks those copies still match the facade tests. |
+| `crates/tests/preset-consumer` | Workspace-only crate that uses a preset from `renamed-dep` while importing `cgp-fork` under its own name. |
 | `crates/tests/README.md` | The map of the test suite and where a new test belongs. |
 | `docs/rewrite-plan.md`, `docs/adr/`, `docs/baseline/` | The 1.0 rewrite plan, its architecture decision records, and the measured baselines (`bash scripts/baseline.sh`). |
 | `scripts/` | Maintenance scripts (below). |
