@@ -71,3 +71,8 @@ release = false
 [[package]]
 name = "cgp-fork-renamed-dep"
 release = false
+
+# Uses a preset from `cgp-fork-renamed-dep` under the default crate name (`publish = false`).
+[[package]]
+name = "cgp-fork-preset-consumer"
+release = false
