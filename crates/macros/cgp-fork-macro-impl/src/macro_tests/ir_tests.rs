@@ -268,7 +268,7 @@ fn deep_groups_are_rejected_before_parsing() {
 #[test]
 fn long_reference_chains_are_rejected_before_parsing() {
     // Found by the second fuzz round: `&&&&…T` also recurses in `syn`.
-    for chain in ["&&", "&'a mut ", "*const ", "!"] {
+    for chain in ["&&", "&'a mut ", "*const ", "!", "||", "|| v "] {
         let source = format!(
             "pub trait HasN {{ fn n(&self) -> {}u8; }}",
             chain.repeat(3_000)
