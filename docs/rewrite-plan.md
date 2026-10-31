@@ -9,8 +9,8 @@ Every claim below cites a file in that checkout. Effort figures are estimates.
 |---|---|---|
 | 0 Decide and baseline | Done; the hard-fork decision is waiting for the maintainer | [ADR 0001](adr/0001-hard-fork.md) is *Proposed* (hybrid now, hard fork before phase 3); nothing upstream-related was removed. Baseline in [docs/baseline/2026-10-30.md](baseline/2026-10-30.md), `scripts/baseline.sh`. |
 | 1 Internals split | Done, except the shared IR (moved to phase 1b) | `cgp-fork-macro-impl` crate ([ADR 0002](adr/0002-macro-impl-crate.md)); crate-path resolution ([ADR 0003](adr/0003-crate-path-resolution.md)); `crates/tests/renamed-dep`; 38 per-entrypoint fuzz targets. Snapshots unchanged; 867 tests pass ([after phase 1](baseline/2026-10-30-after-phase-1.md)). |
-| 1b Shared IR | Done: every entrypoint runs one pipeline; merging the AST types inside each family is left | All 38 entrypoints implement `ir::Pipeline` (`parse → validate → emit`, errors combined), one entrypoint per commit with every snapshot unchanged ([ADR 0004](adr/0004-shared-ir-pipeline.md)). Each IR is still the entrypoint's own typed input, grouped by `IrFamily`; the registry is generated from the pipelines. |
-| 2 Diagnostics | Done | `#[diagnostic::on_unimplemented]` on `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField`, `HasFieldMut` and on the consumer, provider and auto-getter traits the macros generate ([ADR 0005](adr/0005-diagnostics.md)). Every `tests/ui` case starts without a type-level string; three new cases. 895 tests pass ([after phase 2](baseline/2026-10-31-after-phase-2.md)). |
+| 1b Shared IR | Done | All 38 entrypoints implement `ir::Pipeline` (parse only) into one of seven shared family IR types (the six of §7.1 plus `TraitRewrite`), which implement `ir::FamilyIr` (`validate → emit`, errors combined). Ported one entrypoint, then one family, per commit with every snapshot unchanged ([ADR 0004](adr/0004-shared-ir-pipeline.md)); the registry is generated from the pipelines and its families from the IR types. Open: JSON wiring metadata, moving the last checks out of `emit`. |
+| 2 Diagnostics | Done | `#[diagnostic::do_not_recommend]` on generated `DelegateComponent` impls trims the lower error lines; what stable Rust cannot fix is listed in ADR 0005. `#[diagnostic::on_unimplemented]` on `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField`, `HasFieldMut` and on the consumer, provider and auto-getter traits the macros generate ([ADR 0005](adr/0005-diagnostics.md)). Every `tests/ui` case starts without a type-level string; three new cases. 895 tests pass ([after phase 2](baseline/2026-10-31-after-phase-2.md)). |
 | 3 to 6 | Not started | |
 
 What changed from the plan as written:
@@ -21,11 +21,11 @@ What changed from the plan as written:
   dev-dependencies, build-dependencies, and target tables whose `cfg` does not match.
 - `cgp_preset!` passes the expanding crate's facade path into `with_components!`, so a preset and
   its users may import `cgp-fork` under different names.
-- Phase 1b put every entrypoint on one `parse → validate → emit` pipeline but kept each
-  entrypoint's own typed input as its IR, grouped by `IrFamily`, instead of rewriting the ≈40 AST
-  types into six shared structs in one step; that merge can now proceed one family at a time with
-  snapshot parity (ADR 0004). A seventh family, `TraitRewrite`, covers `async_trait`,
-  `blanket_trait`, `cgp_auto_impl` and `cgp_auto_log`.
+- Phase 1b was done in two steps: first every entrypoint on one `parse → validate → emit`
+  pipeline with its own input as IR, then the inputs merged into shared family IR enums one
+  family per commit, each with snapshot parity (ADR 0004). A seventh family, `TraitRewrite`,
+  covers `async_trait`, `blanket_trait`, `cgp_auto_impl` and `cgp_auto_log`, which rewrite a user
+  trait and define no component or provider.
 - Phase 2's provider-trait message covers both things its `Self` can be, a context or wiring table
   without an entry and a provider without an impl, because rustc reports a method call on an
   unwired context through the provider trait (ADR 0005). Per-symbol readable aliases (§7.2) were
@@ -233,7 +233,7 @@ the prerequisite listed in `IMPROVEMENT_PLAN.md` I-9 for per-entrypoint fuzzing.
 |---|---|---|---|
 | 0 Decide & baseline (**done**, decision pending) | 1 | hard-fork decision, ADRs, baseline metrics | 824 tests green; compile bench baseline recorded |
 | 1 Internals split (**done**, IR moved to 1b) | 3 | `macro-impl` crate, IR, crate-path override | all existing tests + snapshots unchanged; renamed-dep test passes; per-entrypoint fuzz targets |
-| 1b Shared IR (**done**: one pipeline; per-family IR types left) | 3 | one IR for every entrypoint | snapshots unchanged after each ported entrypoint |
+| 1b Shared IR (**done**) | 3 | one IR for every entrypoint | snapshots unchanged after each ported entrypoint |
 | 2 Diagnostics (**done**) | 2 | `on_unimplemented` everywhere, new UI tests | every `tests/ui` case reads without type-level strings in the first line |
 | 3 Handler/data unification | 4 | `Handler`/`AsyncHandler`, mode-generic extractors/dispatch, compat aliases | old tests pass via `compat-0.10`; new tests ported |
 | 4 Async/run/runtime | 2 | `#[cgp_async]`, tokio/smol adapters | async tests on 3 OS |

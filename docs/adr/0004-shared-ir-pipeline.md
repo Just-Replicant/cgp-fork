@@ -50,7 +50,40 @@ structs in the same step would touch most of the 25k-line crate at once, and cou
   `registry_tests` pin the 38 names and check every family is used.
 - Error output changes only when an input has several errors: more of them are reported, and the
   first one is the one reported before.
-- Left for later: merging the per-entrypoint AST types inside a family into shared IR structs,
-  moving the remaining checks that still run during `emit` into `validate`, and the JSON wiring
+- Left for later: moving the remaining checks that still run during `emit` into `validate`, and the JSON wiring
   metadata of §7.1. The `Pipeline` boundary is where that work plugs in; each step can again be
   done one family at a time with snapshot parity.
+
+## Update: the shared family IR (phase 1b, second part)
+
+The per-entrypoint inputs are now merged into one IR type per family, one family per commit, with
+every expansion snapshot unchanged after each commit (`crates/main` had no diff across the eight
+commits).
+
+- `ir::FamilyIr` holds `FAMILY`, `validate` and `emit`; `Pipeline` keeps only `NAME`, `Ir` and
+  `parse`. An entrypoint is therefore a parser into its family's IR, and the registry reads the
+  family from `<P::Ir as FamilyIr>::FAMILY`, so an entrypoint cannot claim one family and emit
+  another. `registry_tests::entrypoints_parse_into_their_documented_family` pins the mapping.
+- The seven types (in `src/ir/`), each an enum over the shapes its entrypoints produce:
+
+  | Family | Variants | Entrypoints |
+  | --- | --- | --- |
+  | `ComponentDef` | `Component`, `AbstractType`, `WithProvider`, `Function`, `AutoDispatch` | `cgp_component`, `cgp_type`, `cgp_provider`/`derive_provider` paths, `cgp_fn`, `cgp_auto_dispatch`, … |
+  | `Getter` | `Component`, `AbstractType`, `Auto` | `cgp_getter`, `cgp_auto_getter` |
+  | `ProviderImpl` | `Impl`, `Provider`, `Computer`, `Producer`, `AutoError` | `cgp_impl`, `cgp_provider`, `cgp_new_provider`, `cgp_computer`, `cgp_producer`, … |
+  | `WiringTable` | `Delegate`, `DelegateAndCheck`, `Check`, `ForEach`, `Preset` | `delegate_components!`, `check_components!`, `cgp_preset!`, … |
+  | `Namespace` | `Table`, `Path` | `cgp_namespace!`, namespace paths |
+  | `DataShape` | `Record`, `Variants`, `Symbol`, `ProductType`, `ProductExpr`, `Sum`, `Struct`, `Enum` | the field/record/variant derives, `Symbol!`, `Product!`, `Sum!`, … |
+  | `TraitRewrite` | `AsyncTrait`, `Passthrough`, `Blanket`, `AutoImpl`, `AutoLog` | `async_trait`, `blanket_trait`, `cgp_auto_impl`, `cgp_auto_log` |
+
+- `CgpData` is not a separate shape: it is `Record`/`Variants` with the `All` derive selector.
+- **`TraitRewrite` is kept as a seventh family.** Its macros take a user trait and rewrite it in
+  place (desugar `async fn`, add a blanket impl, add an auto impl or logging). They define no
+  component, no provider, no wiring and no data shape, so folding them into `ComponentDef` would
+  give that family variants that share none of its validation or emission and would make
+  "a `ComponentDef` defines a component" false. A separate family costs one small enum.
+- Large variants are boxed (`clippy::large_enum_variant`); the box is behind the parse step only.
+- Families whose inputs are fully checked by their grammar (`ProviderImpl`, `DataShape`,
+  `TraitRewrite`) have an empty `validate`; it is the place for semantic checks moved out of
+  `emit` later.
+- The JSON wiring metadata of §7.1 and moving the checks still inside `emit` remain open.

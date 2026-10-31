@@ -23,9 +23,13 @@
   `#[cgp_auto_getter]` trait names the fields it reads. A message you write on a component's
   consumer trait is kept and is no longer copied onto the generated provider trait.
   Generated code gains these attributes and is otherwise unchanged.
+- *(diagnostics)* a missing `delegate_components!` entry no longer lists unrelated wiring tables
+  as "other types that implement `DelegateComponent<Key>`": generated `DelegateComponent` impls
+  carry `#[diagnostic::do_not_recommend]` (stable since Rust 1.85; MSRV unchanged).
 - *(macro)* every macro entrypoint runs one `parse → validate → emit` pipeline. An input with
   several mistakes now reports more of them at once (for example every undeclared parameter in a
-  component's `name:`), with the same first error as before.
+  component's `name:`), with the same first error as before. Internally each entrypoint parses
+  into one of seven shared IR families; generated code is unchanged.
 - *(macro)* the parsers and code generators moved into a new crate, `cgp-fork-macro-impl`, an
   internal dependency of `cgp-fork-macro` with no stability guarantee. Users still depend only on
   `cgp-fork`; macro names and output are unchanged.
