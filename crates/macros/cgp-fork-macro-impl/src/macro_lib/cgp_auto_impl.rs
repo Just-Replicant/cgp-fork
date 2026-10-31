@@ -1,24 +1,34 @@
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Error, ItemTrait};
+use syn::ItemTrait;
 
+use crate::ir::{IrFamily, Pipeline, parse_body_without_args, run};
 use crate::macro_core::types::cgp_auto_impl::ItemCgpAutoImpl;
 
-pub fn cgp_auto_impl(attr: TokenStream, body: TokenStream) -> syn::Result<TokenStream> {
-    if !attr.is_empty() {
-        return Err(Error::new(
-            Span::call_site(),
-            "#[cgp_auto_impl] does not accept any attribute argument",
-        ));
+/// `#[cgp_auto_impl]`: a trait with default methods gets a blanket impl.
+pub struct CgpAutoImplMacro;
+
+impl Pipeline for CgpAutoImplMacro {
+    const NAME: &'static str = "cgp_auto_impl";
+    const FAMILY: IrFamily = IrFamily::TraitRewrite;
+    type Ir = ItemCgpAutoImpl;
+
+    fn parse(attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
+        let item_trait: ItemTrait = parse_body_without_args(Self::NAME, attr, body)?;
+
+        ItemCgpAutoImpl::preprocess(&item_trait)
     }
 
-    let item_trait: ItemTrait = syn::parse2(body)?;
+    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
+        let items = ir.to_items()?;
 
-    let item_cgp_auto_impl = ItemCgpAutoImpl::preprocess(&item_trait)?;
+        Ok(quote! {
+            #( #items )*
+        })
+    }
+}
 
-    let items = item_cgp_auto_impl.to_items()?;
-
-    Ok(quote! {
-        #( #items )*
-    })
+/// `cgp_auto_impl` entry point.
+pub fn cgp_auto_impl(attr: TokenStream, body: TokenStream) -> syn::Result<TokenStream> {
+    run::<CgpAutoImplMacro>(attr, body)
 }
