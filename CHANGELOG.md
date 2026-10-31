@@ -8,7 +8,10 @@
   (`cgp = { package = "cgp-fork" }`). Generated code used to name `::cgp_fork` and failed with
   `E0433`; it now uses the name the caller's `Cargo.toml` imports `cgp-fork` under, including
   through `workspace = true`. `CGP_FORK_CRATE` overrides the detection for non-Cargo builds.
-  Expansion is unchanged for crates that use the default name.
+  Expansion is unchanged for crates that use the default name. A `[dependencies]` entry wins over
+  a dev-dependency, a build-dependency, and a target-specific table whose `cfg` does not match;
+  a keyword rename such as `type` is emitted as `r#type`. A preset used from another crate follows
+  that crate's name for the facade.
 
 ### Changed
 
