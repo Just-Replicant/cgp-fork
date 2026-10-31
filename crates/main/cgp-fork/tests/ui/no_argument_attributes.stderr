@@ -1,0 +1,23 @@
+error: #[cgp_auto_getter] does not accept any attribute argument
+ --> tests/ui/no_argument_attributes.rs:4:19
+  |
+4 | #[cgp_auto_getter(Name)]
+  |                   ^^^^
+
+error: #[cgp_auto_impl] does not accept any attribute argument
+ --> tests/ui/no_argument_attributes.rs:9:17
+  |
+9 | #[cgp_auto_impl(Blanket)]
+  |                 ^^^^^^^
+
+error: #[cgp_auto_log] does not accept any attribute argument
+  --> tests/ui/no_argument_attributes.rs:14:16
+   |
+14 | #[cgp_auto_log(Level)]
+   |                ^^^^^
+
+error: #[cgp_auto_error] does not accept any attribute argument
+  --> tests/ui/no_argument_attributes.rs:21:18
+   |
+21 | #[cgp_auto_error(Backend)]
+   |                  ^^^^^^^

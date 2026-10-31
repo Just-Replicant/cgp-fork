@@ -1,6 +1,6 @@
 //! The [`Pipeline`] trait and its driver.
 
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 use syn::Error;
 use syn::parse::Parse;
 
@@ -42,16 +42,17 @@ pub fn run<P: Pipeline>(attr: TokenStream, body: TokenStream) -> syn::Result<Tok
 /// Parses `body` as `T` for an attribute macro that takes no arguments.
 ///
 /// When `attr` is not empty the error says `#[name] does not accept any attribute
-/// argument`. If the body fails to parse as well, both errors are reported, the argument
-/// error first.
+/// argument`, spanned on the argument tokens (as `#[async_trait]` does) so the compiler
+/// underlines what to remove rather than the whole item. If the body fails to parse as
+/// well, both errors are reported, the argument error first.
 pub fn parse_body_without_args<T: Parse>(
     name: &str,
     attr: TokenStream,
     body: TokenStream,
 ) -> syn::Result<T> {
     let attr_error = (!attr.is_empty()).then(|| {
-        Error::new(
-            Span::call_site(),
+        Error::new_spanned(
+            &attr,
             format!("#[{name}] does not accept any attribute argument"),
         )
     });
