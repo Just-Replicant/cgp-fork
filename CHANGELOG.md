@@ -4,6 +4,22 @@
 
 ### Fixed
 
+- *(macro)* attribute errors in wiring tables are all reported at once. `delegate_components!`,
+  `cgp_namespace!`, `cgp_preset!` and `delegate_and_check_components!` report every illegal
+  attribute on the table and its keys (every attribute on a node, every node in the table)
+  instead of stopping at the first. `cgp_preset!` and `delegate_and_check_components!` now check
+  attributes in the validate stage instead of while generating code;
+  `delegate_and_check_components!` still accepts `#[check_trait]` on the table and
+  `#[check_params]`/`#[skip_check]` on a checked key, and now also rejects attributes on the keys
+  of a nested inner table, which it used to drop silently. `Struct!` and `Enum!` report every
+  attribute on a field or variant.
+- *(macro)* `#[derive_provider(WithProvider)]` rejects a getter with more than one method in the
+  validate stage, together with any other validation error of the component.
+- *(macro)* `#[cgp_auto_getter]`, `#[cgp_auto_impl]`, `#[cgp_auto_error]` and `#[cgp_auto_log]`
+  point "does not accept any attribute argument" at the argument instead of the call site, like
+  `#[async_trait]`.
+- *(macro)* `Symbol!("…")` rejects a string longer than 255 characters, the cap identifiers already
+  had; the string becomes the same per-character `Chars<…>` nest.
 - *(macro)* deeply nested input no longer crashes the compiler. `syn` parses nested generics,
   brackets, reference chains (`&&&&T`) and closures recursively, and a few hundred levels
   overflowed the stack, so rustc stopped with `SIGSEGV`. Every macro now rejects input nested more
