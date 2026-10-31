@@ -1,8 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{ItemStruct, parse2};
+use syn::parse2;
 
-use crate::ir::{IrFamily, Pipeline, run};
+use crate::ir::{DataShape, Diagnostics, FamilyIr, IrFamily, Pipeline, RecordDerive, run};
 use crate::macro_core::types::cgp_data::ItemCgpRecord;
 
 /// `#[derive(BuildField)]`: the builder of a struct.
@@ -10,21 +9,20 @@ pub struct DeriveBuildFieldMacro;
 
 impl Pipeline for DeriveBuildFieldMacro {
     const NAME: &'static str = "derive_build_field";
-    const FAMILY: IrFamily = IrFamily::DataShape;
-    type Ir = ItemCgpRecord;
+    const FAMILY: IrFamily = DataShape::FAMILY;
+    type Ir = DataShape;
 
     fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
-        let item_struct: ItemStruct = parse2(body)?;
+        parse2::<ItemCgpRecord>(body)
+            .map(|record| DataShape::Record(record, RecordDerive::BuildField))
+    }
 
-        Ok(ItemCgpRecord { item_struct })
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.to_build_field_items()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 

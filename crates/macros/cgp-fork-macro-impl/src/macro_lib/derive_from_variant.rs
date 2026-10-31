@@ -1,8 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{ItemEnum, parse2};
+use syn::parse2;
 
-use crate::ir::{IrFamily, Pipeline, run};
+use crate::ir::{DataShape, Diagnostics, FamilyIr, IrFamily, Pipeline, VariantDerive, run};
 use crate::macro_core::types::cgp_data::ItemCgpVariant;
 
 /// `#[derive(FromVariant)]`: one `FromVariant` impl per enum variant.
@@ -10,21 +9,20 @@ pub struct DeriveFromVariantMacro;
 
 impl Pipeline for DeriveFromVariantMacro {
     const NAME: &'static str = "derive_from_variant";
-    const FAMILY: IrFamily = IrFamily::DataShape;
-    type Ir = ItemCgpVariant;
+    const FAMILY: IrFamily = DataShape::FAMILY;
+    type Ir = DataShape;
 
     fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
-        let item_enum: ItemEnum = parse2(body)?;
+        parse2::<ItemCgpVariant>(body)
+            .map(|variant| DataShape::Variants(variant, VariantDerive::FromVariant))
+    }
 
-        Ok(ItemCgpVariant { item_enum })
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.to_from_variant_impls()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 

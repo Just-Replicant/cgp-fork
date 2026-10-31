@@ -1,24 +1,26 @@
 use proc_macro2::TokenStream;
-use quote::ToTokens;
 use syn::parse2;
 
-use crate::ir::{IrFamily, Pipeline, run};
-use crate::macro_core::types::field::Symbol;
+use crate::ir::{DataShape, Diagnostics, FamilyIr, IrFamily, Pipeline, run};
 
 /// `Symbol!`: a type-level string.
 pub struct SymbolMacro;
 
 impl Pipeline for SymbolMacro {
     const NAME: &'static str = "Symbol";
-    const FAMILY: IrFamily = IrFamily::DataShape;
-    type Ir = Symbol;
+    const FAMILY: IrFamily = DataShape::FAMILY;
+    type Ir = DataShape;
 
     fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
-        parse2(body)
+        parse2(body).map(DataShape::Symbol)
+    }
+
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        Ok(ir.to_token_stream())
+        ir.emit()
     }
 }
 

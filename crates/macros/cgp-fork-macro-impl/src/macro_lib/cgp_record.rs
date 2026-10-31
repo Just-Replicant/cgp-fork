@@ -1,28 +1,27 @@
 use proc_macro2::TokenStream;
-use quote::quote;
 use syn::parse2;
 
-use crate::ir::{IrFamily, Pipeline, run};
+use crate::ir::{DataShape, Diagnostics, FamilyIr, IrFamily, Pipeline, RecordDerive, run};
 use crate::macro_core::types::cgp_data::ItemCgpRecord;
 
-/// `#[derive(CgpRecord)]`.
+/// `#[derive(CgpRecord)]`: everything a record supports.
 pub struct DeriveCgpRecordMacro;
 
 impl Pipeline for DeriveCgpRecordMacro {
     const NAME: &'static str = "derive_cgp_record";
-    const FAMILY: IrFamily = IrFamily::DataShape;
-    type Ir = ItemCgpRecord;
+    const FAMILY: IrFamily = DataShape::FAMILY;
+    type Ir = DataShape;
 
     fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
-        parse2(body)
+        parse2::<ItemCgpRecord>(body).map(|record| DataShape::Record(record, RecordDerive::All))
+    }
+
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.to_items()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 

@@ -1,8 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{ItemEnum, parse2};
+use syn::parse2;
 
-use crate::ir::{IrFamily, Pipeline, run};
+use crate::ir::{DataShape, Diagnostics, FamilyIr, IrFamily, Pipeline, VariantDerive, run};
 use crate::macro_core::types::cgp_data::ItemCgpVariant;
 
 /// `#[derive(ExtractField)]`: the extractor of an enum.
@@ -10,21 +9,20 @@ pub struct DeriveExtractFieldMacro;
 
 impl Pipeline for DeriveExtractFieldMacro {
     const NAME: &'static str = "derive_extract_field";
-    const FAMILY: IrFamily = IrFamily::DataShape;
-    type Ir = ItemCgpVariant;
+    const FAMILY: IrFamily = DataShape::FAMILY;
+    type Ir = DataShape;
 
     fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
-        let item_enum: ItemEnum = parse2(body)?;
+        parse2::<ItemCgpVariant>(body)
+            .map(|variant| DataShape::Variants(variant, VariantDerive::ExtractField))
+    }
 
-        Ok(ItemCgpVariant { item_enum })
+    fn validate(ir: &Self::Ir, diagnostics: &mut Diagnostics) {
+        ir.validate(diagnostics);
     }
 
     fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
-        let items = ir.to_extract_field_items()?;
-
-        Ok(quote! {
-            #( #items )*
-        })
+        ir.emit()
     }
 }
 
