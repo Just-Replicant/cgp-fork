@@ -8,70 +8,80 @@
 
 use proc_macro2::TokenStream;
 
-/// A macro entrypoint by name, as an `(attr, body)` function.
-pub type Entrypoint = (
-    &'static str,
-    fn(TokenStream, TokenStream) -> syn::Result<TokenStream>,
-);
+use crate::ir::{IrFamily, Pipeline, run};
 
-macro_rules! body_only {
-    ($path:path) => {{
-        fn call(_attr: TokenStream, body: TokenStream) -> syn::Result<TokenStream> {
-            $path(body)
-        }
-        call as fn(TokenStream, TokenStream) -> syn::Result<TokenStream>
-    }};
+/// A macro expansion function over `(attr, body)` token streams.
+pub type EntrypointFn = fn(TokenStream, TokenStream) -> syn::Result<TokenStream>;
+
+/// A macro entrypoint by name, as an `(attr, body)` function.
+pub type Entrypoint = (&'static str, EntrypointFn);
+
+/// Lists pipelines as `(name, family, run::<P>)` triples, taking each name from
+/// [`Pipeline::NAME`] so the registry cannot drift from the pipelines.
+macro_rules! pipelines {
+    ($($pipeline:ty),* $(,)?) => {
+        vec![$(
+            (
+                <$pipeline as Pipeline>::NAME,
+                <$pipeline as Pipeline>::FAMILY,
+                run::<$pipeline> as EntrypointFn,
+            ),
+        )*]
+    };
 }
 
-/// Every macro entrypoint, as `(attr, body)` functions.
-pub fn entrypoints() -> Vec<Entrypoint> {
-    use crate::{extra_macro_lib as extra, macro_lib as lib};
-    vec![
-        ("async_trait", crate::async_impl::impl_async),
-        ("blanket_trait", lib::blanket_trait),
-        ("cgp_auto_error", lib::cgp_auto_error),
-        ("cgp_auto_getter", lib::cgp_auto_getter),
-        ("cgp_auto_impl", lib::cgp_auto_impl),
-        ("cgp_component", lib::cgp_component),
-        ("cgp_fn", lib::cgp_fn),
-        ("cgp_getter", lib::cgp_getter),
-        ("cgp_impl", lib::cgp_impl),
-        ("cgp_new_provider", lib::cgp_new_provider),
-        ("cgp_provider", lib::cgp_provider),
-        ("cgp_type", lib::cgp_type),
-        ("derive_provider", lib::derive_provider),
-        ("cgp_computer", extra::cgp_computer),
-        ("cgp_producer", extra::cgp_producer),
-        ("cgp_auto_dispatch", extra::cgp_auto_dispatch),
-        ("cgp_auto_log", extra::cgp_auto_log),
-        ("delegate_components", body_only!(lib::delegate_components)),
-        (
-            "delegate_and_check_components",
-            body_only!(lib::delegate_and_check_components),
-        ),
-        ("check_components", body_only!(lib::check_components)),
-        ("cgp_for_each", body_only!(lib::cgp_for_each)),
-        ("cgp_preset", body_only!(lib::cgp_preset)),
-        ("cgp_namespace", body_only!(lib::cgp_namespace)),
-        ("Symbol", body_only!(lib::Symbol)),
-        ("Path", body_only!(lib::Path)),
-        ("Product", body_only!(lib::Product)),
-        ("product", body_only!(lib::product)),
-        ("Sum", body_only!(lib::Sum)),
-        ("Struct", body_only!(lib::Struct)),
-        ("Enum", body_only!(lib::Enum)),
-        ("derive_has_field", body_only!(lib::derive_has_field)),
-        ("derive_has_fields", body_only!(lib::derive_has_fields)),
-        ("derive_build_field", body_only!(lib::derive_build_field)),
-        (
-            "derive_extract_field",
-            body_only!(lib::derive_extract_field),
-        ),
-        ("derive_from_variant", body_only!(lib::derive_from_variant)),
-        ("derive_cgp_data", body_only!(lib::derive_cgp_data)),
-        ("derive_cgp_record", body_only!(lib::derive_cgp_record)),
-        ("derive_cgp_variant", body_only!(lib::derive_cgp_variant)),
+/// Every macro entrypoint with its IR family, in registry order.
+pub fn pipelines() -> Vec<(&'static str, IrFamily, EntrypointFn)> {
+    use crate::{async_impl as asy, extra_macro_lib as extra, macro_lib as lib};
+    pipelines![
+        asy::AsyncTraitMacro,
+        lib::BlanketTraitMacro,
+        lib::CgpAutoErrorMacro,
+        lib::CgpAutoGetterMacro,
+        lib::CgpAutoImplMacro,
+        lib::CgpComponentMacro,
+        lib::CgpFnMacro,
+        lib::CgpGetterMacro,
+        lib::CgpImplMacro,
+        lib::CgpNewProviderMacro,
+        lib::CgpProviderMacro,
+        lib::CgpTypeMacro,
+        lib::DeriveProviderMacro,
+        extra::CgpComputerMacro,
+        extra::CgpProducerMacro,
+        extra::CgpAutoDispatchMacro,
+        extra::CgpAutoLogMacro,
+        lib::DelegateComponentsMacro,
+        lib::DelegateAndCheckComponentsMacro,
+        lib::CheckComponentsMacro,
+        lib::CgpForEachMacro,
+        lib::CgpPresetMacro,
+        lib::CgpNamespaceMacro,
+        lib::SymbolMacro,
+        lib::PathMacro,
+        lib::ProductTypeMacro,
+        lib::ProductExprMacro,
+        lib::SumTypeMacro,
+        lib::StructTypeMacro,
+        lib::EnumTypeMacro,
+        lib::DeriveHasFieldMacro,
+        lib::DeriveHasFieldsMacro,
+        lib::DeriveBuildFieldMacro,
+        lib::DeriveExtractFieldMacro,
+        lib::DeriveFromVariantMacro,
+        lib::DeriveCgpDataMacro,
+        lib::DeriveCgpRecordMacro,
+        lib::DeriveCgpVariantMacro,
     ]
+}
+
+/// Every macro entrypoint, as `(attr, body)` functions. Function-like and derive
+/// macros ignore `attr`.
+pub fn entrypoints() -> Vec<Entrypoint> {
+    pipelines()
+        .into_iter()
+        .map(|(name, _family, entrypoint)| (name, entrypoint))
+        .collect()
 }
 
 /// Valid (or nearly valid) inputs the mutator starts from: `(attr, body)`.

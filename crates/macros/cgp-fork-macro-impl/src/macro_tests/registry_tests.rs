@@ -4,7 +4,7 @@
 use std::collections::BTreeSet;
 use std::path::Path;
 
-use crate::registry::{entrypoints, fuzz_target_name};
+use crate::registry::{entrypoints, fuzz_target_name, pipelines};
 
 #[test]
 fn entrypoint_names_are_unique() {
@@ -76,4 +76,64 @@ fn every_entrypoint_has_a_fuzz_target() {
             "fuzz/Cargo.toml has no [[bin]] for `{target}`; run write_targets",
         );
     }
+}
+
+/// The registry lists exactly the 38 entrypoints of the proc-macro shim, by name.
+#[test]
+fn registry_names_every_entrypoint() {
+    let names: BTreeSet<_> = entrypoints().into_iter().map(|(name, _)| name).collect();
+    let expected: BTreeSet<_> = [
+        "async_trait",
+        "blanket_trait",
+        "cgp_auto_error",
+        "cgp_auto_getter",
+        "cgp_auto_impl",
+        "cgp_component",
+        "cgp_fn",
+        "cgp_getter",
+        "cgp_impl",
+        "cgp_new_provider",
+        "cgp_provider",
+        "cgp_type",
+        "derive_provider",
+        "cgp_computer",
+        "cgp_producer",
+        "cgp_auto_dispatch",
+        "cgp_auto_log",
+        "delegate_components",
+        "delegate_and_check_components",
+        "check_components",
+        "cgp_for_each",
+        "cgp_preset",
+        "cgp_namespace",
+        "Symbol",
+        "Path",
+        "Product",
+        "product",
+        "Sum",
+        "Struct",
+        "Enum",
+        "derive_has_field",
+        "derive_has_fields",
+        "derive_build_field",
+        "derive_extract_field",
+        "derive_from_variant",
+        "derive_cgp_data",
+        "derive_cgp_record",
+        "derive_cgp_variant",
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(names, expected);
+}
+
+/// Every IR family is produced by at least one entrypoint.
+#[test]
+fn every_ir_family_is_used() {
+    let used: BTreeSet<_> = pipelines()
+        .into_iter()
+        .map(|(_, family, _)| family)
+        .collect();
+    let all: BTreeSet<_> = crate::ir::IrFamily::ALL.into_iter().collect();
+    assert_eq!(used, all);
 }
