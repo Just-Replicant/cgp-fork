@@ -94,6 +94,32 @@ fn cgp_impl_with_raw_provider() {
 }
 
 #[test]
+fn cgp_impl_with_raw_provider_trait() {
+    // Found by cargo-fuzz (cgp_impl): the component name derived from a raw provider trait
+    // kept its `r#` and `Ident::new("r#GreeterComponent")` panicked.
+    expands_without_panic("cgp_impl", "GreeterComponent", || {
+        crate::macro_lib::cgp_impl(
+            quote!(new GreetHello),
+            quote!(impl r#Greeter { fn greet(&self) {} }),
+        )
+    });
+}
+
+#[test]
+fn cgp_provider_with_raw_provider_trait() {
+    expands_without_panic("cgp_provider", "GreeterComponent", || {
+        crate::macro_lib::cgp_provider(
+            quote!(),
+            quote!(
+                impl<Context> r#Greeter<Context> for GreetHello {
+                    fn greet(_context: &Context) {}
+                }
+            ),
+        )
+    });
+}
+
+#[test]
 fn cgp_fn_with_raw_name() {
     expands_without_panic("cgp_fn", "Greet", || {
         crate::macro_lib::cgp_fn(

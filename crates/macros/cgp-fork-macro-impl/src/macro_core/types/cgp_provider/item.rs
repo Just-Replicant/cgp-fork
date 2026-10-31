@@ -1,5 +1,6 @@
 use proc_macro2::Span;
 use quote::ToTokens;
+use syn::ext::IdentExt;
 use syn::spanned::Spanned;
 use syn::{Error, Ident, ItemImpl, Type};
 
@@ -63,7 +64,7 @@ impl ItemCgpProvider {
         // marker struct, whose *definition* is instead spanned on the provider
         // identifier so navigation lands there cleanly.)
         let component_ident = Ident::new(
-            &format!("{}Component", provider_trait.ident()),
+            &format!("{}Component", provider_trait.ident().unraw()),
             Span::call_site(),
         );
 
