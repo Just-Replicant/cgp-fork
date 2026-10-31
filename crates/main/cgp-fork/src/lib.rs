@@ -10,6 +10,12 @@ extern crate self as cgp_fork;
 pub mod core;
 /// Handlers, dispatch, logging, and the other providers built on [`core`].
 pub mod extra;
+// `handler` and `compat` are documented by their own `//!` comments, whose links resolve in
+// the module.
+pub mod handler;
+
+#[cfg(feature = "compat-0.10")]
+pub mod compat;
 
 /// The names most programs import: `use cgp_fork::prelude::*;`.
 pub mod prelude;

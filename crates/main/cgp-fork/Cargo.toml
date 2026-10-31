@@ -22,9 +22,13 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
-# `default`/`full` enable `alloc`. Without it the crate needs only `core`.
+# `default`/`full` enable `alloc` and `compat-0.10`. Without `alloc` the crate needs only `core`.
 default = ["full"]
-full = ["alloc"]
+full = ["alloc", "compat-0.10"]
+# The 0.10 handler family (`extra::handler`, `extra::dispatch`, `extra::monad`), the macros that
+# generate it (`#[cgp_computer]`, `#[cgp_producer]`, `#[cgp_auto_dispatch]`) and the `compat`
+# bridges to the unified `handler` module. `no_std`, no dependencies.
+"compat-0.10" = []
 # Links the `alloc` crate and enables the `String`-building error providers
 # (`DebugError`, `DisplayError`).
 alloc = []
