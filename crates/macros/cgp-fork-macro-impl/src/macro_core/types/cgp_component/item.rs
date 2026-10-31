@@ -1,5 +1,6 @@
 use syn::{Error, GenericParam, ItemTrait};
 
+use crate::ir::Diagnostics;
 use crate::macro_core::types::attributes::CgpComponentAttributes;
 use crate::macro_core::types::cgp_component::{CgpComponentArgs, PreprocessedCgpComponent};
 use crate::macro_core::types::ident::TypeGenericParam;
@@ -23,6 +24,12 @@ impl ItemCgpComponent {
             item_trait,
             attributes,
         })
+    }
+
+    /// The validate stage of every component pipeline: records each semantic error of
+    /// the arguments against the trait.
+    pub fn validate(&self, diagnostics: &mut Diagnostics) {
+        diagnostics.check(self.check_component_name_params());
     }
 
     /// Reject a `name:` parameter the trait does not declare. The marker struct is
