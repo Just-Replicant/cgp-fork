@@ -19,6 +19,8 @@ pub mod crate_path;
 #[doc(hidden)]
 pub mod extra_macro_lib;
 #[doc(hidden)]
+pub mod ir;
+#[doc(hidden)]
 pub mod macro_lib;
 #[doc(hidden)]
 pub mod registry;
@@ -40,6 +42,9 @@ mod ident_with_type_params_tests;
 #[cfg(test)]
 #[path = "macro_tests/invalid_expansion_tests.rs"]
 mod invalid_expansion_tests;
+#[cfg(test)]
+#[path = "macro_tests/ir_tests.rs"]
+mod ir_tests;
 #[cfg(test)]
 #[path = "macro_tests/parser_rejections_tests.rs"]
 mod parser_rejections_tests;
