@@ -2,8 +2,8 @@
    The implementation of the `cgp-fork` procedural macros, as an ordinary library.
 
    `cgp-fork-macro` is a thin proc-macro shim: each `#[proc_macro*]` function there converts its
-   `proc_macro::TokenStream` arguments and calls the function of the same name in [`macro_lib`],
-   [`extra_macro_lib`] or [`async_impl`]. Everything that parses or generates code lives here, so
+   `proc_macro::TokenStream` arguments and calls the function of the same name in `macro_lib`,
+   `extra_macro_lib`, or `async_impl`. Everything that parses or generates code lives here, so
    it can be unit-tested, fuzzed with libFuzzer, and reused by tools.
 
    **This crate is an implementation detail of `cgp-fork`.** Its API has no stability guarantee
@@ -12,10 +12,15 @@
    See `docs/adr/0002-macro-impl-crate.md` in the repository for the rationale.
 */
 
+#[doc(hidden)]
 pub mod async_impl;
+#[doc(hidden)]
 pub mod crate_path;
+#[doc(hidden)]
 pub mod extra_macro_lib;
+#[doc(hidden)]
 pub mod macro_lib;
+#[doc(hidden)]
 pub mod registry;
 
 mod extra_macro_core;
@@ -23,6 +28,7 @@ mod macro_core;
 
 /// The `snapshot_*` entrypoints, which print a macro's expansion for the behavior tests.
 #[cfg(any(test, feature = "snapshot"))]
+#[doc(hidden)]
 pub mod test_util_lib;
 
 #[cfg(test)]
