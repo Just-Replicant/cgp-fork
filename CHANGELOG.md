@@ -4,6 +4,15 @@
 
 ### Fixed
 
+- *(macro)* deeply nested input no longer crashes the compiler. `syn` parses nested generics,
+  brackets, reference chains (`&&&&T`) and closures recursively, and a few hundred levels
+  overflowed the stack, so rustc stopped with `SIGSEGV`. Every macro now rejects input nested more
+  than 128 levels or containing an identifier longer than 255 characters with an error (a name
+  becomes a type-level string nested once per character; rustc's default `recursion_limit`
+  already stops at 128 characters), and `Symbol<…>` types are built without re-parsing them.
+  Found with `cargo fuzz`.
+- *(macro)* a raw provider trait (`impl r#Greeter` in `#[cgp_impl]` or `#[cgp_provider]`) and a
+  raw `cgp_namespace!` name no longer make the macro panic. Found with `cargo fuzz`.
 - *(macro)* the macros work when the dependency is renamed
   (`cgp = { package = "cgp-fork" }`). Generated code used to name `::cgp_fork` and failed with
   `E0433`; it now uses the name the caller's `Cargo.toml` imports `cgp-fork` under, including
