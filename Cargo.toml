@@ -8,6 +8,7 @@ members = [
     "crates/macros/cgp-fork-macro-impl",
     "crates/tests/doctests",
     "crates/tests/renamed-dep",
+    "crates/tests/preset-consumer",
 ]
 
 [workspace.package]
