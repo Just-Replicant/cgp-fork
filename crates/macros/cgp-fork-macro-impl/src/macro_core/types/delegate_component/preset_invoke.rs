@@ -28,8 +28,13 @@ pub fn invoke_with_components(
         .as_ref()
         .map(|clause| &clause.predicates);
 
+    // Resolved in the crate that is expanding this macro (the preset's user). The full
+    // path is passed in: a `macro_rules` `$path::item` paste does not produce a macro call.
+    let root = crate::crate_path::crate_root();
+
     quote! {
         #preset_module::with_components! {
+            @ #root::prelude::cgp_for_each,
             exclude [ #(#exclude),* ],
             __Component__ => {
                 impl #impl_generics #DelegateComponent<__Component__> for #table_type
@@ -63,24 +68,25 @@ pub fn define_with_components_macro(
     keys: &[Type],
     parents: &[Path],
 ) -> TokenStream {
-    // The generated `macro_rules!` expands in the crates that use the preset, which are assumed
-    // to import `cgp-fork` under the same name as the crate defining it.
-    let root = crate::crate_path::crate_root();
+    // `@ $for_each` is the `cgp_for_each` path of the crate that expands the macro, passed by
+    // [`invoke_with_components`]. Baking `::cgp_fork` in here would name the facade as the
+    // preset's own crate sees it.
     quote! {
         #[macro_export]
         #[doc(hidden)]
         macro_rules! #macro_name {
-            ( $ph:ident => { $($body:tt)* } ) => {
-                #macro_name! { exclude [], $ph => { $($body)* } }
+            ( @ $for_each:path, $ph:ident => { $($body:tt)* } ) => {
+                #macro_name! { @ $for_each, exclude [], $ph => { $($body)* } }
             };
-            ( exclude [ $($exclude:ty),* $(,)? ], $ph:ident => { $($body:tt)* } ) => {
-                #root::prelude::cgp_for_each! {
+            ( @ $for_each:path, exclude [ $($exclude:ty),* $(,)? ], $ph:ident => { $($body:tt)* } ) => {
+                $for_each! {
                     [ #(#keys),* ],
                     exclude [ $($exclude),* ],
                     $ph => { $($body)* }
                 }
                 #(
                     #parents::with_components! {
+                        @ $for_each,
                         exclude [ $($exclude),* ],
                         $ph => { $($body)* }
                     }
