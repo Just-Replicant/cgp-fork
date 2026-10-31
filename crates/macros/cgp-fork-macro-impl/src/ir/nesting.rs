@@ -15,7 +15,7 @@
 //! parsed recursively too, so each `&`, `*`, `!` or `-` in a row adds a level; `mut`, `const`
 //! and lifetimes inside the run do not end it, anything else does. Other recursive syntax
 //! is a `syn` limit shared by every `syn`-based macro. Closures nest even with other tokens
-//! between them (`|| a || || b`), so every `|` or `||` token adds a level until the next `;`,
+//! between them (`|| a || || b`), so every two `|` characters add a level until the next `;`,
 //! `,` or `=>`; a match arm or condition with more than a hundred alternatives would hit it.
 
 use proc_macro2::{Spacing, Span, TokenStream, TokenTree};
@@ -47,13 +47,14 @@ fn deepest(tokens: TokenStream, depth: usize) -> Option<Span> {
     let mut prefix = 0usize;
     // The prefix run before the current path (`&&` in `&&a::B<…>`), kept until the path's `<`.
     let mut carried = 0usize;
-    // `|` and `||` tokens since the last `;`, `,` or `=>`: nested closures.
+    // `|` characters since the last `;`, `,` or `=>`; every two are one closure (`||`, `|x|`).
+    // A `||` arrives as two `|` puncts, so they are counted one by one.
     let mut pipes = 0usize;
     let mut previous: Option<(char, Spacing)> = None;
 
     for tree in tokens {
         let base = angles.last().copied().unwrap_or(depth);
-        let current = base + prefix + pipes;
+        let current = base + prefix + pipes.div_ceil(2);
         if current > MAX_NESTING_DEPTH {
             return Some(tree.span());
         }
@@ -83,7 +84,7 @@ fn deepest(tokens: TokenStream, depth: usize) -> Option<Span> {
                     _ => {}
                 }
                 match ch {
-                    '|' if punct.spacing() == Spacing::Alone => pipes += 1,
+                    '|' => pipes += 1,
                     ';' | ',' => pipes = 0,
                     '>' if joined_to_previous && matches!(previous, Some(('=', _))) => pipes = 0,
                     _ => {}
