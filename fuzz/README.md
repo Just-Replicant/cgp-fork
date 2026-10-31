@@ -65,6 +65,10 @@ finding, raw identifiers in derived names (`check_components! { r#r {} }`), is p
 
 - No structure-aware (`arbitrary`) input generation. The mutator works on raw bytes and most
   inputs fail to lex. The seeds and libFuzzer's dictionary learning offset this, but not fully.
-- The long verification run (one hour per target) has not been done. On 2026-10-30 a 20-second
-  smoke run of `cgp_component`, `type_product` and `delegate_components` (about 280k to 330k
-  executions each) found no crash.
+- The one-hour run per target from the old improvement plan is not a phase-1 exit criterion.
+  It stays deferred: thirty-eight hour-long runs do not fit this phase, and a 20-second smoke
+  (about 280k to 330k executions of `cgp_component`, `type_product`, and `delegate_components`
+  on 2026-10-30, no crash) does not by itself show the parsers are clean. The standing check is
+  the weekly `Coverage-guided fuzzing (cargo-fuzz)` job: 15 minutes on `entrypoints`, then 20
+  seconds on each single-entrypoint target. A crash there is a finding; lengthen a target's run
+  when investigating one, rather than blocking the rewrite on a full hour each.
