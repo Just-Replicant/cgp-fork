@@ -228,3 +228,73 @@ fn derive_provider_validates_the_inner_component() {
         ["the component name's parameter `X` is not a generic parameter of the trait `CanFoo`"]
     );
 }
+
+fn nested_generics(depth: usize) -> TokenStream {
+    let source = format!(
+        "pub trait HasN {{ fn n(&self) -> &{}u8{}; }}",
+        "A<".repeat(depth),
+        ">".repeat(depth)
+    );
+    source.parse().unwrap()
+}
+
+#[test]
+fn deep_generics_are_rejected_before_parsing() {
+    // Found by `cargo fuzz` (cgp_auto_getter, cgp_auto_impl, blanket_trait, cgp_computer,
+    // cgp_for_each): about 400 levels of `A<…>` overflowed the stack inside `syn` and crashed
+    // rustc. The pipeline now rejects the input with an error instead.
+    let result = crate::macro_lib::cgp_auto_getter(TokenStream::new(), nested_generics(5_000));
+    let error = result.expect_err("deeply nested input must be rejected");
+    assert!(
+        error
+            .to_string()
+            .starts_with("this macro input nests more than 128 levels"),
+        "{error}"
+    );
+}
+
+#[test]
+fn deep_groups_are_rejected_before_parsing() {
+    let depth = 5_000;
+    let source = format!(
+        "pub trait HasN {{ fn n(&self) -> &{}u8{}; }}",
+        "(".repeat(depth),
+        ",)".repeat(depth)
+    );
+    let result = crate::macro_lib::cgp_auto_getter(TokenStream::new(), source.parse().unwrap());
+    assert!(result.is_err());
+}
+
+#[test]
+fn nesting_up_to_the_limit_is_accepted() {
+    // rustc runs proc macros on its 8 MiB compiler thread; the default 2 MiB test thread is
+    // too small to parse 126 levels in a debug build, so give the check the compiler's stack.
+    std::thread::Builder::new()
+        .stack_size(8 * 1024 * 1024)
+        .spawn(|| {
+            // The trait body and the `&` add two levels around the generics.
+            let tokens = nested_generics(crate::ir::MAX_NESTING_DEPTH - 2);
+            assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
+            assert!(crate::macro_lib::cgp_auto_getter(TokenStream::new(), tokens).is_ok());
+
+            let tokens = nested_generics(crate::ir::MAX_NESTING_DEPTH);
+            assert!(crate::macro_lib::cgp_auto_getter(TokenStream::new(), tokens).is_err());
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}
+
+#[test]
+fn comparisons_and_arrows_do_not_count_as_generics() {
+    let body: String = (0..500)
+        .map(|i| format!("a < {i}; b <= c; d -> e; f => g; "))
+        .collect();
+    let tokens: TokenStream = format!("fn f() {{ {body} }}").parse().unwrap();
+    assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
+
+    let tokens: TokenStream = "fn f() -> A<B<C>> where X: Fn() -> Y, Z: PartialOrd<W> {}"
+        .parse()
+        .unwrap();
+    assert!(crate::ir::check_nesting_depth(&tokens).is_ok());
+}

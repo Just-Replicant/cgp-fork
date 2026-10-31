@@ -4,7 +4,7 @@ use proc_macro2::{Span, TokenStream};
 use syn::Error;
 use syn::parse::Parse;
 
-use crate::ir::{Diagnostics, FamilyIr};
+use crate::ir::{Diagnostics, FamilyIr, check_nesting_depth};
 
 /// One macro entrypoint: a parser into the IR of its family.
 ///
@@ -27,6 +27,9 @@ pub trait Pipeline {
 /// Runs `P` over one macro invocation: parse, then validate (reporting every error at
 /// once), then emit.
 pub fn run<P: Pipeline>(attr: TokenStream, body: TokenStream) -> syn::Result<TokenStream> {
+    check_nesting_depth(&attr)?;
+    check_nesting_depth(&body)?;
+
     let ir = P::parse(attr, body)?;
 
     let mut diagnostics = Diagnostics::new();
