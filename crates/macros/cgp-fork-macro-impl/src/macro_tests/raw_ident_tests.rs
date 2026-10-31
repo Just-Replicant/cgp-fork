@@ -120,6 +120,17 @@ fn cgp_provider_with_raw_provider_trait() {
 }
 
 #[test]
+fn cgp_namespace_with_raw_name() {
+    // Found by cargo-fuzz (cgp_namespace): `__r#GreetComponents` panicked in `Ident::new`.
+    expands_without_panic("cgp_namespace", "__GreetComponents", || {
+        crate::macro_lib::cgp_namespace(quote!(new r#Greet {}))
+    });
+    expands_without_panic("cgp_namespace with a parent", "__GreetComponents", || {
+        crate::macro_lib::cgp_namespace(quote!(r#Greet: ParentNamespace))
+    });
+}
+
+#[test]
 fn cgp_fn_with_raw_name() {
     expands_without_panic("cgp_fn", "Greet", || {
         crate::macro_lib::cgp_fn(
