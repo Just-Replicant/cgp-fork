@@ -17,10 +17,24 @@
 //! plan (`docs/rewrite-plan.md`, §7.1) unifies; `docs/adr/0004-shared-ir.md` explains the
 //! design and what is left to share between the entrypoints of one family.
 
+mod component_def;
+mod data_shape;
 mod diagnostics;
 mod family;
+mod getter;
+mod namespace;
 mod pipeline;
+mod provider_impl;
+mod trait_rewrite;
+mod wiring_table;
 
+pub use component_def::ComponentDef;
+pub use data_shape::{DataShape, RecordDerive, VariantDerive};
 pub use diagnostics::Diagnostics;
-pub use family::IrFamily;
+pub use family::{FamilyIr, IrFamily};
+pub use getter::Getter;
+pub use namespace::Namespace;
 pub use pipeline::{Pipeline, parse_body_without_args, run};
+pub use provider_impl::ProviderImpl;
+pub use trait_rewrite::TraitRewrite;
+pub use wiring_table::WiringTable;

@@ -1,4 +1,8 @@
-//! The kinds of IR the entrypoints produce.
+//! The kinds of IR the entrypoints produce, and the trait every family IR implements.
+
+use proc_macro2::TokenStream;
+
+use crate::ir::Diagnostics;
 
 /// The kind of IR a [`Pipeline`](super::Pipeline) produces.
 ///
@@ -35,4 +39,17 @@ impl IrFamily {
         IrFamily::DataShape,
         IrFamily::TraitRewrite,
     ];
+}
+
+/// One IR family: the shared IR type every entrypoint of the family parses into, with the
+/// family's validation and code generation.
+pub trait FamilyIr: Sized {
+    /// The family this IR type represents.
+    const FAMILY: IrFamily;
+
+    /// Checks the IR and records every semantic error in `diagnostics`.
+    fn validate(&self, diagnostics: &mut Diagnostics);
+
+    /// Generates the output tokens from a validated IR.
+    fn emit(self) -> syn::Result<TokenStream>;
 }
