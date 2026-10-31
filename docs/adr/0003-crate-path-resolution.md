@@ -55,8 +55,13 @@ covering both `name = { package = "cgp-fork", … }` and `[dependencies.name]` t
 - Expansion for ordinary users is byte-for-byte unchanged (still `::cgp_fork`).
 - A manifest edit that only renames the dependency is picked up on the next build, because Cargo
   rebuilds the crate when its manifest changes.
-- `cgp_preset!` generates a `macro_rules!` that expands in the crates using the preset. It names
-  the facade as the crate that defines the preset does, so a preset and its users must import
-  `cgp-fork` under the same name (as before this change, when both had to use `cgp_fork`).
+- `cgp_preset!` generates a `macro_rules!` that expands in the crates using the preset. Callers
+  pass their own facade path into `with_components!` (`crates/tests/preset-consumer` defines the
+  preset under the name `cgp` and uses it under `cgp_fork`).
+- A normal `[dependencies]` entry wins over a target-specific table, then a dev-dependency.
+  Build-dependencies apply only when the crate being compiled is a build script. A
+  `[target.'cfg(...)'.…]` table counts only when that `cfg` matches the build. A key of
+  `cgp-fork` with no `package` field is a real hit, so it is not hidden by a rename in another
+  table.
 - Implementation: `crates/macros/cgp-fork-macro-impl/src/crate_path.rs`; unit tests in
   `src/macro_tests/crate_path_tests.rs`.
