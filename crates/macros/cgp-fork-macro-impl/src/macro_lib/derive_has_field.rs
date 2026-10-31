@@ -1,17 +1,34 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::ItemStruct;
+use syn::{ItemStruct, parse2};
 
+use crate::ir::{IrFamily, Pipeline, run};
 use crate::macro_core::types::cgp_data::ItemCgpRecord;
 
-pub fn derive_has_field(input: TokenStream) -> syn::Result<TokenStream> {
-    let item_struct: ItemStruct = syn::parse2(input)?;
+/// `#[derive(HasField)]`: one `HasField` impl per struct field.
+pub struct DeriveHasFieldMacro;
 
-    let record = ItemCgpRecord { item_struct };
+impl Pipeline for DeriveHasFieldMacro {
+    const NAME: &'static str = "derive_has_field";
+    const FAMILY: IrFamily = IrFamily::DataShape;
+    type Ir = ItemCgpRecord;
 
-    let item_impls = record.to_has_field_impls()?;
+    fn parse(_attr: TokenStream, body: TokenStream) -> syn::Result<Self::Ir> {
+        let item_struct: ItemStruct = parse2(body)?;
 
-    Ok(quote! {
-        #( #item_impls )*
-    })
+        Ok(ItemCgpRecord { item_struct })
+    }
+
+    fn emit(ir: Self::Ir) -> syn::Result<TokenStream> {
+        let items = ir.to_has_field_impls()?;
+
+        Ok(quote! {
+            #( #items )*
+        })
+    }
+}
+
+/// `derive_has_field` entry point.
+pub fn derive_has_field(body: TokenStream) -> syn::Result<TokenStream> {
+    run::<DeriveHasFieldMacro>(TokenStream::new(), body)
 }
