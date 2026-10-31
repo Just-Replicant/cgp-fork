@@ -87,3 +87,18 @@ commits).
   `TraitRewrite`) have an empty `validate`; it is the place for semantic checks moved out of
   `emit` later.
 - The JSON wiring metadata of §7.1 and moving the checks still inside `emit` remain open.
+
+## Update: input limits checked by the pipeline
+
+`cargo fuzz` found that `syn` parses nested generics, groups, prefix-operator runs (`&&&&T`) and
+closures recursively, and that the macros re-parse type-level strings nested once per character.
+A few hundred levels overflowed the compiler thread's stack and rustc aborted with `SIGSEGV`.
+`ir::run` therefore checks the attribute and body before `parse` (`ir::check_nesting_depth`):
+
+- at most 128 levels of brackets, open `<`, runs of `&`/`*`/`!`/`-` and nested closures;
+- no identifier longer than 255 characters (rustc's default `recursion_limit` already rejects
+  type-level strings from 128 characters).
+
+Both are reported as normal errors on the offending token. The walk itself stops at the depth
+limit, so it cannot overflow. `Symbol::to_type` builds its syntax tree in a loop instead of
+re-parsing tokens. Other recursive syntax remains a `syn` limit shared by every `syn`-based macro.
