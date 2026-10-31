@@ -16,10 +16,11 @@ version="$(cargo metadata --no-deps --format-version 1 \
   | python3 -c 'import json,sys; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "cgp-fork"))')"
 
 # `--allow-dirty` so the check also runs on uncommitted local changes.
-# `cgp-fork-doctests` and `cgp-fork-renamed-dep` (publish = false) are
-# workspace-only checks that read files outside their own directory or depend
-# on the facade by path; they are never published.
-cargo package --workspace --exclude cgp-fork-doctests --exclude cgp-fork-renamed-dep --locked --allow-dirty
+# `cgp-fork-doctests`, `cgp-fork-renamed-dep` and `cgp-fork-preset-consumer`
+# (publish = false) are workspace-only checks that read files outside their own
+# directory or depend on another workspace crate by path; they are never published.
+cargo package --workspace --exclude cgp-fork-doctests --exclude cgp-fork-renamed-dep \
+  --exclude cgp-fork-preset-consumer --locked --allow-dirty
 
 for crate in cgp-fork cgp-fork-macro cgp-fork-macro-impl; do
   if ! cargo package -p "$crate" --list --allow-dirty | grep -qx LICENSE; then
