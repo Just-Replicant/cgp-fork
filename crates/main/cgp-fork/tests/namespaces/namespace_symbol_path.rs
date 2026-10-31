@@ -62,7 +62,13 @@ snapshot_cgp_component! {
     }
 
     expand_symbol_path_bar(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `Bar`",
+            label = "`Bar` is not implemented for `{Self}`",
+            note = "`Bar` is implemented through the component `BarProviderComponent`: wire a provider for `BarProviderComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `BarProviderComponent` names the requirement it is missing"
+        )]
         pub trait Bar {
             fn bar(&self);
         }
@@ -74,6 +80,12 @@ snapshot_cgp_component! {
                 __Context__::bar(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `BarProviderComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `BarProvider` nor wires `BarProviderComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `BarProviderComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `BarProvider` for it with `#[cgp_impl]` or `#[cgp_provider(BarProviderComponent)]`"
+        )]
         pub trait BarProvider<
             __Context__,
         >: IsProviderFor<BarProviderComponent, __Context__, ()> {
@@ -145,7 +157,7 @@ snapshot_cgp_component! {
                 >,
             >;
         }
-        ")
+        "#)
     }
 }
 

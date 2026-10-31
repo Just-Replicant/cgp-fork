@@ -27,7 +27,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_has_foo_bar(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFooBar`",
+            label = "`HasFooBar` needs the field `foo_bar` on `{Self}`",
+            note = "`HasFooBar` reads the field `foo_bar` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait HasFooBar: HasFooType + HasBarType {
             fn foo_bar(foo: &Self::Foo) -> &Self::Bar;
         }
@@ -69,7 +74,7 @@ snapshot_cgp_auto_getter! {
                     )
             }
         }
-        ")
+        "#)
     }
 }
 

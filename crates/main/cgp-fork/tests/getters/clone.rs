@@ -22,7 +22,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_name(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasName`",
+            label = "`HasName` is not implemented for `{Self}`",
+            note = "`HasName` is implemented through the component `NameGetterComponent`: wire a provider for `NameGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `NameGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasName: HasNameType<Name: Copy> {
             fn name(&self) -> Self::Name;
         }
@@ -35,6 +41,12 @@ snapshot_cgp_getter! {
                 __Context__::name(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `NameGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `NameGetter` nor wires `NameGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `NameGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `NameGetter` for it with `#[cgp_impl]` or `#[cgp_provider(NameGetterComponent)]`"
+        )]
         pub trait NameGetter<__Context__>: IsProviderFor<NameGetterComponent, __Context__, ()>
         where
             __Context__: HasNameType<Name: Copy>,
@@ -165,7 +177,7 @@ snapshot_cgp_getter! {
                 Value = __Context__::Name,
             >,
         {}
-        ")
+        "#)
     }
 }
 

@@ -20,7 +20,13 @@ snapshot_cgp_component! {
     }
 
     expand_has_limit(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasLimit`",
+            label = "`HasLimit` is not implemented for `{Self}`",
+            note = "`HasLimit` is implemented through the component `LimitProviderComponent`: wire a provider for `LimitProviderComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `LimitProviderComponent` names the requirement it is missing"
+        )]
         pub trait HasLimit {
             const LIMIT: u32;
             fn limit(&self) -> u32;
@@ -34,6 +40,12 @@ snapshot_cgp_component! {
                 __Context__::limit(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `LimitProviderComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `LimitProvider` nor wires `LimitProviderComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `LimitProviderComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `LimitProvider` for it with `#[cgp_impl]` or `#[cgp_provider(LimitProviderComponent)]`"
+        )]
         pub trait LimitProvider<
             __Context__,
         >: IsProviderFor<LimitProviderComponent, __Context__, ()> {
@@ -100,7 +112,7 @@ snapshot_cgp_component! {
             >>::Delegate: IsProviderFor<LimitProviderComponent, __Context__, ()>
                 + LimitProvider<__Context__>,
         {}
-        ")
+        "#)
     }
 }
 

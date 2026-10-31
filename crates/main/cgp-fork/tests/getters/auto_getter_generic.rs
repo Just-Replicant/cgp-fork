@@ -14,7 +14,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_has_foo(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFoo`",
+            label = "`HasFoo` needs the field `foo` on `{Self}`",
+            note = "`HasFoo` reads the field `foo` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait HasFoo<Foo> {
             fn foo(&self, _tag: PhantomData<Foo>) -> &Foo;
         }
@@ -33,7 +38,7 @@ snapshot_cgp_auto_getter! {
                 )
             }
         }
-        ")
+        "#)
     }
 }
 

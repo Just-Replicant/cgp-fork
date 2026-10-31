@@ -24,7 +24,13 @@ snapshot_cgp_component! {
     }
 
     expand_can_greet(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasReference`",
+            label = "`HasReference` is not implemented for `{Self}`",
+            note = "`HasReference` is implemented through the component `ReferenceGetterComponent`: wire a provider for `ReferenceGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `ReferenceGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasReference<'a, T: 'a + ?Sized> {
             fn get_reference(&self) -> &'a T;
         }
@@ -36,6 +42,12 @@ snapshot_cgp_component! {
                 __Context__::get_reference(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `ReferenceGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `ReferenceGetter` nor wires `ReferenceGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `ReferenceGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `ReferenceGetter` for it with `#[cgp_impl]` or `#[cgp_provider(ReferenceGetterComponent)]`"
+        )]
         pub trait ReferenceGetter<
             'a,
             __Context__,
@@ -115,7 +127,7 @@ snapshot_cgp_component! {
                 <__Path__ as ConcatPath<PathCons<T, Nil>>>::Output,
             >>::Delegate: ReferenceGetter<'a, __Context__, T>,
         {}
-        ")
+        "#)
     }
 }
 

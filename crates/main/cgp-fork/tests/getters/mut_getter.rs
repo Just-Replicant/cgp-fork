@@ -18,7 +18,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_count(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasCount`",
+            label = "`HasCount` is not implemented for `{Self}`",
+            note = "`HasCount` is implemented through the component `CountGetterComponent`: wire a provider for `CountGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `CountGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasCount {
             fn count(&mut self) -> &mut u32;
         }
@@ -30,6 +36,12 @@ snapshot_cgp_getter! {
                 __Context__::count(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `CountGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `CountGetter` nor wires `CountGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `CountGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `CountGetter` for it with `#[cgp_impl]` or `#[cgp_provider(CountGetterComponent)]`"
+        )]
         pub trait CountGetter<
             __Context__,
         >: IsProviderFor<CountGetterComponent, __Context__, ()> {
@@ -141,7 +153,7 @@ snapshot_cgp_getter! {
         where
             __Provider__: MutFieldGetter<__Context__, CountGetterComponent, Value = u32>,
         {}
-        ")
+        "#)
     }
 }
 

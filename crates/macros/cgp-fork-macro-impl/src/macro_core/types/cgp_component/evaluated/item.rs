@@ -1,5 +1,8 @@
 use syn::{Item, ItemImpl, ItemTrait};
 
+use crate::macro_core::functions::{
+    add_on_unimplemented, consumer_on_unimplemented, provider_on_unimplemented,
+};
 use crate::macro_core::types::attributes::CgpComponentAttributes;
 use crate::macro_core::types::cgp_component::CgpComponentArgs;
 use crate::macro_core::types::empty_struct::EmptyStruct;
@@ -23,9 +26,9 @@ impl EvaluatedCgpComponent {
     /// provider trait, provider impl, marker struct), then the provider impls.
     pub fn to_items(&self) -> syn::Result<Vec<Item>> {
         let mut items = vec![
-            Item::Trait(self.consumer_trait.clone()),
+            Item::Trait(self.to_consumer_trait_with_diagnostics()),
             Item::Impl(self.consumer_impl.clone()),
-            Item::Trait(self.provider_trait.clone()),
+            Item::Trait(self.to_provider_trait_with_diagnostics()),
             Item::Impl(self.provider_impl.clone()),
             Item::Struct(self.component_struct.to_item_struct()),
         ];
@@ -39,6 +42,33 @@ impl EvaluatedCgpComponent {
         items.extend(item_impls);
 
         Ok(items)
+    }
+
+    /// The consumer trait as emitted, with an `on_unimplemented` message that names the
+    /// component to wire. Only the emitted trait carries it: impls derived from
+    /// `consumer_trait` must not copy the attribute.
+    pub fn to_consumer_trait_with_diagnostics(&self) -> ItemTrait {
+        let mut consumer_trait = self.consumer_trait.clone();
+        add_on_unimplemented(
+            &mut consumer_trait,
+            consumer_on_unimplemented(&self.consumer_trait.ident, &self.args.component_name.ident),
+        );
+        consumer_trait
+    }
+
+    /// The provider trait as emitted, with an `on_unimplemented` message. Only the emitted
+    /// trait carries it: the provider impls are derived from `provider_trait`.
+    pub fn to_provider_trait_with_diagnostics(&self) -> ItemTrait {
+        let mut provider_trait = self.provider_trait.clone();
+        add_on_unimplemented(
+            &mut provider_trait,
+            provider_on_unimplemented(
+                &self.args.provider_ident,
+                &self.args.component_name.ident,
+                &self.args.context_ident,
+            ),
+        );
+        provider_trait
     }
 
     /// The standard provider impls (`UseContext`, `RedirectLookup`, per-attribute

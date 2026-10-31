@@ -15,7 +15,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_has_count(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasCount`",
+            label = "`HasCount` needs the field `count` on `{Self}`",
+            note = "`HasCount` reads the field `count` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait HasCount {
             fn count(&mut self) -> &mut u32;
         }
@@ -37,7 +42,7 @@ snapshot_cgp_auto_getter! {
                 )
             }
         }
-        ")
+        "#)
     }
 }
 

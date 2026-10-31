@@ -15,7 +15,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_has_name(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasName`",
+            label = "`HasName` needs the field `name` on `{Self}`",
+            note = "`HasName` reads the field `name` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait HasName {
             fn name(&mut self) -> Option<&mut str>;
         }
@@ -35,7 +40,7 @@ snapshot_cgp_auto_getter! {
                     .as_deref_mut()
             }
         }
-        ")
+        "#)
     }
 }
 

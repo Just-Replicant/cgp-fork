@@ -26,7 +26,13 @@ snapshot_cgp_component! {
     }
 
     expand_show(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `Show`",
+            label = "`Show` is not implemented for `{Self}`",
+            note = "`Show` is implemented through the component `ShowImplComponent`: wire a provider for `ShowImplComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `ShowImplComponent` names the requirement it is missing"
+        )]
         pub trait Show<T> {
             fn show(&self, value: &T) -> String;
         }
@@ -38,6 +44,12 @@ snapshot_cgp_component! {
                 __Context__::show(self, value)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `ShowImplComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `ShowImpl` nor wires `ShowImplComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `ShowImplComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `ShowImpl` for it with `#[cgp_impl]` or `#[cgp_provider(ShowImplComponent)]`"
+        )]
         pub trait ShowImpl<__Context__, T>: IsProviderFor<ShowImplComponent, __Context__, (T)> {
             fn show(__context__: &__Context__, value: &T) -> String;
         }
@@ -112,7 +124,7 @@ snapshot_cgp_component! {
                 >,
             >;
         }
-        ")
+        "#)
     }
 }
 

@@ -28,7 +28,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_foo_bar(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFooBar`",
+            label = "`HasFooBar` is not implemented for `{Self}`",
+            note = "`HasFooBar` is implemented through the component `FooBarGetterComponent`: wire a provider for `FooBarGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `FooBarGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasFooBar: HasFooType + HasBarType {
             fn foo_bar(foo: &Self::Foo) -> &Self::Bar;
         }
@@ -41,6 +47,12 @@ snapshot_cgp_getter! {
                 __Context__::foo_bar(foo)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `FooBarGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `FooBarGetter` nor wires `FooBarGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `FooBarGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `FooBarGetter` for it with `#[cgp_impl]` or `#[cgp_provider(FooBarGetterComponent)]`"
+        )]
         pub trait FooBarGetter<
             __Context__,
         >: IsProviderFor<FooBarGetterComponent, __Context__, ()>
@@ -201,7 +213,7 @@ snapshot_cgp_getter! {
                 Value = __Context__::Bar,
             >,
         {}
-        ")
+        "#)
     }
 }
 

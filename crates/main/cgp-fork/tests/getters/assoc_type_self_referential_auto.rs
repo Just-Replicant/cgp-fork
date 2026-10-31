@@ -18,7 +18,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_has_scalar_type(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasScalarType`",
+            label = "`HasScalarType` needs the field `scalar` on `{Self}`",
+            note = "`HasScalarType` reads the field `scalar` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait HasScalarType {
             type Scalar: Mul<Output = Self::Scalar> + Clone;
             fn scalar(&self) -> &Self::Scalar;
@@ -49,7 +54,7 @@ snapshot_cgp_auto_getter! {
                 )
             }
         }
-        ")
+        "#)
     }
 }
 

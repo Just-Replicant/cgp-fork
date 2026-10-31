@@ -20,7 +20,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_items(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasItems`",
+            label = "`HasItems` is not implemented for `{Self}`",
+            note = "`HasItems` is implemented through the component `ItemsGetterComponent`: wire a provider for `ItemsGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `ItemsGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasItems {
             fn items(&mut self) -> &mut [u32];
         }
@@ -32,6 +38,12 @@ snapshot_cgp_getter! {
                 __Context__::items(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `ItemsGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `ItemsGetter` nor wires `ItemsGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `ItemsGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `ItemsGetter` for it with `#[cgp_impl]` or `#[cgp_provider(ItemsGetterComponent)]`"
+        )]
         pub trait ItemsGetter<
             __Context__,
         >: IsProviderFor<ItemsGetterComponent, __Context__, ()> {
@@ -153,7 +165,7 @@ snapshot_cgp_getter! {
                 Value: AsMut<[u32]> + 'static,
             >,
         {}
-        ")
+        "#)
     }
 }
 

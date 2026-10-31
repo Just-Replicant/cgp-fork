@@ -1,5 +1,6 @@
 mod camel_case;
 mod delegated_impls;
+mod diagnostic_attrs;
 mod field;
 mod generics;
 mod getter;
@@ -15,6 +16,7 @@ mod tokens_eq;
 
 pub use camel_case::*;
 pub use delegated_impls::*;
+pub use diagnostic_attrs::*;
 pub use field::*;
 pub use generics::*;
 pub use getter::*;

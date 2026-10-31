@@ -25,7 +25,13 @@ snapshot_cgp_type! {
     }
 
     expand_has_types(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasTypes`",
+            label = "`HasTypes` is not implemented for `{Self}`",
+            note = "`HasTypes` is implemented through the component `TypesTypeProviderComponent`: wire a provider for `TypesTypeProviderComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `TypesTypeProviderComponent` names the requirement it is missing"
+        )]
         pub trait HasTypes {
             type Types: HasScalarType;
         }
@@ -35,6 +41,12 @@ snapshot_cgp_type! {
         {
             type Types = <__Context__ as TypesTypeProvider<__Context__>>::Types;
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `TypesTypeProviderComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `TypesTypeProvider` nor wires `TypesTypeProviderComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `TypesTypeProviderComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `TypesTypeProvider` for it with `#[cgp_impl]` or `#[cgp_provider(TypesTypeProviderComponent)]`"
+        )]
         pub trait TypesTypeProvider<
             __Context__,
         >: IsProviderFor<TypesTypeProviderComponent, __Context__, ()> {
@@ -119,6 +131,6 @@ snapshot_cgp_type! {
             Types: HasScalarType,
             __Provider__: TypeProvider<__Context__, TypesTypeProviderComponent, Type = Types>,
         {}
-        ")
+        "#)
     }
 }

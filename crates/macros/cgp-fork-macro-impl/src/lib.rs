@@ -37,6 +37,9 @@ pub mod test_util_lib;
 #[path = "macro_tests/crate_path_tests.rs"]
 mod crate_path_tests;
 #[cfg(test)]
+#[path = "macro_tests/diagnostic_attrs_tests.rs"]
+mod diagnostic_attrs_tests;
+#[cfg(test)]
 #[path = "macro_tests/ident_with_type_params_tests.rs"]
 mod ident_with_type_params_tests;
 #[cfg(test)]

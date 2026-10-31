@@ -19,8 +19,14 @@ snapshot_cgp_component! {
     }
 
     expand_can_fetch(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[async_trait]
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `CanFetch`",
+            label = "`CanFetch` is not implemented for `{Self}`",
+            note = "`CanFetch` is implemented through the component `FetcherComponent`: wire a provider for `FetcherComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `FetcherComponent` names the requirement it is missing"
+        )]
         pub trait CanFetch {
             async fn fetch(&self, id: u32) -> String;
         }
@@ -34,6 +40,12 @@ snapshot_cgp_component! {
             }
         }
         #[async_trait]
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `FetcherComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `Fetcher` nor wires `FetcherComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `FetcherComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `Fetcher` for it with `#[cgp_impl]` or `#[cgp_provider(FetcherComponent)]`"
+        )]
         pub trait Fetcher<__Context__>: IsProviderFor<FetcherComponent, __Context__, ()> {
             async fn fetch(__context__: &__Context__, id: u32) -> String;
         }
@@ -93,6 +105,6 @@ snapshot_cgp_component! {
             >>::Delegate: IsProviderFor<FetcherComponent, __Context__, ()>
                 + Fetcher<__Context__>,
         {}
-        ")
+        "#)
     }
 }

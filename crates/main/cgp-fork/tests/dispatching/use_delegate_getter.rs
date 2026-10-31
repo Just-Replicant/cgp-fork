@@ -30,7 +30,13 @@ snapshot_cgp_type! {
     }
 
     expand_has_foo_type_at(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFooTypeAt`",
+            label = "`HasFooTypeAt` is not implemented for `{Self}`",
+            note = "`HasFooTypeAt` is implemented through the component `FooTypeProviderAtComponent`: wire a provider for `FooTypeProviderAtComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `FooTypeProviderAtComponent` names the requirement it is missing"
+        )]
         pub trait HasFooTypeAt<I, J> {
             type Foo;
         }
@@ -40,6 +46,12 @@ snapshot_cgp_type! {
         {
             type Foo = <__Context__ as FooTypeProviderAt<__Context__, I, J>>::Foo;
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `FooTypeProviderAtComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `FooTypeProviderAt` nor wires `FooTypeProviderAtComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `FooTypeProviderAtComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `FooTypeProviderAt` for it with `#[cgp_impl]` or `#[cgp_provider(FooTypeProviderAtComponent)]`"
+        )]
         pub trait FooTypeProviderAt<
             __Context__,
             I,
@@ -185,7 +197,7 @@ snapshot_cgp_type! {
         where
             __Provider__: TypeProvider<__Context__, FooTypeProviderAtComponent, Type = Foo>,
         {}
-        ")
+        "#)
     }
 }
 
@@ -198,7 +210,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_foo_at(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFooAt`",
+            label = "`HasFooAt` is not implemented for `{Self}`",
+            note = "`HasFooAt` is implemented through the component `FooGetterAtComponent`: wire a provider for `FooGetterAtComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `FooGetterAtComponent` names the requirement it is missing"
+        )]
         pub trait HasFooAt<I, J>: HasFooTypeAt<I, J> {
             fn foo_at(&self, _tag: PhantomData<(I, J)>) -> &Self::Foo;
         }
@@ -211,6 +229,12 @@ snapshot_cgp_getter! {
                 __Context__::foo_at(self, _tag)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `FooGetterAtComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `FooGetterAt` nor wires `FooGetterAtComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `FooGetterAtComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `FooGetterAt` for it with `#[cgp_impl]` or `#[cgp_provider(FooGetterAtComponent)]`"
+        )]
         pub trait FooGetterAt<
             __Context__,
             I,
@@ -451,7 +475,7 @@ snapshot_cgp_getter! {
                 Value = __Context__::Foo,
             >,
         {}
-        ")
+        "#)
     }
 }
 

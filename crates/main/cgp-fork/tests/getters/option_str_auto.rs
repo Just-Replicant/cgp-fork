@@ -15,7 +15,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_has_nickname(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasNickname`",
+            label = "`HasNickname` needs the field `nickname` on `{Self}`",
+            note = "`HasNickname` reads the field `nickname` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait HasNickname {
             fn nickname(&self) -> Option<&str>;
         }
@@ -62,7 +67,7 @@ snapshot_cgp_auto_getter! {
                     .as_deref()
             }
         }
-        ")
+        "#)
     }
 }
 

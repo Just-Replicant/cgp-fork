@@ -13,7 +13,13 @@ snapshot_cgp_component! {
     }
 
     expand_promote_area(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasArea`",
+            label = "`HasArea` is not implemented for `{Self}`",
+            note = "`HasArea` is implemented through the component `AreaCalculatorComponent`: wire a provider for `AreaCalculatorComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `AreaCalculatorComponent` names the requirement it is missing"
+        )]
         pub trait HasArea {
             fn area(&self) -> f64;
         }
@@ -25,6 +31,12 @@ snapshot_cgp_component! {
                 __Context__::area(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `AreaCalculatorComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `AreaCalculator` nor wires `AreaCalculatorComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `AreaCalculatorComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `AreaCalculator` for it with `#[cgp_impl]` or `#[cgp_provider(AreaCalculatorComponent)]`"
+        )]
         pub trait AreaCalculator<
             __Context__,
         >: IsProviderFor<AreaCalculatorComponent, __Context__, ()> {
@@ -104,6 +116,6 @@ snapshot_cgp_component! {
         where
             __Provider__: Computer<__Context__, (), (), Output = f64>,
         {}
-        ")
+        "#)
     }
 }

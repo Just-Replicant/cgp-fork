@@ -3,7 +3,9 @@ use syn::visit_mut::VisitMut;
 use syn::{Ident, ItemTrait, TraitItem, Type, TypeParamBound};
 
 use crate::macro_core::exports::IsProviderFor;
-use crate::macro_core::functions::{parse_internal, parse_is_provider_params, to_snake_case_ident};
+use crate::macro_core::functions::{
+    is_on_unimplemented, parse_internal, parse_is_provider_params, to_snake_case_ident,
+};
 use crate::macro_core::types::cgp_component::PreprocessedCgpComponent;
 use crate::macro_core::visitors::{
     ReplaceSelfReceiverVisitor, ReplaceSelfTypeVisitor, ReplaceSelfValueVisitor,
@@ -22,6 +24,12 @@ impl PreprocessedCgpComponent {
         let mut provider_trait = consumer_trait.clone();
 
         provider_trait.ident = provider_name.clone();
+
+        // A message the user wrote for the consumer trait talks about the consumer's
+        // `Self`; the provider trait gets its own message when it is emitted.
+        provider_trait
+            .attrs
+            .retain(|attr| !is_on_unimplemented(attr));
 
         let context_type: Type = parse_internal!(#context_type_ident);
 

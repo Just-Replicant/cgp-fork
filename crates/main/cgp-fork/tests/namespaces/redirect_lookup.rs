@@ -22,7 +22,13 @@ snapshot_cgp_component! {
     }
 
     expand_redirect_foo(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `CanDoFoo`",
+            label = "`CanDoFoo` is not implemented for `{Self}`",
+            note = "`CanDoFoo` is implemented through the component `FooProviderComponent`: wire a provider for `FooProviderComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `FooProviderComponent` names the requirement it is missing"
+        )]
         pub trait CanDoFoo {
             fn foo();
         }
@@ -34,6 +40,12 @@ snapshot_cgp_component! {
                 __Context__::foo()
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `FooProviderComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `FooProvider` nor wires `FooProviderComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `FooProviderComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `FooProvider` for it with `#[cgp_impl]` or `#[cgp_provider(FooProviderComponent)]`"
+        )]
         pub trait FooProvider<
             __Context__,
         >: IsProviderFor<FooProviderComponent, __Context__, ()> {
@@ -100,7 +112,7 @@ snapshot_cgp_component! {
                 >,
             >;
         }
-        ")
+        "#)
     }
 }
 

@@ -21,7 +21,13 @@ snapshot_cgp_type! {
     }
 
     expand_has_foo_type(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFooType`",
+            label = "`HasFooType` is not implemented for `{Self}`",
+            note = "`HasFooType` is implemented through the component `ProvideFooTypeComponent`: wire a provider for `ProvideFooTypeComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `ProvideFooTypeComponent` names the requirement it is missing"
+        )]
         pub trait HasFooType<T: ?Sized> {
             type Foo;
         }
@@ -31,6 +37,12 @@ snapshot_cgp_type! {
         {
             type Foo = <__Context__ as ProvideFooType<__Context__, T>>::Foo;
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `ProvideFooTypeComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `ProvideFooType` nor wires `ProvideFooTypeComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `ProvideFooTypeComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `ProvideFooType` for it with `#[cgp_impl]` or `#[cgp_provider(ProvideFooTypeComponent)]`"
+        )]
         pub trait ProvideFooType<
             __Context__,
             T: ?Sized,
@@ -119,7 +131,7 @@ snapshot_cgp_type! {
         where
             __Provider__: TypeProvider<__Context__, ProvideFooTypeComponent, Type = Foo>,
         {}
-        ")
+        "#)
     }
 }
 

@@ -27,7 +27,12 @@ snapshot_cgp_auto_getter! {
     }
 
     expand_auto_rectangle_fields(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `AutoRectangleFields`",
+            label = "`AutoRectangleFields` needs the fields `width`, `height` on `{Self}`",
+            note = "`AutoRectangleFields` reads the fields `width`, `height` from `{Self}`: add it with the type the getter returns and derive `HasField` on `{Self}` (`#[derive(HasField)]`)"
+        )]
         pub trait AutoRectangleFields: HasScalarType {
             fn width(&self) -> <Self as HasScalarType>::Scalar;
             fn height(&self) -> <Self as HasScalarType>::Scalar;
@@ -76,7 +81,7 @@ snapshot_cgp_auto_getter! {
                     .clone()
             }
         }
-        ")
+        "#)
     }
 }
 
@@ -90,7 +95,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_rectangle_fields(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasRectangleFields`",
+            label = "`HasRectangleFields` is not implemented for `{Self}`",
+            note = "`HasRectangleFields` is implemented through the component `RectangleFieldsGetterComponent`: wire a provider for `RectangleFieldsGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `RectangleFieldsGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasRectangleFields: HasScalarType {
             fn width(&self) -> <Self as HasScalarType>::Scalar;
             fn height(&self) -> <Self as HasScalarType>::Scalar;
@@ -107,6 +118,12 @@ snapshot_cgp_getter! {
                 __Context__::height(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `RectangleFieldsGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `RectangleFieldsGetter` nor wires `RectangleFieldsGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `RectangleFieldsGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `RectangleFieldsGetter` for it with `#[cgp_impl]` or `#[cgp_provider(RectangleFieldsGetterComponent)]`"
+        )]
         pub trait RectangleFieldsGetter<
             __Context__,
         >: IsProviderFor<RectangleFieldsGetterComponent, __Context__, ()>
@@ -248,6 +265,6 @@ snapshot_cgp_getter! {
                 Value = <__Context__ as HasScalarType>::Scalar,
             >,
         {}
-        ")
+        "#)
     }
 }

@@ -18,7 +18,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_foo(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasFoo`",
+            label = "`HasFoo` is not implemented for `{Self}`",
+            note = "`HasFoo` is implemented through the component `GetStringComp`: wire a provider for `GetStringComp` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `GetStringComp` names the requirement it is missing"
+        )]
         pub trait HasFoo {
             fn foo(&self) -> &str;
         }
@@ -30,6 +36,12 @@ snapshot_cgp_getter! {
                 __Context__::foo(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `GetStringComp` for `{__Context__}`",
+            label = "`{Self}` neither implements `GetString` nor wires `GetStringComp`",
+            note = "if `{Self}` is a context or a wiring table, add `GetStringComp: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `GetString` for it with `#[cgp_impl]` or `#[cgp_provider(GetStringComp)]`"
+        )]
         pub trait GetString<__Context__>: IsProviderFor<GetStringComp, __Context__, ()> {
             fn foo(__context__: &__Context__) -> &str;
         }
@@ -129,7 +141,7 @@ snapshot_cgp_getter! {
         where
             __Provider__: FieldGetter<__Context__, GetStringComp, Value = String>,
         {}
-        ")
+        "#)
     }
 }
 

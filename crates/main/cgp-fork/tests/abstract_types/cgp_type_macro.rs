@@ -21,7 +21,13 @@ snapshot_cgp_type! {
     }
 
     expand_has_scalar_type(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasScalarType`",
+            label = "`HasScalarType` is not implemented for `{Self}`",
+            note = "`HasScalarType` is implemented through the component `ScalarTypeProviderComponent`: wire a provider for `ScalarTypeProviderComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `ScalarTypeProviderComponent` names the requirement it is missing"
+        )]
         pub trait HasScalarType {
             type Scalar;
         }
@@ -31,6 +37,12 @@ snapshot_cgp_type! {
         {
             type Scalar = <__Context__ as ScalarTypeProvider<__Context__>>::Scalar;
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `ScalarTypeProviderComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `ScalarTypeProvider` nor wires `ScalarTypeProviderComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `ScalarTypeProviderComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `ScalarTypeProvider` for it with `#[cgp_impl]` or `#[cgp_provider(ScalarTypeProviderComponent)]`"
+        )]
         pub trait ScalarTypeProvider<
             __Context__,
         >: IsProviderFor<ScalarTypeProviderComponent, __Context__, ()> {
@@ -107,6 +119,6 @@ snapshot_cgp_type! {
         where
             __Provider__: TypeProvider<__Context__, ScalarTypeProviderComponent, Type = Scalar>,
         {}
-        ")
+        "#)
     }
 }

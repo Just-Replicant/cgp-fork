@@ -1,11 +1,14 @@
-error[E0599]: the method `greet` exists for struct `App`, but its trait bounds were not satisfied
+error[E0599]: `App` does not provide `GreeterComponent` for `App`
   --> tests/ui/missing_wiring.rs:16:17
    |
  9 | pub struct App;
    | -------------- method `greet` not found for this struct because it doesn't satisfy `App: CanGreet` or `App: Greeter<App>`
 ...
 16 |     let _ = App.greet();
-   |                 ^^^^^ this is an associated function, not a method
+   |                 ^^^^^
+   |                 |
+   |                 this is an associated function, not a method
+   |                 `App` neither implements `Greeter` nor wires `GreeterComponent`
    |
    = note: found the following associated functions; to be used as methods, functions must have a `self` parameter
 note: the candidate is defined in the trait `Greeter`
@@ -20,6 +23,8 @@ note: trait bound `App: Greeter<App>` was not satisfied
    | ^^^^^^^^^^^^^^^^^^^^^^^^^
  5 | pub trait CanGreet {
    |           ^^^^^^^^
+   = note: if `App` is a context or a wiring table, add `GreeterComponent: SomeProvider` to its `delegate_components!` table
+   = note: if `App` is a provider, implement `Greeter` for it with `#[cgp_impl]` or `#[cgp_provider(GreeterComponent)]`
 note: the trait `Greeter` must be implemented
   --> tests/ui/missing_wiring.rs:5:1
    |

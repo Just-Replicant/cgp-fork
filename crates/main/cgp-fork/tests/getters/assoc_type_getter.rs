@@ -21,7 +21,13 @@ snapshot_cgp_getter! {
     }
 
     expand_has_scalar(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `HasScalar`",
+            label = "`HasScalar` is not implemented for `{Self}`",
+            note = "`HasScalar` is implemented through the component `ScalarGetterComponent`: wire a provider for `ScalarGetterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `ScalarGetterComponent` names the requirement it is missing"
+        )]
         pub trait HasScalar {
             type Scalar: Mul<Output = Self::Scalar> + Clone;
             fn scalar(&self) -> &Self::Scalar;
@@ -35,6 +41,12 @@ snapshot_cgp_getter! {
                 __Context__::scalar(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `ScalarGetterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `ScalarGetter` nor wires `ScalarGetterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `ScalarGetterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `ScalarGetter` for it with `#[cgp_impl]` or `#[cgp_provider(ScalarGetterComponent)]`"
+        )]
         pub trait ScalarGetter<
             __Context__,
         >: IsProviderFor<ScalarGetterComponent, __Context__, ()> {
@@ -180,7 +192,7 @@ snapshot_cgp_getter! {
             Scalar: Mul<Output = Scalar> + Clone,
             __Provider__: FieldGetter<__Context__, ScalarGetterComponent, Value = Scalar>,
         {}
-        ")
+        "#)
     }
 }
 

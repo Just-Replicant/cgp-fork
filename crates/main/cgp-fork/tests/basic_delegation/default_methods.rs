@@ -30,6 +30,12 @@ snapshot_cgp_component! {
 
     expand_can_greet(output) {
         insta::assert_snapshot!(output, @r#"
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not implement `CanGreet`",
+            label = "`CanGreet` is not implemented for `{Self}`",
+            note = "`CanGreet` is implemented through the component `GreeterComponent`: wire a provider for `GreeterComponent` in the `delegate_components!` table of `{Self}`",
+            note = "if a provider is wired, `check_components!` on `{Self}` with `GreeterComponent` names the requirement it is missing"
+        )]
         pub trait CanGreet: HasName {
             fn greet(&self) -> String {
                 format!("Hello, {}!", self.name())
@@ -44,6 +50,12 @@ snapshot_cgp_component! {
                 __Context__::greet(self)
             }
         }
+        #[diagnostic::on_unimplemented(
+            message = "`{Self}` does not provide `GreeterComponent` for `{__Context__}`",
+            label = "`{Self}` neither implements `Greeter` nor wires `GreeterComponent`",
+            note = "if `{Self}` is a context or a wiring table, add `GreeterComponent: SomeProvider` to its `delegate_components!` table",
+            note = "if `{Self}` is a provider, implement `Greeter` for it with `#[cgp_impl]` or `#[cgp_provider(GreeterComponent)]`"
+        )]
         pub trait Greeter<__Context__>: IsProviderFor<GreeterComponent, __Context__, ()>
         where
             __Context__: HasName,
