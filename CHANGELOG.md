@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Added
+
+- *(handler)* a unified handler family in `cgp_fork::handler` (rewrite plan phase 3,
+  ADR 0006). Two components, `Handler` and `AsyncHandler`, replace the nine 0.10 ones: borrowing
+  is in the input type (`&'a T`), fallibility in `Output = Result<_, Context::Error>`, a producer
+  takes `()`. One adapter family (`Promote`, `PromoteOk`, `PromoteDeref`, `IgnoreInput`,
+  `ReturnInput`), `Pipe` and `TryPipe`, and one dispatcher, `MatchWith<Handlers, All | First,
+  Owned | Ref | Mut>`, with `OnField`, `FieldValue`, `MatchFields`/`MatchValues` and the record
+  builders `BuildWith`, `TryBuildWith`, `SetField`, `Merge` and `MergeOutputs`. Import them with
+  `use cgp_fork::handler::prelude::*;`; they are not in `cgp_fork::prelude`, which keeps the
+  0.10 `Handler`.
+- *(field)* access modes `Owned`, `Ref` and `Mut` with the mode-generic `ModeExtractor` and
+  `ModeFields`, implemented through the existing `HasExtractor*` and `ToFields*` traits.
+- *(compat)* `cgp_fork::compat` (`compat-0.10` feature): `Compat`, `CompatTry`, `CompatRef`,
+  `CompatTryRef` and `CompatProducer` turn a 0.10 provider into a unified handler, and
+  `Compat<P>` wires a unified handler to every 0.10 handler component.
+- *(diagnostics)* a `MatchWith` whose handlers miss a variant of the enum reports "still has a
+  variant left: not every variant of the enum is handled" (`FinalizeExtract` carries
+  `#[diagnostic::on_unimplemented]`).
+
 ### Fixed
 
 - *(macro)* attribute errors in wiring tables are all reported at once. `delegate_components!`,
@@ -40,6 +60,11 @@
 
 ### Changed
 
+- *(features)* the 0.10 handler family (`extra::handler`, `extra::dispatch`, `extra::monad`) and
+  the macros that generate it (`#[cgp_computer]`, `#[cgp_producer]`, `#[cgp_auto_dispatch]`)
+  need the new `compat-0.10` feature. It is part of `full`, so default builds are unchanged; a
+  crate with `default-features = false` that uses them adds `features = ["compat-0.10"]`. The
+  0.10 names are not deprecated yet.
 - *(diagnostics)* readable compiler errors for common wiring mistakes, without an external tool.
   `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField` and `HasFieldMut` carry
   `#[diagnostic::on_unimplemented]` messages, so a failed `check_components!` starts with

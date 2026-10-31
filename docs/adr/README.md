@@ -10,6 +10,7 @@ and its consequences. A record is never rewritten after it is accepted; a later 
 | [0003](0003-crate-path-resolution.md) | Resolve the facade's path in generated code | Accepted |
 | [0004](0004-shared-ir-pipeline.md) | One `parse → IR → validate → emit` pipeline for every macro entrypoint | Accepted |
 | [0005](0005-diagnostics.md) | Readable diagnostics with `#[diagnostic::on_unimplemented]` | Accepted |
+| [0006](0006-handler-unification.md) | One `Handler` and one `AsyncHandler` instead of nine handler components | Accepted |
 
 Statuses: Proposed, Accepted, Superseded by NNNN, Rejected. New records copy the headings of an
 existing one and take the next number.
