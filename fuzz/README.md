@@ -53,6 +53,15 @@ Then add the minimised input as a `macro_tests` regression test before fixing it
 finding, raw identifiers in derived names (`check_components! { r#r {} }`), is pinned in
 `src/macro_tests/raw_ident_tests.rs`.
 
+## Known findings
+
+`known/` keeps reproducers of findings that are not fixed, so they survive `artifacts/` being
+ignored by git. Each is listed in the latest `docs/baseline/` report.
+
+- `known/cgp_new_provider-slow-563b4e2c`: a slow input, not a crash (about 1.3 s in a release
+  build). The time is spent in `syn`'s `ToTokens` for long `&&..&&..=` runs in a method body.
+  Replay it with `cargo +nightly fuzz run cgp_new_provider fuzz/known/cgp_new_provider-slow-563b4e2c`.
+
 ## CI
 
 - Every run: the `Macro fuzzing (deep)` job checks that this crate builds

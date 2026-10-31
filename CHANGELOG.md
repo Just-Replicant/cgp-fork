@@ -54,6 +54,10 @@
 
 - ADR 0004 (the shared macro pipeline) and ADR 0005 (diagnostics); the rewrite plan marks phases
   1b and 2 done.
+- `docs/baseline/2026-10-31-after-phase-1b-final.md`: coverage (95.0% of lines), `cargo audit`,
+  `cargo deny`, `cargo semver-checks` (no semver update required against 0.10.0) and a final
+  three-minute pass over every fuzz target, with every fuzz finding fixed on this branch. One slow
+  input in `syn`'s printer is kept as a known finding under `fuzz/known/`.
 - The 1.0 rewrite plan (`docs/rewrite-plan.md`), architecture decision records (`docs/adr/`), and
   a measured baseline (`docs/baseline/`, `scripts/baseline.sh`).
 
