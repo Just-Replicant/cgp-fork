@@ -20,7 +20,7 @@ This fork includes upstream [contextgeneric/cgp](https://github.com/contextgener
 cargo add cgp-fork
 ```
 
-`anyhow`, `eyre`, and `std-error` are optional features of that one crate. They select `anyhow::Error`, `eyre::Report`, or a boxed `core::error::Error` as the context error.
+`anyhow`, `eyre`, and `std-error` are optional features of that one crate. They select `anyhow::Error`, `eyre::Report`, or a boxed `core::error::Error` as the context error. `tokio` and `smol` are optional runtime adapters (spawn, sleep, timeout) and are not part of the default build.
 
 ```rust
 use cgp_fork::prelude::*;
@@ -77,7 +77,8 @@ fn main() {
 
 This example (and every Rust block in this README) is compiled as a doctest of `cgp-fork`. More programs live in
 [`crates/main/cgp-fork/examples`](crates/main/cgp-fork/examples): `hello`, `swap_context`,
-`error_backends` (`--features anyhow,std-error`), and `async_component`.
+`error_backends` (`--features anyhow,std-error`), `async_component`, and `runtime`
+(`--features tokio`).
 
 ## Features
 
@@ -88,6 +89,8 @@ This example (and every Rust block in this README) is compiled as a doctest of `
 | `anyhow` | no | `alloc` | `anyhow::Error` as the context error |
 | `eyre` | no | `std` | `eyre::Report` as the context error |
 | `std-error` | no | `alloc` | a boxed `core::error::Error` as the context error |
+| `tokio` | no | `std` | `tokio::runtime::Handle` as an `AsyncRuntime` (spawn, sleep, timeout) |
+| `smol` | no | `std` | an owned `smol` executor as an `AsyncRuntime` |
 
 With `default-features = false` the crate needs only `core`.
 
