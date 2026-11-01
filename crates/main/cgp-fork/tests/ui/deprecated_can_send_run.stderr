@@ -1,0 +1,17 @@
+error: use of deprecated trait `cgp_fork::extra::run::CanSendRun`: put `#[cgp_async(Send)]` on the component you spawn. `CanRun` stays the runner; its future is `Send` only when that component says so
+ --> tests/ui/deprecated_can_send_run.rs:4:27
+  |
+4 | use cgp_fork::extra::run::CanSendRun;
+  |                           ^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_can_send_run.rs:2:9
+  |
+2 | #![deny(deprecated)]
+  |         ^^^^^^^^^^
+
+error: use of deprecated trait `cgp_fork::extra::run::CanSendRun`: put `#[cgp_async(Send)]` on the component you spawn. `CanRun` stays the runner; its future is `Send` only when that component says so
+ --> tests/ui/deprecated_can_send_run.rs:7:24
+  |
+7 | fn needs_send<Context: CanSendRun<()>>() {}
+  |                        ^^^^^^^^^^
