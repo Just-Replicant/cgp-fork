@@ -119,10 +119,10 @@ All since 0.11.0, each with its replacement in the note. Internal uses (the 0.10
 ### Changed
 
 - *(features)* the 0.10 handler family (`extra::handler`, `extra::dispatch`, `extra::monad`) and
-  the macros that generate it (`#[cgp_computer]`, `#[cgp_producer]`, `#[cgp_auto_dispatch]`)
-  need the new `compat-0.10` feature. It is part of `full`, so default builds are unchanged; a
-  crate with `default-features = false` that uses them adds `features = ["compat-0.10"]`. The
-  0.10 names are not deprecated yet.
+  the macros `#[cgp_computer]` and `#[cgp_producer]` need the `compat-0.10` feature. It is part
+  of `full`, so default builds are unchanged; a crate with `default-features = false` that uses
+  them adds `features = ["compat-0.10"]`. Those names are deprecated since 0.11.0.
+  `#[cgp_auto_dispatch]` emits the unified family with or without the feature.
 - *(diagnostics)* readable compiler errors for common wiring mistakes, without an external tool.
   `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField` and `HasFieldMut` carry
   `#[diagnostic::on_unimplemented]` messages, so a failed `check_components!` starts with
