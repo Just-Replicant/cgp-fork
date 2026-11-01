@@ -30,7 +30,7 @@ pub trait CanHandle<Code, Input> {
     fn handle(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
 }
 
-#[async_trait]
+#[cgp_async]
 #[cgp_component(AsyncHandler)]
 #[prefix(@cgp.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
