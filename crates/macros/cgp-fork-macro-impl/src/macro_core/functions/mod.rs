@@ -1,3 +1,4 @@
+mod async_attr;
 mod camel_case;
 mod delegated_impls;
 mod deprecation;
@@ -15,6 +16,7 @@ mod snake_case;
 mod strip;
 mod tokens_eq;
 
+pub use async_attr::*;
 pub use camel_case::*;
 pub use delegated_impls::*;
 pub use deprecation::*;
