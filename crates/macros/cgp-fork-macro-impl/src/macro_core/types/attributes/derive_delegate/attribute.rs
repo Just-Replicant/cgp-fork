@@ -49,6 +49,7 @@ impl DeriveDelegateAttribute {
             &provider_trait.items,
             &parse_internal!( #delegate_ident ),
             &parse_internal!( #provider_trait_ident #type_generics ),
+            crate::macro_core::functions::is_cgp_async_send(&provider_trait.attrs),
         )?;
 
         let provider_type = parse_internal! {
