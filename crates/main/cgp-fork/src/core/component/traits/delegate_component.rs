@@ -1,0 +1,69 @@
+/**
+   This is the core trait used by the `delegate_component!` macro to define a mapping
+   from `Name` to `Delegate` on the target `Self` type.
+
+   ## `DelegateComponent` as a type-level key-value map
+
+   Essentially, `DelegateComponent` turns the `Self` type into a type-level key-value map,
+   with `Name` as the key and `Delegate` as the value. The implementation of
+   `DelegateComponent` serves as "setting" an entry of `Self` at `Name` to `Delegate`.
+   Then, the inclusion of `DelegateComponent` in a constraint serves as "getting" the
+   `Delegate` value with the provided `Name` as the key.
+
+   When `Name` type in `DelegateComponent` is a CGP component name type, then the `Self`
+   type would also automatically implement the corresponding provider trait through the
+   blanket implementation.
+
+   However, it is also common to use `DelegateComponent` with regular types as the `Name`
+   key, especially when it is used to define lookup tables for providers such as
+   `UseDelegate`. In such cases, the `Self` type that implements `DelegateComponent` would
+   not be used to implement any provider trait.
+
+   ## Examples
+
+   As an example, given the following `delegate_components!` macro invocation:
+
+   ```rust
+   # use cgp_fork::prelude::*;
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet {
+   #     fn greet(&self) -> String;
+   # }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter {
+   #     fn greet(&self) -> String {
+   #         "hello".to_owned()
+   #     }
+   # }
+   pub struct MyComponent;
+
+   delegate_components! {
+       MyComponent {
+           GreeterComponent: GreetHello,
+       }
+   }
+   # fn delegates_to_greet_hello<T: DelegateComponent<GreeterComponent, Delegate = GreetHello>>() {}
+   # delegates_to_greet_hello::<MyComponent>();
+   ```
+
+   would generate the following impl:
+
+   ```rust
+   # use cgp_fork::prelude::*;
+   # pub struct GreeterComponent;
+   # pub struct GreetHello;
+   # pub struct MyComponent;
+   impl DelegateComponent<GreeterComponent> for MyComponent {
+       type Delegate = GreetHello;
+   }
+   ```
+*/
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` has no wiring entry for `{Key}`",
+    label = "`{Key}` is not wired for `{Self}`",
+    note = "add an entry `{Key}: SomeProvider` to the `delegate_components!` table of `{Self}`"
+)]
+pub trait DelegateComponent<Key: ?Sized> {
+    /// The provider (or nested table) stored at `Key`.
+    type Delegate;
+}

@@ -1,0 +1,9 @@
+# Maps commit identities to canonical ones for `git shortlog`, `git blame`, and
+# `git log --use-mailmap`. It never rewrites history.
+#
+# Commits 5ee342fb..e6e8d7f1 and the 0.10.1 work were made offline with the
+# placeholder identity `cgp-fork maintainer <maintainer@localhost>`. To credit
+# them to a real identity, replace "Real Name <real-email@example.com>" with the
+# maintainer's own name and email and remove the leading "# " from that line.
+#
+# Real Name <real-email@example.com> cgp-fork maintainer <maintainer@localhost>

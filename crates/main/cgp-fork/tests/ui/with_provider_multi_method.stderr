@@ -1,0 +1,5 @@
+error: `#[derive_provider(WithProvider)]` supports a getter with a single method
+ --> tests/ui/with_provider_multi_method.rs:6:1
+  |
+6 | pub trait HasNames {
+  | ^^^

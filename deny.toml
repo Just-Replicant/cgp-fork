@@ -1,0 +1,30 @@
+# cargo-deny configuration: advisories, licenses, duplicate/banned crates, sources.
+# Run locally with `cargo deny check`.
+
+[graph]
+all-features = true
+
+[advisories]
+# RustSec: fail on vulnerabilities and on unmaintained/unsound/yanked crates.
+yanked = "deny"
+ignore = []
+
+[licenses]
+# Every dependency must be under one of these (the crate itself is Apache-2.0).
+allow = [
+    "Apache-2.0",
+    "MIT",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+# Path dependencies inside the workspace carry a version, so they are not wildcards.
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

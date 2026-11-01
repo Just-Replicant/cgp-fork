@@ -1,0 +1,39 @@
+[package]
+name         = "cgp-fork-macro-impl"
+version      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+repository   = { workspace = true }
+authors      = { workspace = true }
+rust-version = { workspace = true }
+homepage     = { workspace = true }
+keywords     = { workspace = true }
+categories   = { workspace = true }
+description  = "Implementation of the cgp-fork procedural macros. Internal: depend on cgp-fork instead."
+# `src/macro_tests/` ships with the crate: `lib.rs` declares those modules under
+# `cfg(test)`, so `cargo test` on the published sources needs them.
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+# The `snapshot_*` entrypoints that pretty-print an expansion (used by the
+# behavior tests of `cgp-fork` through `cgp-fork-macro/snapshot`).
+snapshot = ["dep:prettyplease"]
+
+[dependencies]
+# No `extra-traits`: the macros compare syntax with `tokens_eq` and derive `Debug`
+# only under `cfg(test)`, so downstream builds compile a smaller syn.
+syn         = { version = "3", features = ["full", "visit", "visit-mut"] }
+quote       = { version = "1" }
+proc-macro2 = { version = "1" }
+prettyplease = { version = "0.3", optional = true }
+
+[dev-dependencies]
+# The unit tests print and compare syntax trees (`Debug`, `PartialEq`).
+syn   = { version = "3", features = ["full", "extra-traits", "visit", "visit-mut"] }
+insta = { version = "1" }
+prettyplease = { version = "0.3" }

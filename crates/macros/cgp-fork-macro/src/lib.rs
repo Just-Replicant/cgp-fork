@@ -1,0 +1,1553 @@
+/*!
+   This crate provides the proc macros used for defining CGP components.
+*/
+#![deny(missing_docs)]
+
+use cgp_fork_macro_impl::{async_impl, extra_macro_lib, macro_lib};
+use proc_macro::TokenStream;
+
+/**
+    `#[cgp_component]` is the most basic macro used to define a CGP component.
+
+    The macro can be used on a Rust trait, which would be used as the base consumer
+    trait for the macro to generate the other constructs, including the provider
+    trait and the blanket implementations.
+
+    The macro accepts two forms of attribute arguments. If only an identifier is
+    provided, the identifier is used as the name of the provider trait. Otherwise,
+    the macro accepts a list of key/value pairs, with the following keys allowed:
+
+    - `name` - the name of the component. If not provided, the name would be in the
+      format `{provider_trait_name}Component`.
+
+    - `provider` - the name of the provider trait.
+
+    - `context` - the identifier used for the generic context type. If not provided,
+      the default identifier `__Context__` is used.
+
+    ## Extension Macros
+
+    There are two other macros that extends `#[cgp_component]` that can be used for
+    deriving specialized CGP components: [`#[cgp_type]`](macro@cgp_type) can be used to
+    define abstract type components, and [`#[cgp_getter]`](macro@cgp_getter) can be used
+    to define getter components.
+
+    These macros share the same arguments and expansion as `#[cgp_component]`,
+    but also derive additional constructs for the specialized use cases.
+
+    ## Example
+
+    Given the following simplified component definition:
+
+    ```rust,ignore
+    #[cgp_component(Greeter)]
+    pub trait CanGreet {
+        fn greet(&self);
+    }
+    ```
+
+    is equivalent to the fully explicit definition:
+
+    ```rust,ignore
+    #[cgp_component {
+        name: GreeterComponent,
+        provider: Greeter,
+        context: __Context__,
+    }]
+    pub trait CanGreet {
+        fn greet(&self);
+    }
+    ```
+
+    ## Generated code
+
+    The definition above expands to (abridged; the full expansion is pinned by the
+    `basic_delegation::component_macro` snapshot test in `cgp-fork`):
+
+    ```rust,ignore
+    // The consumer trait, unchanged.
+    pub trait CanGreet {
+        fn greet(&self);
+    }
+
+    // Blanket impl: any context whose own provider implements `Greeter` can greet.
+    impl<__Context__> CanGreet for __Context__
+    where
+        __Context__: Greeter<__Context__>,
+    {
+        fn greet(&self) {
+            __Context__::greet(self)
+        }
+    }
+
+    // The provider trait, with `Self` moved to an explicit context parameter.
+    pub trait Greeter<__Context__>: IsProviderFor<GreeterComponent, __Context__, ()> {
+        fn greet(__context__: &__Context__);
+    }
+
+    // Blanket impl: a provider that delegates `GreeterComponent` (a wiring table, or a
+    // context wired with `delegate_components!`) forwards to its delegate.
+    impl<__Provider__, __Context__> Greeter<__Context__> for __Provider__
+    where
+        __Provider__: DelegateComponent<GreeterComponent>
+            + IsProviderFor<GreeterComponent, __Context__, ()>,
+        <__Provider__ as DelegateComponent<GreeterComponent>>::Delegate: Greeter<__Context__>,
+    {
+        fn greet(__context__: &__Context__) {
+            <__Provider__ as DelegateComponent<GreeterComponent>>::Delegate::greet(__context__)
+        }
+    }
+
+    // The component name used as the key in `delegate_components!`.
+    pub struct GreeterComponent;
+
+    // Plus `Greeter` and `IsProviderFor` impls for `UseContext` and `RedirectLookup`.
+    ```
+
+    A runnable version of this wiring is the `UseContext` example in `cgp-fork`
+    (`cgp_fork::core::component::UseContext`), which is compiled as a doctest.
+
+    ## `#[derive_handler(Name)]`
+
+    On a component with one method, also generates a provider `Name<P>` that implements the
+    component by calling the unified `Handler` `P`, with the method's arguments (after
+    `&self`) as its input: none is `()`, one is that value, more are a tuple. Wire it as
+    `Name<SomeHandler>`. It replaces the deprecated `#[derive_promote(Name)]`, which calls a
+    0.10 `Computer`.
+
+    ## Deprecation
+
+    A `#[deprecated]` attribute on the consumer trait deprecates the provider trait and the
+    component struct too; the generated impls allow the lint, so only users are warned.
+*/
+#[proc_macro_attribute]
+pub fn cgp_component(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_component(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_provider]` is used for implementing a provider trait.
+
+    It is applied on a provider trait `impl` block, and generates the accompanying
+    `IsProviderFor` trait implementation that captures the same constraints as
+    specified in the provider trait implementation.
+
+    The macro is mainly used to propagate the provider implementation constraints
+    through the `IsProviderFor` trait, so that Rust would print out any unsatisfied
+    constraints in the error messages.
+
+    In an ideal world, Rust should be able to print out the unsatisfied constraints,
+    even if we don't have an `IsProviderFor` trait. However, since that is not the case,
+    the use of this macro is required on all provider trait implementations to ensure
+    that the unsatisfied constraints are always printed out.
+
+    The macro accepts an optional identifier as its argument, which is used as the
+    component name identifier. If not provided, the component name would default to
+    the format `{provider_trait_name}Component`.
+
+    Although the component name may be omitted when using `#[cgp_provider]`, a issue
+    that arises is that the default component name identifier cannot be imported
+    automatically by Rust Analyzer, due to it being an identifier generated by the
+    macro. This means that the user cannot use the quick fix feature to auto import
+    the component name, but instead has to add the import statement manually.
+
+    ## Example
+
+    Given the following provider trait implementation:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    #[cgp_provider]
+    impl<Context> Greeter<Context> for GreetName
+    where
+        Context: HasName,
+    {
+        fn greet(context: &Context) {
+            println!("Hello, {}!", context.name());
+        }
+    }
+    ```
+
+    Is equivalent to the following fully explicit implementation:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    #[cgp_provider(GreeterComponent)]
+    impl<Context> Greeter<Context> for GreetName
+    where
+        Context: HasName,
+    {
+        fn greet(context: &Context) {
+            println!("Hello, {}!", context.name());
+        }
+    }
+    ```
+
+    Which would generate the following `IsProviderFor` trait implementation:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    impl<Context> IsProviderFor<GreeterComponent, Context> for GreetName
+    where
+        Context: HasName,
+    {}
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_provider(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_impl]` provides a simplified ergonomic implementing a provider trait,
+    by making it look like we are writing blanket implementations on a generic context.
+
+    The macro accepts a provider type in its attribute argument, along with an optional `new`
+    keyword at the front. If `new` is specified, a provider struct is defined along with
+    the trait impl.
+
+    The macro can be applied with a trait `impl` body, where the provider trait is implemented
+    as if it has the same trait signature as the consumer trait. Behind the scene, it moves
+    the `Self` type in the trait impl to the first position of the generic parameter
+    in the trait path, and use the given provider type as the new `Self` type.
+
+    The macro also replaces all references to `Self` and `self` in the trait body to explicitly
+    refer to the original context type.
+
+    After the transformation of the trait `impl`, `#[cgp_impl]` works the same way as
+    [`#[cgp_provider]`](cgp_provider), and also generates the corresponding `IsProviderFor`
+    implementation for the provider.
+
+    ## Example
+
+    Given the following provider trait implementation:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    #[cgp_impl(GreetName)]
+    impl<Context> Greeter for Context
+    where
+        Context: HasName,
+    {
+        fn greet(context: &Context) {
+            println!("Hello, {}!", context.name());
+        }
+    }
+    ```
+
+    would be equivalent to the following provider implementation using `#[cgp_provider]`:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    #[cgp_provider]
+    impl<Context> Greeter<Context> for GreetName
+    where
+        Context: HasName,
+    {
+        fn greet(context: &Context) {
+            println!("Hello, {}!", context.name());
+        }
+    }
+    ```
+
+    Which would generate the following `IsProviderFor` trait implementation:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    impl<Context> IsProviderFor<GreeterComponent, Context> for GreetName
+    where
+        Context: HasName,
+    {}
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_impl(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_fn]` turns a function with `#[implicit]` parameters into a trait and a blanket impl.
+
+    Each `#[implicit]` parameter is removed from the signature and read from a same-named field
+    of the context through `HasField`. The function name becomes the trait name in PascalCase,
+    unless the attribute names a different trait.
+
+    ## Example
+
+    ```rust,ignore
+    #[cgp_fn]
+    pub fn greet(&self, #[implicit] name: &str) {
+        println!("Hello, {name}!");
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_fn(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    The `#[cgp_new_provider]` macro is an extension to [`#[cgp_provider]`](macro@cgp_provider)
+    that in addition to the derivation of `IsProviderFor`, also generates a new provider
+    struct based on the `Self` type.
+
+    This macro is a convenient shorthand for users to skip the manual definition of
+    the provider struct. It is commonly used when user only wants to implement one
+    provider trait for each provider struct.
+
+    When the user wants to implement multiple provider traits for the same provider struct,
+    the user should still explicitly define the provider struct, and use `#[cgp_provider]`
+    instead.
+
+    ## Example
+
+    Given the following provider trait implementation:
+
+    ```rust,ignore
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    # pub struct GreetName;
+    #[cgp_provider]
+    impl<Context> Greeter<Context> for GreetName
+    where
+        Context: HasName,
+    {
+        fn greet(context: &Context) {
+            println!("Hello, {}!", context.name());
+        }
+    }
+    ```
+
+    The provider struct `GreetName` is also generated as follows:
+
+    ```rust
+    struct GreetName;
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_new_provider(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_getter]` is an extension to [`#[cgp_component]`](macro@cgp_component) that
+    derives additional getter constructs.
+
+    This macro can only be used on traits that contains only getter-like methods.
+
+    The macro accepts the same arguments as `#[cgp_component]`, and generates the same
+    CGP component constructs. Additionally, it also generates implementation for the
+    following getter providers:
+
+    - `UseField<Tag>` - implements the provider trait using `HasField<Tag>`.
+    - `UseFields` - implements the provider trait using `HasField`, with the tag
+      being the same name as the getter methods.
+    - `WithProvider<Provider>` - implements the provider trait if the given
+      `Provider` implements `FieldGetter<ComponentName>`.
+
+    ## Example
+
+    Given the following getter component definition:
+
+    ```rust,ignore
+    #[cgp_component(NameGetter)]
+    pub trait HasName {
+        fn name(&self) -> &str;
+    }
+    ```
+
+    The following getter providers are generated:
+
+    ```rust,ignore
+    # // doc-example: not compiled (abridged expansion of the getter providers)
+    #[cgp_provider]
+    impl<Context, Tag> NameGetter<Context> for UseField<Tag>
+    where
+        Context: HasField<Tag, Value = String>,
+    {
+        fn get(context: &Context) -> &str {
+            context.get_field(PhantomData).as_str()
+        }
+    }
+
+    #[cgp_provider]
+    impl<Context> NameGetter<Context> for UseFields
+    where
+        Context: HasField<Symbol!("name"), Value = String>,
+    {
+        fn get(context: &Context) -> &str {
+            context.get_field(PhantomData).as_str()
+        }
+    }
+
+    #[cgp_provider]
+    impl<Context, Provider> NameGetter<Context> for WithProvider<Provider>
+    where
+        Provider: FieldGetter<Context, NameGetterComponent, Value = String>,
+    {
+        fn get(context: &Context) -> &str {
+            Provider::get_field(context, PhantomData).as_str()
+        }
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_getter(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_auto_getter]` is used on a regular getter Rust trait without turnning it
+    into a CGP component. Instead, a blanket implementation is derived directly on
+    that trait.
+
+    This macro can only be used on traits that contains only getter-like methods.
+
+    This macro is a simplified version of [`#[cgp_getter]`](macro@cgp_getter) that does
+    not require explicit implementation or wiring. Instead, the trait would have a blanket
+    implementation that is implemented only if the context implements `HasField` with the
+    field having the exact same name as the getter methods.
+
+    This macro serves as a convenient alternative, so that whenever there is a need to
+    use the `HasField` trait directly, one can instead define a getter trait that is
+    applied with `#[cgp_auto_getter]`.
+
+    This can significantly improve developer experience, as the `HasField` trait can be
+    confusing to new users, who may not be familiar with how the field tag being used
+    as a type-level string instead of regular values.
+
+    ## Example
+
+    Given the following getter trait definition:
+
+    ```rust,ignore
+    #[cgp_auto_getter]
+    pub trait HasName {
+        fn name(&self) -> &str;
+    }
+    ```
+
+    The trait will always be implemented for any struct that derives `HasField` with
+    a `name` field of type `String`, without requiring further wiring. For example:
+
+    ```rust,ignore
+    #[derive(HasField)]
+    struct Person {
+        name: String,
+    }
+    ```
+
+    or:
+
+    ```rust,ignore
+    #[derive(HasField)]
+    struct Person {
+        name: String,
+        age: u8,
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_auto_getter(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_auto_getter(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_auto_impl]` turns a trait's method bodies into a blanket provider.
+
+    The trait is emitted with those bodies removed. A blanket impl for
+    `__Context__` carries the bodies, and the trait's supertraits become a
+    `where` bound on that context. Associated types on the trait are lifted to
+    generic parameters of the impl, with their bounds alongside.
+
+    ## Example
+
+    ```rust,ignore
+    # #[cgp_auto_getter]
+    # pub trait HasName { fn name(&self) -> &str; }
+    #[cgp_auto_impl]
+    pub trait CanGreet: HasName {
+        fn greet(&self) -> String {
+            format!("Hello, {}!", self.name())
+        }
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_auto_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_auto_impl(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_auto_error]` turns a small error definition into the providers for
+    `HasErrorType`, `CanRaiseError`, and `CanWrapError`.
+
+    The impl names the provider. `type Error` selects the abstract error type.
+    `raise_error` and `wrap_error` are the provider bodies: a bare `Error` in
+    type position is that abstract error. Wire the generated provider on
+    `ErrorTypeProviderComponent`, `ErrorRaiserComponent`, and
+    `ErrorWrapperComponent`.
+
+    ## Example
+
+    ```rust,ignore
+    # #[derive(Debug)]
+    # pub struct AppError { message: String }
+    #[cgp_auto_error]
+    impl ProvideAppError {
+        type Error = AppError;
+
+        fn raise_error<Source>(source: Source) -> Error
+        where
+            Source: core::fmt::Display,
+        {
+            AppError { message: source.to_string() }
+        }
+
+        fn wrap_error<Detail>(error: Error, detail: Detail) -> Error
+        where
+            Detail: core::fmt::Display,
+        {
+            AppError { message: format!("{detail}: {}", error.message) }
+        }
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::cgp_auto_error(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    The `delegate_components!` macro is used to define wiring of CGP components
+    on a provider type.
+
+    ## Type-Level Maps
+
+    Conceptually, we can think of the use of `delegate_components!` as defining a
+    type-level map, with the keys and values being types. When the keys are the
+    CGP component name types and the values are the CGP providers, then
+    `delegate_components!` is effectively implementing the specified providers
+    on the target type by delegating them to the providers specified in the
+    type-level map.
+
+    The macro is implemented by having the target type implement the `DelegateComponent`
+    trait, with the key used in the `Name` parameter and the value being set as the
+    `Delegate` associated type.
+
+    Additionally, for each key/value entry, the macro also generates implementation for
+    the `IsProviderFor` trait, which would be used during provider trait implementation
+    to propagate any unsatisfied constraints error to be shown to the user.
+
+    ## Basic Syntax
+
+    In its most basic form, the macro can be used by specifying a list of key/value pairs
+    as follows:
+
+    ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
+    delegate_components! {
+        MyComponents {
+            KeyA: ValueA,
+            KeyB: ValueB,
+            ...
+        }
+    }
+    ```
+
+    This would turn the target type into a type-level map, which would contain the entries
+    `KeyA` -> `ValueA`, `KeyB` -> `ValueB`, etc. For each `Key` and `Value`, the macro
+    would generate the following implementation:
+
+    ```rust,ignore
+    # // doc-example: not compiled (expansion of the table above, for illustration)
+    impl DelegateComponent<Key> for MyComponents
+    {
+        type Delegate = Value;
+    }
+
+    impl<Context, Params> IsProviderFor<Key, Context, Params> for Value
+    where
+        Value: IsProviderFor<Key, Context, Params>,
+    {
+    }
+    ```
+
+    ## Grouping Keys
+
+    The macro also supports grouping multiple keys together using the list syntax,
+    when the grouped keys all map to the same value. This is useful when we want to
+    delegate multiple CGP components to the same target provider.
+
+    For example, given the following:
+
+    ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
+    delegate_components! {
+        MyComponents {
+            [
+                KeyA,
+                KeyB,
+                ...
+            ]:
+                Value,
+        }
+    }
+    ```
+
+    It would be equivalent to the following:
+
+    ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
+    delegate_components! {
+        MyComponents {
+            KeyA: Value,
+            KeyB: Value,
+            ...
+        }
+    }
+    ```
+
+    ## Type and getter shorthand
+
+    A type component whose provider is `UseType`, and a getter component whose
+    provider is `UseField`, may be written as the value alone:
+
+    ```rust,ignore
+    # #[cgp_type]
+    # pub trait HasNameType { type Name; }
+    # #[cgp_getter]
+    # pub trait HasName: HasNameType { fn name(&self) -> &Self::Name; }
+    # #[derive(HasField)]
+    # pub struct Person { pub name: String }
+    # #[cgp_component(Greeter)]
+    # pub trait CanGreet { fn greet(&self); }
+    # #[cgp_impl(new GreetHello)]
+    # impl Greeter { fn greet(&self) {} }
+    delegate_components! {
+        Person {
+            type Name = String,
+            getter name,
+            GreeterComponent: GreetHello,
+        }
+    }
+    ```
+
+    `type Name = String` is `NameTypeProviderComponent: UseType<String>`.
+    `getter name` is `NameGetterComponent: UseField<Symbol!("name")>`.
+    The explicit `Key: Provider` form, including `UseType` and `UseField`
+    written out, means the same thing and stays available for a provider that
+    is not the obvious one.
+
+    ## Preset entries
+
+    `preset Name` expands to one `DelegateComponent` impl for every component
+    in that preset. Two presets combine by listing both. An explicit entry for
+    the same component overrides the preset. See [`cgp_preset!`](macro@cgp_preset).
+
+    ## Generating Mapping Struct
+
+    By default, mapping types like `MyComponents` would be defined outside of `delegate_components!`
+    as a dummy struct, or generated through other macros such as `#[cgp_context]`. However,
+    `delegate_components!` also accepts an optional `new` keyword in front of the map type,
+    in which it would also generate the struct definition for the mapping type.
+
+    For example, given the following:
+
+    ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
+    delegate_components! {
+        new MyComponents {
+            KeyA: ValueA,
+            KeyB: ValueB,
+            ...
+        }
+    }
+    ```
+
+    The macro would also generate the `MyComponents` struct as follows:
+
+    ```rust,ignore
+    pub struct MyComponents;
+    ```
+
+    ## Inner Maps
+
+    When defining component wiring that involves inner maps, such as with the use of
+    `UseDelegate`, `delegate_components!` also supports defining the inner map type
+    as well as the definition of inner key/value pairs all within the same macro invocation.
+
+    For example, given the following:
+
+    ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
+    delegate_components! {
+        MyComponents {
+            OuterKey: UseDelegate<new InnerMap {
+                InnerKeyA: InnerValueA,
+                InnerKeyB: InnerValueB,
+                ...
+            }>,
+        }
+    }
+    ```
+
+    It would be the same as writing two separate calls to `delegate_components!` as follows:
+
+    ```rust,ignore
+    # // doc-example: not compiled (grammar sketch)
+    delegate_components! {
+        MyComponents {
+            OuterKey: UseDelegate<InnerMap>,
+        }
+    }
+
+    delegate_components! {
+        new InnerMap {
+            InnerKeyA: InnerValueA,
+            InnerKeyB: InnerValueB,
+            ...
+        }
+    }
+    ```
+*/
+#[proc_macro]
+pub fn delegate_components(body: TokenStream) -> TokenStream {
+    macro_lib::delegate_components(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `cgp_for_each!` repeats a body once per type in a list, substituting a
+    placeholder ident. Preset `with_components!` macros expand through it.
+
+    An optional `exclude [ .. ]` list drops types the caller already implements.
+
+    ```rust,ignore
+    # pub struct FooComponent;
+    # pub struct BarComponent;
+    # pub struct App;
+    # #[allow(non_snake_case)]
+    # mod Preset { pub struct Provider; }
+    cgp_for_each! {
+        [ FooComponent, BarComponent ],
+        exclude [ FooComponent ],
+        __Component__ => {
+            impl DelegateComponent<__Component__> for App {
+                type Delegate = Preset::Provider;
+            }
+        }
+    }
+    ```
+*/
+#[proc_macro]
+pub fn cgp_for_each(body: TokenStream) -> TokenStream {
+    macro_lib::cgp_for_each(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `cgp_preset!` bundles wiring entries into a module other tables can replay.
+
+    Each entry uses the same grammar as [`delegate_components!`](macro@delegate_components),
+    including the `type Name = Type` and `getter field` shorthand. The macro
+    defines `Name::Provider` and a `DelegateComponent` impl per entry, and exports
+    `Name::with_components!`, which expands one preset entry into those impls.
+
+    A preset lists parent presets after a colon. The child implements its own
+    entries and inherits the rest, so two presets combine without repeating
+    `UseType` or `UseField`.
+
+    ```rust,ignore
+    # #[cgp_type]
+    # pub trait HasNameType { type Name; }
+    # #[cgp_getter]
+    # pub trait HasName: HasNameType { fn name(&self) -> &Self::Name; }
+    # #[derive(HasField)]
+    # pub struct Person { pub name: String }
+    cgp_preset! {
+        Types {
+            type Name = String,
+        }
+    }
+
+    cgp_preset! {
+        PersonPreset: Types {
+            getter name,
+        }
+    }
+
+    delegate_components! {
+        Person {
+            preset PersonPreset,
+        }
+    }
+    ```
+
+    `PersonPreset` expands to the `Name` type entry and the `name` getter entry.
+    An explicit `Key: Provider` entry in the same table overrides the preset.
+*/
+#[proc_macro]
+pub fn cgp_preset(body: TokenStream) -> TokenStream {
+    macro_lib::cgp_preset(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[derive_provider(WithProvider)]` derives the `WithProvider` impl for a
+    component instead of writing it by hand.
+
+    Place it outside [`#[cgp_component]`](macro@cgp_component). The `WithProvider`
+    struct already exists in `cgp_fork::core::component`; this macro only generates the impl.
+    An abstract-type trait bridges through `TypeProvider`. A single-method getter
+    bridges through `FieldGetter`.
+
+    ```rust,ignore
+    #[derive_provider(WithProvider)]
+    #[cgp_component(NameTypeProvider)]
+    pub trait HasNameType {
+        type Name;
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn derive_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::derive_provider(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `cgp_namespace!` defines a namespace table: a type-level map from paths to providers.
+
+    The body uses the same entries as [`delegate_components!`](macro@delegate_components).
+    `new Name` declares the table type. `Name: Parent` inherits the parent's entries, and an
+    entry in the child overrides the parent. `#[prefix]` and `open` look providers up in
+    these tables through `RedirectLookup`.
+
+    ```rust,ignore
+    # use cgp_fork::core::error::ErrorRaiserComponent;
+    # pub struct RaiseFrom;
+    cgp_namespace! {
+        new AppNamespace {
+            @app.error.ErrorRaiserComponent: RaiseFrom,
+        }
+    }
+    ```
+*/
+#[proc_macro]
+pub fn cgp_namespace(body: TokenStream) -> TokenStream {
+    macro_lib::cgp_namespace(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+   The `check_components!` macro allows users to write compile-time tests to check
+   for the correctness of component wiring for a CGP context.
+
+   ## Example
+
+   Given the following:
+
+   ```rust,ignore
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet { fn greet(&self); }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter { fn greet(&self) {} }
+   # pub struct Person;
+   # delegate_components! { Person { GreeterComponent: GreetHello } }
+   check_components! {
+       #[check_trait(CanUsePerson)]
+       Person {
+           GreeterComponent,
+       }
+   }
+   ```
+
+   The code above generates a *check trait* called `CanUsePerson`, which verifies
+   whether the `Person` context implements the consumer trait for
+   `GreeterComponent` (i.e., `CanGreet`):
+
+   ```rust,ignore
+   # // doc-example: not compiled (expansion of the check above, for illustration)
+   trait CanUsePerson<Component, Params>: CanUseComponent<Component, Params> {}
+
+   impl CanUsePerson<GreeterComponent, ()> for Person {}
+   ```
+*/
+#[proc_macro]
+pub fn check_components(body: TokenStream) -> TokenStream {
+    macro_lib::check_components(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+   The `delegate_and_check_components!` macro combines both `delegate_components!`
+   and `check_components!`, allowing both delegation and checks within a single
+   macro call.
+
+   This is useful for the majority of simple cases, providing immediate feedback on
+   whether the wiring works as intended.
+
+   ## Example
+
+   Given the following code:
+
+   ```rust,ignore
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet { fn greet(&self); }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter { fn greet(&self) {} }
+   # pub struct Person;
+   delegate_and_check_components! {
+       #[check_trait(CanUsePerson)]
+       Person {
+           GreeterComponent: GreetHello,
+       }
+   }
+   ```
+
+   is equivalent to writing the two separate macro calls:
+
+   ```rust,ignore
+   # #[cgp_component(Greeter)]
+   # pub trait CanGreet { fn greet(&self); }
+   # #[cgp_impl(new GreetHello)]
+   # impl Greeter { fn greet(&self) {} }
+   # pub struct Person;
+   delegate_components! {
+       Person {
+           GreeterComponent: GreetHello,
+       }
+   }
+
+   check_components! {
+       #[check_trait(CanUsePerson)]
+       Person {
+           GreeterComponent,
+       }
+   }
+   ```
+
+   In more advanced cases, it may still be necessary to call `delegate_components!`
+   and `check_components` separately. This applies to cases where the CGP traits
+   contain additional generic parameters, or when presets are used.
+*/
+#[proc_macro]
+pub fn delegate_and_check_components(body: TokenStream) -> TokenStream {
+    macro_lib::delegate_and_check_components(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_type]` is an extension to [`#[cgp_component]`](macro@cgp_component) that
+    derives additional constructs for abstract type components.
+
+    This macro can only be used on an abstract type trait that contains a single
+    associated type as its item, and nothing else.
+
+    The macro can be used with no attribute argument, in which case the provider
+    type would be named in the format `{associated_type_name}TypeProvider`.
+
+    In addition to the component constructs generated by `#[cgp_component]`, the macro
+    also generates a provider for `UseType<Type>`, that implements the provider trait
+    using `Type`.
+
+    The macro also generates a type alias for accessing the associated type, with the
+    type alias named in the format `{associated_type_name}Of`.
+
+    For advanced use cases, the macro also generates an implementation of
+    `WithProvider<Provider>`, which implements the provider trait if the given
+    `Provider` implements  `TypeProvider<Context, ComponentName>`.
+
+    ## Example
+
+    Given the following abstract type trait definition:
+
+    ```rust,ignore
+    # use core::fmt::Display;
+    #[cgp_type]
+    pub trait HasNameType {
+        type Name: Display;
+    }
+    ```
+
+    would be equivalent to the following fully explicit definition:
+
+    ```rust,ignore
+    # use core::fmt::Display;
+    #[cgp_type {
+        name: NameTypeProviderComponent,
+        provider: NameTypeProvider,
+        context: Context,
+    }]
+    pub trait HasNameType {
+        type Name: Display;
+    }
+    ```
+
+    Which would generate the following constructs:
+
+    ```rust,ignore
+    # // doc-example: not compiled (abridged expansion)
+    impl<Context, Type> NameTypeProvider<Context> for UseType<Type>
+    where
+        Type: Display,
+    {
+        type Name = Type;
+    }
+
+    type NameOf<Context> = <Context as HasNameType>::Name;
+
+    impl<Context, Provider> HasNameType<Context> for WithProvider<Provider>
+    where
+        Provider: TypeProvider<Context, NameTypeProviderComponent>,
+        Provider::Type: Display,
+    {
+        type Name = Provider::Type;
+    }
+    ```
+*/
+#[proc_macro_attribute]
+pub fn cgp_type(attrs: TokenStream, body: TokenStream) -> TokenStream {
+    macro_lib::cgp_type(attrs.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+   The `#[blanket_trait]` macro can be used to define trait aliases that contain
+   empty body and trivial blanket implementations.
+
+   Developers can use the `#[blanket_trait]` macro to define trait aliases,
+   as well as abstract type aliases for more advanced cases.
+
+   ## Example
+
+   Given the following:
+
+   ```rust,ignore
+   # use cgp_fork::core::macros::blanket_trait;
+   #[blanket_trait]
+   pub trait HasSendErrorType: Send + HasErrorType<Error: Send> {}
+   ```
+
+   automatically generates the following blanket implementation:
+
+   ```rust,ignore
+   # // doc-example: not compiled (expansion of the alias above, for illustration)
+   impl<Context> HasSendErrorType for Context
+   where
+       Context: Send + HasErrorType<Error: Send> {}
+   ```
+*/
+#[proc_macro_attribute]
+pub fn blanket_trait(attr: TokenStream, item: TokenStream) -> TokenStream {
+    macro_lib::blanket_trait(attr.into(), item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    The `Symbol!` macro is used to create a type-level string through the string literal
+    given to the macro.
+
+    The macro constructs the type-level string as a chain of `Chars` types terminated with
+    the `Nil` type, wrapped in `Symbol` together with the string's byte length. In other
+    words, it constructs a type-level list of characters to represent them as a type-level
+    string.
+
+    Read more about type-level strings in the documentation for `Symbol` and `Chars`.
+
+    ## Example
+
+    Given the following symbol definition:
+
+    ```rust,ignore
+    type Hello = Symbol!("hello");
+    ```
+
+    The following type would be generated:
+
+    ```rust,ignore
+    type Hello = Symbol<5, Chars<'h', Chars<'e', Chars<'l', Chars<'l', Chars<'o', Nil>>>>>>;
+    ```
+*/
+#[proc_macro]
+#[allow(non_snake_case)]
+pub fn Symbol(body: TokenStream) -> TokenStream {
+    macro_lib::Symbol(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    The `Product!` macro is used to define a type-level list of types, a.k.a. a product type.
+
+    Given a list of types to the macro, it would generate a chain of `Cons` types
+    for each type in the list, and terminated with the `Nil` type.
+
+    Read more about product types in the documentation for `Cons`.
+
+    ## Example
+
+    Given the following product type definition:
+
+    ```rust,ignore
+    type MyTypes = Product![u32, String, bool];
+    ```
+
+    The following type would be generated:
+
+    ```rust,ignore
+    type MyTypes = Cons<u32, Cons<String, Cons<bool, Nil>>>;
+    ```
+*/
+#[proc_macro]
+#[allow(non_snake_case)]
+pub fn Product(body: TokenStream) -> TokenStream {
+    macro_lib::Product(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `product!` builds a value-level `Cons` list from expressions.
+
+    The type of the value is the [`Product!`](macro@Product) of the expression types. An empty
+    `product![]` is `Nil`.
+
+    ```rust,ignore
+    let row: Product![u32, String, bool] = product![2 + 3, "hi".to_owned(), true];
+    ```
+*/
+#[proc_macro]
+pub fn product(body: TokenStream) -> TokenStream {
+    macro_lib::product(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+   The `Sum!` macro is used to define a sum type, with the given list of types
+   as disjoint variants.
+
+   Given a list of types to the macro, it would generate a chain of `Either` types
+   for each type in the list, and terminated with the `Void` type.
+
+   Read more about sum types in the documentation for `Either`.
+
+   ## Example
+
+   Given the following sum type definition:
+
+   ```rust,ignore
+   type MyUnion = Sum![u32, String, bool];
+   ```
+
+   The following type would be generated:
+
+   ```rust,ignore
+   type MyUnion = Either<u32, Either<String, Either<bool, Void>>>;
+   ```
+*/
+#[proc_macro]
+#[allow(non_snake_case)]
+pub fn Sum(body: TokenStream) -> TokenStream {
+    macro_lib::Sum(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+   The `Struct!` macro builds the type-level shape of a struct from the body of a
+   struct declaration: the same type that `#[derive(HasFields)]` gives as `Fields`.
+
+   The body is either named fields or a list of types, written as in a struct
+   declaration. The delimiter of the invocation is not significant: the form is
+   read from the entries. Named fields become `Field` entries keyed by `Symbol!`,
+   positional fields become `Field` entries keyed by `Index<N>`, and the entries
+   are chained into a `Product!`. A body with one positional field is that field's
+   type, and an empty body is `Nil`.
+
+   ## Example
+
+   Given the following shape definitions:
+
+   ```rust,ignore
+   type Person = Struct! { name: String, age: u8 };
+   type Pair = Struct!(u64, String);
+   ```
+
+   The following types would be generated:
+
+   ```rust,ignore
+   type Person = Product![Field<Symbol!("name"), String>, Field<Symbol!("age"), u8>];
+   type Pair = Product![Field<Index<0>, u64>, Field<Index<1>, String>];
+   ```
+*/
+#[proc_macro]
+#[allow(non_snake_case)]
+pub fn Struct(body: TokenStream) -> TokenStream {
+    macro_lib::Struct(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+   The `Enum!` macro builds the type-level shape of an enum from the body of an
+   enum declaration: the same type that `#[derive(HasFields)]` gives as `Fields`.
+
+   Each variant becomes a `Field` entry keyed by the variant name as a `Symbol!`,
+   and the entries are chained into a `Sum!`. A variant's payload follows the
+   `Struct!` rules for its fields, so a unit variant carries `Nil` and a variant
+   with one positional field carries that field's type. An empty body is `Void`.
+
+   ## Example
+
+   Given the following shape definition:
+
+   ```rust,ignore
+   type Shape = Enum! { Circle(f64), Rectangle { width: f64, height: f64 } };
+   ```
+
+   The following type would be generated:
+
+   ```rust,ignore
+   type Shape = Sum![
+       Field<Symbol!("Circle"), f64>,
+       Field<Symbol!("Rectangle"), Struct! { width: f64, height: f64 }>,
+   ];
+   ```
+*/
+#[proc_macro]
+#[allow(non_snake_case)]
+pub fn Enum(body: TokenStream) -> TokenStream {
+    macro_lib::Enum(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `Path!` builds a type-level path from a dotted `@` path.
+
+    Each segment becomes a step in a `PathCons` chain. Namespace wiring uses the same paths
+    to name a component inside a table.
+
+    ```rust,ignore
+    # use cgp_fork::core::error::ErrorRaiserComponent;
+    type ErrorRaiser = Path!(@app.error.ErrorRaiserComponent);
+    ```
+*/
+#[proc_macro]
+#[allow(non_snake_case)]
+pub fn Path(body: TokenStream) -> TokenStream {
+    macro_lib::Path(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives `HasField` for each field.
+///
+/// Named fields are keyed by `Symbol!("field")`. Positional fields are keyed by `Index<N>`.
+#[proc_macro_derive(HasField)]
+pub fn derive_fields(item: TokenStream) -> TokenStream {
+    macro_lib::derive_has_field(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives `HasFields`: the type-level [`Struct!`](macro@Struct) or [`Enum!`](macro@Enum) shape.
+#[proc_macro_derive(HasFields)]
+pub fn derive_has_fields(item: TokenStream) -> TokenStream {
+    macro_lib::derive_has_fields(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives the partial builder: `HasBuilder`, `BuildField`, and `FinalizeBuild`.
+#[proc_macro_derive(BuildField)]
+pub fn derive_builder(item: TokenStream) -> TokenStream {
+    macro_lib::derive_build_field(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives the extractor that pulls one field out of a struct or one variant out of an enum.
+#[proc_macro_derive(ExtractField)]
+pub fn derive_extractor(item: TokenStream) -> TokenStream {
+    macro_lib::derive_extract_field(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives `FromVariant` for each variant, wrapping a payload in that variant.
+#[proc_macro_derive(FromVariant)]
+pub fn derive_from_variant(item: TokenStream) -> TokenStream {
+    macro_lib::derive_from_variant(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives the extensible-variant spine: fields, extraction, and `FromVariant` for an enum.
+#[proc_macro_derive(CgpVariant)]
+pub fn derive_cgp_variant(item: TokenStream) -> TokenStream {
+    macro_lib::derive_cgp_variant(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives the extensible-record spine: field access, the field list, conversions, and the partial builder.
+#[proc_macro_derive(CgpRecord)]
+pub fn derive_cgp_record(item: TokenStream) -> TokenStream {
+    macro_lib::derive_cgp_record(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Derives [`CgpRecord`](derive@CgpRecord) for a struct and [`CgpVariant`](derive@CgpVariant) for an enum.
+#[proc_macro_derive(CgpData)]
+pub fn derive_cgp_data(item: TokenStream) -> TokenStream {
+    macro_lib::derive_cgp_data(item.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_producer]` defines a `Producer` provider from a function that takes
+    no input.
+
+    The provider is named after the function in PascalCase, or after the
+    identifier given as the attribute's argument. It is wired so the same
+    function answers every member of the handler family, each returning the
+    produced value whatever input it is given. The function must be
+    synchronous, with no parameters, no generic parameters, and no
+    `impl Trait` return type.
+
+    ## Example
+
+    ```rust,ignore
+    #[cgp_producer]
+    fn magic_number() -> u64 {
+        42
+    }
+    ```
+
+    defines the provider `MagicNumber`, so `MagicNumber::produce(&context, code)`
+    returns `42`.
+*/
+#[deprecated(
+    since = "0.11.0",
+    note = "use `#[cgp_handler]`: a function without parameters becomes a `Handler` of `()` (wrap the provider in `IgnoreInput` to accept any input)"
+)]
+#[proc_macro_attribute]
+pub fn cgp_producer(attr: TokenStream, body: TokenStream) -> TokenStream {
+    extra_macro_lib::cgp_producer(attr.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_computer]` defines a `Computer` provider from a function.
+
+    The function's parameters become the provider's input and its return type
+    its output. A `#[implicit]` or `#[field]` parameter is read from a
+    same-named field of the context instead of the input tuple. A synchronous
+    function implements `Computer` and an `async` one `AsyncComputer`, and a
+    return type written `Result<T, E>` makes the fallible members of the
+    handler family propagate the error. The provider is wired so the same
+    function answers every member of the family it can reach. The provider is
+    named after the function in PascalCase, or after the identifier given as
+    the attribute's argument.
+
+    ## Example
+
+    ```rust,ignore
+    #[cgp_computer]
+    fn add(a: u64, b: u64) -> u64 {
+        a + b
+    }
+    ```
+
+    defines the provider `Add`, so `Add::compute(&context, code, (1, 2))`
+    returns `3`.
+*/
+#[deprecated(
+    since = "0.11.0",
+    note = "use `#[cgp_handler]`, which defines a unified `Handler` (or, for an `async` function, `AsyncHandler`) provider"
+)]
+#[proc_macro_attribute]
+pub fn cgp_computer(attr: TokenStream, body: TokenStream) -> TokenStream {
+    extra_macro_lib::cgp_computer(attr.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_handler]` defines a provider of the unified handler family
+    (`cgp_fork::handler`) from a function.
+
+    The function's parameters become the provider's input (one parameter is the
+    input itself, several are a tuple, none is `()`) and its return type the
+    output. A `#[implicit]` or `#[field]` parameter is read from a same-named
+    field of the context instead of the input. A synchronous function implements
+    `Handler`, and through `Promote` also `AsyncHandler`; an `async` function
+    implements `AsyncHandler`. A fallible function simply returns a `Result`;
+    there is no separate fallible component. The provider is named after the
+    function in PascalCase, or after the identifier given as the attribute's
+    argument.
+
+    It replaces `#[cgp_computer]` and `#[cgp_producer]`. A 0.10 consumer can
+    still use the provider through `cgp_fork::compat::Compat`.
+
+    ## Example
+
+    ```rust,ignore
+    use cgp_fork::handler::{CanHandle, Handler};
+
+    #[cgp_handler]
+    fn add(a: u64, b: u64) -> u64 {
+        a + b
+    }
+    ```
+
+    defines the provider `Add`, so `Add::handle(&context, code, (1, 2))`
+    returns `3`.
+*/
+#[proc_macro_attribute]
+pub fn cgp_handler(attr: TokenStream, body: TokenStream) -> TokenStream {
+    extra_macro_lib::cgp_handler(attr.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+    `#[cgp_auto_dispatch]` implements a trait for every extensible enum whose
+    variants' payloads implement it.
+
+    The trait is kept unchanged. The macro adds a blanket impl that matches the
+    enum's current variant and calls the same method on its payload, plus one
+    per-variant `Computer` provider per method, named `Compute` followed by the
+    method name in PascalCase. Every method must take `self`, `&self`, or
+    `&mut self`, and must not have type or const generic parameters; the
+    attribute takes no arguments.
+
+    ## Example
+
+    ```rust,ignore
+    #[cgp_auto_dispatch]
+    pub trait HasArea {
+        fn area(&self) -> f64;
+    }
+
+    #[derive(CgpData)]
+    pub enum Shape {
+        Circle(Circle),
+        Rectangle(Rectangle),
+    }
+    # pub struct Circle { pub radius: f64 }
+    # pub struct Rectangle { pub width: f64, pub height: f64 }
+    # impl HasArea for Circle { fn area(&self) -> f64 { 3.0 * self.radius * self.radius } }
+    # impl HasArea for Rectangle { fn area(&self) -> f64 { self.width * self.height } }
+    # fn main() {
+    #     let shape = Shape::Rectangle(Rectangle { width: 2.0, height: 3.0 });
+    #     assert_eq!(shape.area(), 6.0);
+    # }
+    ```
+
+    With `HasArea` implemented for `Circle` and `Rectangle`, `Shape` implements
+    it too.
+*/
+#[proc_macro_attribute]
+pub fn cgp_auto_dispatch(attr: TokenStream, body: TokenStream) -> TokenStream {
+    extra_macro_lib::cgp_auto_dispatch(attr.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Blanket-implements a logger trait by packing each method's arguments into a
+/// detail struct and calling `CanLog`.
+///
+/// The trait's methods take `&self` and have no body. Each method becomes a
+/// call to `self.log` with a struct named after the method (`log_hello` →
+/// `__LogHello`). A context implements the trait when it implements `CanLog`
+/// for those detail structs.
+///
+/// ```rust,ignore
+/// #[cgp_auto_log]
+/// pub trait CanLogHello {
+///     fn log_hello(&self, name: &str);
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
+    extra_macro_lib::cgp_auto_log(attr.into(), body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Rewrites `async fn` in a trait to a method that returns `impl Future`.
+///
+/// The desugared method is what `#[cgp_component]` forwards. A provided (default) method body
+/// is wrapped in `async move { … }`. The future is not automatically `Send`; `CanSendRun` is
+/// the component that asks for a `Send` future. The attribute takes no arguments, so
+/// `#[async_trait(?Send)]` is rejected rather than silently ignored.
+#[proc_macro_attribute]
+pub fn async_trait(attr: TokenStream, stream: TokenStream) -> TokenStream {
+    async_impl::impl_async(attr.into(), stream.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+#[cfg(feature = "snapshot")]
+include!("snapshot_macros.rs");

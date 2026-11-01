@@ -1,0 +1,41 @@
+error: unsupported attribute: first
+  --> tests/ui/wiring_attributes.rs:18:9
+   |
+18 |         #[first]
+   |         ^
+
+error: unsupported attribute: second
+  --> tests/ui/wiring_attributes.rs:19:9
+   |
+19 |         #[second]
+   |         ^
+
+error: unsupported attribute: third
+  --> tests/ui/wiring_attributes.rs:21:9
+   |
+21 |         #[third]
+   |         ^
+
+error: unsupported attribute: in_preset
+  --> tests/ui/wiring_attributes.rs:28:9
+   |
+28 |         #[in_preset]
+   |         ^
+
+error: unsupported attribute: also_in_preset
+  --> tests/ui/wiring_attributes.rs:30:9
+   |
+30 |         #[also_in_preset]
+   |         ^
+
+error: Expected either `#[skip_check]` or `#[check_params]` attribute for specifying the check generics
+  --> tests/ui/wiring_attributes.rs:42:9
+   |
+42 |         #[extra]
+   |         ^
+
+error: Expected either `#[skip_check]` or `#[check_params]` attribute for specifying the check generics
+  --> tests/ui/wiring_attributes.rs:44:9
+   |
+44 |         #[unknown]
+   |         ^

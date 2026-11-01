@@ -1,0 +1,27 @@
+error[E0277]: `App` cannot use the component `GreeterComponent`
+  --> tests/ui/missing_entry.rs:33:9
+   |
+33 |         GreeterComponent,
+   |         ^^^^^^^^^^^^^^^^ `App` cannot use `GreeterComponent`
+   |
+   = note: `App` must wire `GreeterComponent` to a provider in `delegate_components!`, and that provider's requirements must hold for `App`
+   = note: the notes below name the missing wiring entry or the unmet requirement
+help: the trait `DelegateComponent<GreeterComponent>` is not implemented for `App`
+      but trait `DelegateComponent<NamerComponent>` is implemented for it
+  --> tests/ui/missing_entry.rs:26:9
+   |
+26 |         NamerComponent: NameApp,
+   |         ^^^^^^^^^^^^^^
+   = help: for that trait implementation, expected `NamerComponent`, found `GreeterComponent`
+   = note: required for `App` to implement `CanUseComponent<GreeterComponent>`
+note: required by a bound in `__CheckApp`
+  --> tests/ui/missing_entry.rs:30:1
+   |
+30 | / check_components! {
+31 | |     App {
+32 | |         NamerComponent,
+33 | |         GreeterComponent,
+34 | |     }
+35 | | }
+   | |_^ required by this bound in `__CheckApp`
+   = note: this error originates in the macro `check_components` (in Nightly builds, run with -Z macro-backtrace for more info)

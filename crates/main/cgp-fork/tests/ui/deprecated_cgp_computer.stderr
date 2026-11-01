@@ -1,0 +1,11 @@
+error: use of deprecated macro `cgp_computer`: use `#[cgp_handler]`, which defines a unified `Handler` (or, for an `async` function, `AsyncHandler`) provider
+ --> tests/ui/deprecated_cgp_computer.rs:7:3
+  |
+7 | #[cgp_computer]
+  |   ^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_cgp_computer.rs:3:9
+  |
+3 | #![deny(deprecated)]
+  |         ^^^^^^^^^^

@@ -1,0 +1,34 @@
+use core::fmt::Debug;
+
+use cgp_fork_macro::cgp_type;
+
+use crate::core::component::DefaultNamespace;
+
+/**
+    The `HasErrorType` trait provides an abstract error type that can be used by
+    CGP components to decouple the code from any concrete error implementation.
+
+    Although it is possible for each context to declare their own associated
+    `Error` type, doing so may result in having multiple ambiguous `Self::Error` types,
+    if there are multiple associated types with the same name in different traits.
+
+    As a result, it is better for context traits to include `HasErrorType` as their
+    parent traits, so that multiple traits can all refer to the same abstract
+    `Self::Error` type.
+
+   The `Error` associated type is also required to implement [`Debug`].
+   This is to allow `Self::Error` to be used in calls like `.unwrap()`,
+   as well as for simpler error logging.
+
+   More details about how to use `HasErrorType` is available at
+   <https://patterns.contextgeneric.dev/error-handling.html>
+*/
+#[cgp_type]
+#[prefix(@cgp.core.error in DefaultNamespace)]
+pub trait HasErrorType {
+    /// The context's abstract error. Providers raise and wrap this type.
+    type Error: Debug;
+}
+
+/// [`HasErrorType::Error`](crate::core::error::HasErrorType::Error) of `Context`.
+pub type ErrorOf<Context> = <Context as HasErrorType>::Error;

@@ -1,0 +1,102 @@
+use quote::{ToTokens, quote_spanned};
+use syn::punctuated::Punctuated;
+use syn::token::Comma;
+use syn::{Attribute, GenericParam, Generics, Ident, ItemStruct, Type, parse_quote};
+
+use crate::macro_core::exports::Life;
+
+pub struct EmptyStruct {
+    pub ident: Ident,
+    pub generics: Generics,
+    pub docs: Vec<Attribute>,
+}
+
+impl EmptyStruct {
+    pub fn new(ident: Ident, generics: Generics) -> Self {
+        Self {
+            ident,
+            generics,
+            docs: Vec::new(),
+        }
+    }
+
+    pub fn with_doc(mut self, doc: impl AsRef<str>) -> Self {
+        let lit = syn::LitStr::new(doc.as_ref(), self.ident.span());
+        self.docs.push(parse_quote!(#[doc = #lit]));
+        self
+    }
+
+    pub fn with_doc_attrs(mut self, attrs: impl IntoIterator<Item = Attribute>) -> Self {
+        self.docs.extend(attrs);
+        self
+    }
+
+    pub fn to_item_struct(&self) -> ItemStruct {
+        parse_quote!(#self)
+    }
+}
+
+impl ToTokens for EmptyStruct {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let struct_ident = &self.ident;
+        let struct_generics = &self.generics;
+        let docs = &self.docs;
+
+        // Stamp the synthesized `pub struct … ;` tokens with the struct ident's
+        // span rather than the macro `call_site`, so a redefinition error
+        // (`E0428`) when two providers share a name points at the offending name
+        // (e.g. the `Foo` in `#[cgp_impl(new Foo)]`) instead of the whole macro
+        // invocation.
+        let span = struct_ident.span();
+
+        if struct_generics.params.is_empty() {
+            tokens.extend(quote_spanned! { span =>
+                #(#docs)*
+                pub struct #struct_ident;
+            });
+        } else {
+            let mut generic_params = struct_generics.params.clone();
+            let mut phantom_params: Punctuated<Type, Comma> = Default::default();
+
+            for param in &mut generic_params {
+                match param {
+                    GenericParam::Type(type_param) => {
+                        type_param.colon_token = None;
+                        type_param.bounds.clear();
+
+                        let type_ident = &type_param.ident;
+                        phantom_params.push(parse_quote!( #type_ident ));
+                    }
+                    GenericParam::Lifetime(life_param) => {
+                        life_param.colon_token = None;
+                        life_param.bounds.clear();
+
+                        let lifetime = &life_param.lifetime;
+                        phantom_params.push(parse_quote!( #Life<#lifetime> ));
+                    }
+                    GenericParam::Const(_) => {}
+                }
+            }
+
+            // Emit `PhantomData<T>` for a single parameter and `PhantomData<()>`
+            // when none survive (all consts), reserving the tuple form for two or
+            // more. A single-element `PhantomData<(T)>` is a parenthesized type,
+            // not a tuple, and now that the struct carries the user's span (above)
+            // it would trip the `unused_parens` lint in the caller's crate.
+            let phantom_type: Type = match phantom_params.len() {
+                1 => match phantom_params.into_iter().next() {
+                    Some(param) => param,
+                    None => parse_quote!(()),
+                },
+                _ => parse_quote!( ( #phantom_params ) ),
+            };
+
+            tokens.extend(quote_spanned! { span =>
+                #(#docs)*
+                pub struct #struct_ident < #generic_params > (
+                    pub ::core::marker::PhantomData< #phantom_type >
+                );
+            });
+        }
+    }
+}

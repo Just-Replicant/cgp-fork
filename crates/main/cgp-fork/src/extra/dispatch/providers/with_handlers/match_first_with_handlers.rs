@@ -1,0 +1,69 @@
+use core::marker::PhantomData;
+
+use crate::core::prelude::*;
+use crate::extra::dispatch::DispatchMatchers;
+use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
+
+/// Runs `Handlers` on `(input, args)` and keeps `args` beside a non-matching remainder.
+///
+/// The first handler that returns `Ok` wins. `args` is threaded through so a later handler still
+/// sees them.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::MatchWith<H, First>` (`cgp_fork::handler::MatchWith`)"
+)]
+pub struct MatchFirstWithHandlers<Handlers>(pub PhantomData<Handlers>);
+
+#[cgp_provider]
+impl<Context, Code, Input, Args, Output, Remainder, Handlers> Computer<Context, Code, (Input, Args)>
+    for MatchFirstWithHandlers<Handlers>
+where
+    Input: HasExtractor,
+    DispatchMatchers<Handlers>: Computer<
+            Context,
+            Code,
+            (Input::Extractor, Args),
+            Output = Result<Output, (Remainder, Args)>,
+        >,
+    Remainder: FinalizeExtract,
+{
+    type Output = Output;
+
+    fn compute(context: &Context, code: PhantomData<Code>, (input, args): (Input, Args)) -> Output {
+        let res = DispatchMatchers::compute(context, code, (input.to_extractor(), args));
+        match res {
+            Ok(output) => output,
+            Err((remainder, _)) => remainder.finalize_extract(),
+        }
+    }
+}
+
+#[cgp_provider]
+impl<Context, Code, Input, Args, Output, Remainder, Handlers>
+    AsyncComputer<Context, Code, (Input, Args)> for MatchFirstWithHandlers<Handlers>
+where
+    Input: HasExtractor,
+    DispatchMatchers<Handlers>: AsyncComputer<
+            Context,
+            Code,
+            (Input::Extractor, Args),
+            Output = Result<Output, (Remainder, Args)>,
+        >,
+    Remainder: FinalizeExtract,
+{
+    type Output = Output;
+
+    async fn compute_async(
+        context: &Context,
+        code: PhantomData<Code>,
+        (input, args): (Input, Args),
+    ) -> Output {
+        let res =
+            DispatchMatchers::compute_async(context, code, (input.to_extractor(), args)).await;
+
+        match res {
+            Ok(output) => output,
+            Err((remainder, _)) => remainder.finalize_extract(),
+        }
+    }
+}

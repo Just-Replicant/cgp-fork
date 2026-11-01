@@ -1,0 +1,5 @@
+error: getter method must not be unsafe fn
+ --> tests/ui/getter_unsafe.rs:6:5
+  |
+6 |     unsafe fn name(&self) -> &str;
+  |     ^^^^^^

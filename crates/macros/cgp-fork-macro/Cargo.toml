@@ -1,0 +1,32 @@
+[package]
+name         = "cgp-fork-macro"
+version      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+repository   = { workspace = true }
+authors      = { workspace = true }
+rust-version = { workspace = true }
+homepage     = { workspace = true }
+keywords     = { workspace = true }
+categories   = { workspace = true }
+description  = "CGP procedural macros for defining and wiring components."
+# The proc-macro shim: every parser and code generator lives in
+# `cgp-fork-macro-impl` (see docs/adr/0002-macro-impl-crate.md).
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lib]
+proc-macro = true
+
+[features]
+# The hidden `snapshot_*` macros used by the behavior tests of `cgp-fork`.
+snapshot = ["cgp-fork-macro-impl/snapshot"]
+
+[dependencies]
+cgp-fork-macro-impl = { workspace = true }
+syn                 = { version = "3", features = ["full", "visit", "visit-mut"] }

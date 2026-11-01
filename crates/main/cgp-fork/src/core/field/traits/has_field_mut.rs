@@ -1,0 +1,33 @@
+use core::marker::PhantomData;
+use core::ops::DerefMut;
+
+use crate::core::field::traits::{FieldGetter, HasField};
+
+/// Mutable access to the value stored under `Tag`.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` does not have a mutable field that this code writes",
+    label = "missing mutable field on `{Self}`",
+    note = "the field name is spelled out in the tag type `{Tag}`: `Symbol<N, Chars<'a', Chars<'b', ..>>>` reads as \"ab..\"",
+    note = "add the field to `{Self}` and derive it with `#[derive(HasField)]` or `#[derive(CgpData)]`"
+)]
+pub trait HasFieldMut<Tag>: HasField<Tag> {
+    /// Mutably borrows the value stored under `Tag`.
+    fn get_field_mut(&mut self, tag: PhantomData<Tag>) -> &mut Self::Value;
+}
+
+/// Provider form of [`HasFieldMut`].
+pub trait MutFieldGetter<Context, Tag>: FieldGetter<Context, Tag> {
+    /// Mutably borrows `Tag` from `context`.
+    fn get_field_mut(context: &mut Context, tag: PhantomData<Tag>) -> &mut Self::Value;
+}
+
+#[diagnostic::do_not_recommend]
+impl<Context, Tag, Target, Value> HasFieldMut<Tag> for Context
+where
+    Context: DerefMut<Target = Target>,
+    Target: HasFieldMut<Tag, Value = Value> + 'static,
+{
+    fn get_field_mut(&mut self, tag: PhantomData<Tag>) -> &mut Self::Value {
+        self.deref_mut().get_field_mut(tag)
+    }
+}

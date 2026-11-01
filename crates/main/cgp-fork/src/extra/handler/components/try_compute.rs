@@ -1,0 +1,47 @@
+use core::marker::PhantomData;
+
+use crate::core::component::UseDelegate;
+use crate::core::prelude::*;
+use crate::extra::handler::UseInputDelegate;
+
+#[cgp_component(TryComputer)]
+#[prefix(@cgp.extra.handler in DefaultNamespace)]
+#[derive_delegate(UseDelegate<Code>)]
+#[derive_delegate(UseInputDelegate<Input>)]
+#[use_type(HasErrorType.Error)]
+/// Fallible form of [`CanCompute`](crate::extra::handler::CanCompute).
+///
+/// Failure is the context's abstract error from [`HasErrorType`](crate::core::error::HasErrorType).
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`) with `Output = Result<T, Context::Error>`"
+)]
+pub trait CanTryCompute<Code, Input> {
+    /// The success value.
+    type Output;
+
+    /// Runs the computation, returning the context error on failure.
+    fn try_compute(&self, _code: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
+}
+
+#[cgp_component(TryComputerRef)]
+#[prefix(@cgp.extra.handler in DefaultNamespace)]
+#[derive_delegate(UseDelegate<Code>)]
+#[derive_delegate(UseInputDelegate<Input>)]
+#[use_type(HasErrorType.Error)]
+/// [`CanTryCompute`] for a shared borrow of `Input`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`) with a `&T` input and `Output = Result<T, Context::Error>`"
+)]
+pub trait CanTryComputeRef<Code, Input> {
+    /// The success value.
+    type Output;
+
+    /// Runs the computation on a borrowed `input`.
+    fn try_compute_ref(
+        &self,
+        _code: PhantomData<Code>,
+        input: &Input,
+    ) -> Result<Self::Output, Error>;
+}

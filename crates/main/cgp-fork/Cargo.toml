@@ -1,0 +1,63 @@
+[package]
+name         = "cgp-fork"
+version      = { workspace = true }
+readme       = "./README.md"
+edition      = { workspace = true }
+license      = { workspace = true }
+repository   = { workspace = true }
+authors      = { workspace = true }
+rust-version = { workspace = true }
+homepage     = { workspace = true }
+keywords     = { workspace = true }
+categories   = { workspace = true }
+description  = "A language extension for Rust, with pluggable trait implementations at compile-time."
+# The test suite and examples stay in the repository; the published crate is the library.
+exclude      = ["tests/", "examples/", "benches/"]
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+# `default`/`full` enable `alloc` and `compat-0.10`. Without `alloc` the crate needs only `core`.
+default = ["full"]
+full = ["alloc", "compat-0.10"]
+# The 0.10 handler family (`extra::handler`, `extra::dispatch`, `extra::monad`), the macros
+# `#[cgp_computer]` and `#[cgp_producer]`, and the `compat` bridges to the unified `handler`
+# module. `#[cgp_auto_dispatch]` emits the unified family without this feature. `no_std`, no
+# dependencies.
+"compat-0.10" = []
+# Links the `alloc` crate and enables the `String`-building error providers
+# (`DebugError`, `DisplayError`).
+alloc = []
+# The error backends. `anyhow` and `std-error` are `no_std` + `alloc`; `eyre` requires `std`.
+anyhow = ["alloc", "dep:anyhow"]
+eyre = ["alloc", "dep:eyre"]
+std-error = ["alloc"]
+
+[dependencies]
+cgp-fork-macro = { workspace = true }
+anyhow = { version = "1", default-features = false, optional = true }
+# `auto-install` installs eyre's default report handler on first use. Without it, building any
+# `eyre::Report` panics unless the application has called `eyre::set_hook` first.
+#
+# `track-caller` records where a report was built. `CanRaiseError::raise_error` is
+# `#[track_caller]`, and so is every impl of it, which is what lets that location be the caller's
+# line rather than a line in this crate.
+eyre = { version = "0.6", default-features = false, features = ["auto-install", "track-caller"], optional = true }
+
+[dev-dependencies]
+cgp-fork-macro = { workspace = true, features = ["snapshot"] }
+insta = { version = "1" }
+futures = { version = "0.3" }
+trybuild = { version = "1" }
+syn = { version = "3", features = ["full", "extra-traits"] }
+quote = { version = "1" }
+proc-macro2 = { version = "1" }
+
+[[example]]
+name              = "error_backends"
+required-features = ["anyhow", "std-error"]

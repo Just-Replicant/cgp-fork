@@ -1,0 +1,78 @@
+# Publish the workspace as one version.
+#
+# Every crate inherits `[workspace.package].version`. `version_group` makes
+# release-plz assign that single next version to every crate it releases, then
+# rewrite the path-dependency versions in the root `Cargo.toml` to match.
+# The facade owns the root changelog, the `v<version>` tag, and the GitHub release.
+# `cgp-fork-macro-impl` and `cgp-fork-macro` are published in dependency order
+# under that same version.
+
+[workspace]
+# Publish whenever the committed version is newer than crates.io (the release
+# job runs only after Tests passed on that commit), including
+# when GitHub does not associate that push with the release pull request.
+release_always = true
+repo_url = "https://github.com/Just-Replicant/cgp-fork"
+# A release PR is opened only when a commit since the last release matches.
+# Only user-visible changes cut a release: `feat`, `fix`, and `perf`. A
+# `refactor`, `test`, `docs`, `chore`, `style`, or `ci` commit stays on main
+# until a matching commit lands with it (it is still listed in that release's
+# changelog). A `!` on any type is breaking and also matches.
+release_commits = '^(feat|fix|perf)(\([^)]*\))?!?:|^\w+(\([^)]*\))?!:'
+git_release_enable = false
+git_tag_enable = false
+changelog_update = false
+publish_timeout = "30m"
+
+[changelog]
+header = """
+# Changelog
+
+"""
+protect_breaking_commits = true
+commit_parsers = [
+  { message = "^feat", group = "added" },
+  { message = "^fix", group = "fixed" },
+  { message = "^perf", group = "changed" },
+  { message = "^refactor", group = "changed" },
+  { message = "^doc", group = "documentation" },
+  { message = "^test", skip = true },
+  { message = "^chore", skip = true },
+  { message = "^ci", skip = true },
+  { message = "^style", skip = true },
+  { message = "^.*", group = "other" },
+]
+
+[[package]]
+name = "cgp-fork"
+version_group = "cgp-fork"
+changelog_update = true
+changelog_path = "CHANGELOG.md"
+changelog_include = ["cgp-fork-macro", "cgp-fork-macro-impl"]
+git_release_enable = true
+git_tag_enable = true
+git_tag_name = "v{{ version }}"
+git_release_name = "v{{ version }}"
+
+[[package]]
+name = "cgp-fork-macro"
+version_group = "cgp-fork"
+
+[[package]]
+name = "cgp-fork-macro-impl"
+version_group = "cgp-fork"
+
+# Workspace-only doctest crate (`publish = false`): never versioned or released.
+[[package]]
+name = "cgp-fork-doctests"
+release = false
+
+# Workspace-only check that renamed dependencies work (`publish = false`).
+[[package]]
+name = "cgp-fork-renamed-dep"
+release = false
+
+# Uses a preset from `cgp-fork-renamed-dep` under the default crate name (`publish = false`).
+[[package]]
+name = "cgp-fork-preset-consumer"
+release = false

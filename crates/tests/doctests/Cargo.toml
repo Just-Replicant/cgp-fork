@@ -1,0 +1,19 @@
+[package]
+name         = "cgp-fork-doctests"
+version      = "0.0.0"
+edition      = { workspace = true }
+license      = { workspace = true }
+rust-version = { workspace = true }
+description  = "Compiles documentation that lives outside the published crates. Never published."
+publish      = false
+
+[lints]
+workspace = true
+
+[lib]
+# Only the doctests matter; there is nothing to unit-test or benchmark.
+test  = false
+bench = false
+
+[dependencies]
+cgp-fork = { workspace = true, features = ["anyhow", "eyre", "std-error"] }

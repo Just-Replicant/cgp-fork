@@ -1,0 +1,47 @@
+use core::marker::PhantomData;
+
+use crate::core::field::traits::FinalizeExtractResult;
+use crate::core::prelude::*;
+use crate::extra::dispatch::DispatchMatchers;
+use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
+
+/// [`MatchWithHandlers`](super::match_with_handlers::MatchWithHandlers) for a shared borrow of the enum.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::MatchWith<H, All, Ref>` (`cgp_fork::handler::MatchWith`)"
+)]
+pub struct MatchWithHandlersRef<Handlers>(pub PhantomData<Handlers>);
+
+#[cgp_provider]
+impl<'a, Context, Code, Input, Output, Remainder, Handlers> Computer<Context, Code, &'a Input>
+    for MatchWithHandlersRef<Handlers>
+where
+    Input: HasExtractorRef,
+    DispatchMatchers<Handlers>:
+        Computer<Context, Code, Input::ExtractorRef<'a>, Output = Result<Output, Remainder>>,
+    Remainder: FinalizeExtract,
+{
+    type Output = Output;
+
+    fn compute(context: &Context, code: PhantomData<Code>, input: &'a Input) -> Output {
+        DispatchMatchers::compute(context, code, input.extractor_ref()).finalize_extract_result()
+    }
+}
+
+#[cgp_provider]
+impl<'a, Context, Code, Input, Output, Remainder, Handlers> AsyncComputer<Context, Code, &'a Input>
+    for MatchWithHandlersRef<Handlers>
+where
+    Input: HasExtractorRef,
+    DispatchMatchers<Handlers>:
+        AsyncComputer<Context, Code, Input::ExtractorRef<'a>, Output = Result<Output, Remainder>>,
+    Remainder: FinalizeExtract,
+{
+    type Output = Output;
+
+    async fn compute_async(context: &Context, code: PhantomData<Code>, input: &'a Input) -> Output {
+        DispatchMatchers::compute_async(context, code, input.extractor_ref())
+            .await
+            .finalize_extract_result()
+    }
+}

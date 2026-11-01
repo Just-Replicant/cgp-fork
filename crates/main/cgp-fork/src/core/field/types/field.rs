@@ -1,0 +1,74 @@
+use core::fmt::Debug;
+use core::marker::PhantomData;
+
+/**
+   The `Field` type is used to represent a _named_ field entry
+   within a product type or a sum type.
+
+   `Field` is parameterized by a phantom `Tag` type, which is used to represent
+   the field name as type. Typically, this would either be a type-level string
+   such as `Symbol!("name")`, or a type-level index such as `Index<0>`.
+   Aside from that, `Field` is essentially a wrapper around `Value`.
+
+   `Field` is mainly used within the derived [`HasFields`](crate::core::field::traits::HasFields)
+   implementations, to include the field name in the generic product or sum
+   representation of the given struct or enum.
+
+   ## Example
+
+   Given the following struct definition:
+
+   ```rust
+   # use core::marker::PhantomData;
+   # use cgp_fork::prelude::*;
+   # use cgp_fork::core::field::types::Field;
+   #[derive(HasFields)]
+   pub struct MyContext {
+       pub name: String,
+       pub age: u8,
+   }
+
+   // The derived `HasFields` implementation is equivalent to:
+   //
+   // impl HasFields for MyContext {
+   //     type Fields = Product![Field<Symbol!("name"), String>, Field<Symbol!("age"), u8>];
+   // }
+   let _: PhantomData<<MyContext as HasFields>::Fields> =
+       PhantomData::<Product![Field<Symbol!("name"), String>, Field<Symbol!("age"), u8>]>;
+   ```
+*/
+pub struct Field<Tag, Value> {
+    /// The field's value.
+    pub value: Value,
+    /// Remembers `Tag` without storing it.
+    pub phantom: PhantomData<Tag>,
+}
+
+impl<Tag, Value> From<Value> for Field<Tag, Value> {
+    fn from(value: Value) -> Self {
+        Self {
+            value,
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<Tag, Value> Debug for Field<Tag, Value>
+where
+    Value: Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.value.fmt(f)
+    }
+}
+
+impl<Tag, Value> PartialEq for Field<Tag, Value>
+where
+    Value: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.value.eq(&other.value)
+    }
+}
+
+impl<Tag, Value> Eq for Field<Tag, Value> where Value: Eq {}

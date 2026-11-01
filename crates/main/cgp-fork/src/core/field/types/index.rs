@@ -1,0 +1,55 @@
+use core::fmt::{Debug, Display};
+
+/**
+    The `Index` type is used to represent a `usize` value at
+    the _type level_.
+
+    `Index` is simply defined to be parameterized by a _const-generic_ value
+    of type `usize`. It is most often used to access generic fields by their
+    _index_, instead of by their _name_.
+
+    ## Example
+
+    Given the following struct definition:
+
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # use cgp_fork::core::field::types::Index;
+    #[derive(HasField)]
+    pub struct MyContext(pub u32);
+
+    let context = MyContext(7);
+    assert_eq!(*context.get_field(PhantomData::<Index<0>>), 7);
+    ```
+
+    The following `HasField` implementation would be generated, with use of
+    `Index<0>` as the field tag:
+
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # pub struct MyContext(u32);
+    impl HasField<Index<0>> for MyContext {
+        type Value = u32;
+
+        fn get_field(&self, _tag: PhantomData<Index<0>>) -> &u32 {
+            &self.0
+        }
+    }
+    ```
+*/
+#[derive(Eq, PartialEq, Clone, Copy, Default)]
+pub struct Index<const I: usize>;
+
+impl<const I: usize> Display for Index<I> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{I}")
+    }
+}
+
+impl<const I: usize> Debug for Index<I> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{I}")
+    }
+}

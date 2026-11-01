@@ -1,0 +1,47 @@
+use core::marker::PhantomData;
+
+use crate::core::field::traits::FinalizeExtractResult;
+use crate::core::prelude::*;
+use crate::extra::dispatch::DispatchMatchers;
+use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
+
+/// Runs `Handlers` against an extensible enum until one variant matches.
+///
+/// Each handler returns `Result`. `Err` means "not this variant" and the next handler runs.
+/// A leftover remainder is uninhabited once every variant has a handler.
+#[deprecated(since = "0.11.0", note = "use `cgp_fork::handler::MatchWith<H>`")]
+pub struct MatchWithHandlers<Handlers>(pub PhantomData<Handlers>);
+
+#[cgp_provider]
+impl<Context, Code, Input, Output, Remainder, Handlers> Computer<Context, Code, Input>
+    for MatchWithHandlers<Handlers>
+where
+    Input: HasExtractor,
+    DispatchMatchers<Handlers>:
+        Computer<Context, Code, Input::Extractor, Output = Result<Output, Remainder>>,
+    Remainder: FinalizeExtract,
+{
+    type Output = Output;
+
+    fn compute(context: &Context, code: PhantomData<Code>, input: Input) -> Output {
+        DispatchMatchers::compute(context, code, input.to_extractor()).finalize_extract_result()
+    }
+}
+
+#[cgp_provider]
+impl<Context, Code, Input, Output, Remainder, Handlers> AsyncComputer<Context, Code, Input>
+    for MatchWithHandlers<Handlers>
+where
+    Input: HasExtractor,
+    DispatchMatchers<Handlers>:
+        AsyncComputer<Context, Code, Input::Extractor, Output = Result<Output, Remainder>>,
+    Remainder: FinalizeExtract,
+{
+    type Output = Output;
+
+    async fn compute_async(context: &Context, code: PhantomData<Code>, input: Input) -> Output {
+        DispatchMatchers::compute_async(context, code, input.to_extractor())
+            .await
+            .finalize_extract_result()
+    }
+}

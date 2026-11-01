@@ -1,0 +1,98 @@
+# CGP test suite
+
+This directory holds the test suite for Context-Generic Programming, organized **by
+CGP concept** — basic delegation, abstract types, implicit arguments, namespaces,
+and so on — rather than by the macro that implements each concept, because a single
+macro such as `delegate_components!` serves many concepts at once. This README is
+the map of what is here and how to run it.
+
+## The trees
+
+The suite lives inside these workspace crates.
+
+**`cgp-fork` `tests/`** is the main suite: realistic example code that must compile and
+run. Because much of CGP is compile-time wiring, a test here often passes simply
+by compiling. It is also where the user-facing macros are exercised end-to-end and
+where the canonical macro-expansion snapshots live.
+
+**`cgp-fork-macro-impl` `src/macro_tests/`** tests the macro internals directly (the parsers
+and AST types), and is the home for **rejection cases** — inputs CGP
+refuses during expansion — and for pinning the invalid tokens a macro currently
+emits. It also holds the `crate_path` tests (how generated code names the facade), the
+`registry` tests that keep the fuzz targets in step with the entrypoints, the `ir` tests of the
+shared pipeline driver, and the `diagnostic_attrs` tests of the `on_unimplemented` messages the
+macros generate.
+
+**`crates/tests/renamed-dep`** imports `cgp-fork` under the name `cgp` and compiles copies of
+representative behavior tests with every `cgp_fork` path renamed, so every macro must generate
+paths through the caller's own name for the facade (ADR 0003). `tests/copies_match.rs` fails when
+a copy drifts from its source. When a macro starts naming a new facade item, add a test here that
+uses it. **`crates/tests/preset-consumer`** uses a preset defined in that crate while importing
+the facade as `cgp_fork`.
+
+**`crates/tests/doctests`** compiles the repository README and the macro-crate examples.
+
+A third category lives in another repository: the cases where a macro *accepts*
+input whose *expansion* then fails to compile are UI fixtures in
+[`cargo-cgp`](https://github.com/contextgeneric/cargo-cgp/blob/main/tests/README.md),
+so each is pinned as the readable error the tool renders for it. A new case
+belongs in one of these three places: the main suite, a macro rejection
+target, or a `cargo-cgp` UI fixture.
+
+## How the tests are laid out
+
+Inside `cgp-fork` `tests/`, each concept is one **integration test target**, which Cargo
+compiles as its own crate — and therefore its own coherence scope. A target is an
+entrypoint file `tests/<concept>_tests.rs` plus a module directory
+`tests/<concept>/` holding one `.rs` file per unit test, each self-contained so the
+type-level wiring of one test never leaks into another. `tests/basic_delegation/`
+is the reference example of the layout.
+
+The concept targets currently cover: basic delegation, impl-side dependencies,
+implicit arguments, higher-order providers, generic components, abstract types,
+getters, field access, extensible records, extensible variants, checking,
+dispatching, namespaces, handlers, monadic handlers, async and Send bounds,
+blanket traits, runtime, and the standalone error backends (`error_backends`). The example in each error
+backend's README (`src/{anyhow,eyre,std_error}/README.md`) is the module's rustdoc and runs as a
+doctest under `cargo test --doc --all-features`, so those examples are tested without being copied. The set grows and subdivides over time. `cgp-fork-macro-impl` `src/macro_tests` follows
+the same shape, with `ident_with_type_params` for parser corner cases and the
+failure-case targets `parser_rejections` and `invalid_expansion`.
+
+## Running the tests
+
+```
+cargo nextest run -p cgp-fork --all-features             # the main suite
+cargo nextest run -p cgp-fork-macro-impl                 # macro internals + rejection cases
+cargo nextest run -p cgp-fork-renamed-dep                # macros under a renamed dependency
+cargo nextest run --all-features --workspace            # everything
+
+cargo insta test -p cgp-fork --all-features --review     # review snapshot diffs interactively
+cargo insta test -p cgp-fork --all-features --accept     # accept intended snapshot changes
+```
+
+Many tests assert the exact code a macro generates, through the `snapshot_*!`
+macros on `cgp-fork-macro` (feature `snapshot`): each emits the real generated code into the
+module *and* generates a `#[test]` asserting a pretty-printed inline `insta`
+snapshot of it. So a failing snapshot prints a diff of the generated code — accept
+it with `cargo insta` only after confirming the change is intended. Snapshot a
+macro in the concept target that owns that macro's feature.
+
+## Documentation outside the published crates
+
+**`crates/tests/doctests`** (`cgp-fork-doctests`, `publish = false`) compiles examples that live
+outside a published package: the repository `README.md`, and the `cgp-fork-macro` docs'
+examples. It runs under `cargo test --workspace --doc` like any other doctest, with no cfg flag
+to forget.
+
+The macro crate cannot depend on `cgp-fork` (that is a cycle), so its examples stay
+`rust,ignore` there. `build.rs` extracts every one of them and compiles it here with a hidden
+`use cgp_fork::prelude::*;`. Give an example its setup with hidden `# ` lines in the macro
+crate's doc comment; they are hidden on docs.rs too. An example that cannot compile on its own,
+such as an abridged expansion or a grammar sketch with `...`, opts out with a hidden first line
+that states why:
+
+```text
+# // doc-example: not compiled (abridged expansion)
+```
+
+A marker without a reason fails the build. Of the 56 examples, 45 compile and 11 opt out.

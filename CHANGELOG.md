@@ -1,0 +1,704 @@
+# Changelog
+
+## Unreleased
+
+### Added
+
+- *(handler)* `#[cgp_handler]`: a function becomes a unified `Handler` provider (an `async`
+  function, an `AsyncHandler`), also wired as an `AsyncHandler` through `Promote`. It takes the
+  same arguments as `#[cgp_computer]` (`#[field]`/`#[implicit]` context arguments, an optional
+  provider name); the output is the return type as written, so a `Result` stays a `Result`, and a
+  function without parameters handles `()`. Available without `compat-0.10`.
+- *(component)* `#[derive_handler(Name)]` on `#[cgp_component]`: a provider `Name<P>` that forwards
+  the component's single method to the unified `Handler` `P`, packing the method arguments into
+  its input. Replaces `#[derive_promote]`.
+- *(handler)* `Downcast<Inner, P>` (runs `P` on a downcast subset of an extensible enum, output
+  `Result<P::Output, Remainder>`) and `DispatchHandlers<Handlers>` (tries a list of
+  `Result<_, Remainder>` handlers, keeping the remainder), the unified `DowncastAndHandle` and
+  `DispatchMatchers`.
+- *(component)* a `#[deprecated]` consumer trait deprecates its component: `#[cgp_component]`
+  copies the attribute to the component struct (the provider trait already inherits it) and puts
+  `#[allow(deprecated)]` on the generated impls, so only users are warned.
+- *(handler)* a unified handler family in `cgp_fork::handler` (rewrite plan phase 3,
+  ADR 0006). Two components, `Handler` and `AsyncHandler`, replace the nine 0.10 ones: borrowing
+  is in the input type (`&'a T`), fallibility in `Output = Result<_, Context::Error>`, a producer
+  takes `()`. One adapter family (`Promote`, `PromoteOk`, `PromoteDeref`, `IgnoreInput`,
+  `ReturnInput`), `Pipe` and `TryPipe`, and one dispatcher, `MatchWith<Handlers, All | First,
+  Owned | Ref | Mut>`, with `OnField`, `FieldValue`, `MatchFields`/`MatchValues` and the record
+  builders `BuildWith`, `TryBuildWith`, `SetField`, `Merge` and `MergeOutputs`. Import them with
+  `use cgp_fork::handler::prelude::*;`; they are not in `cgp_fork::prelude`, which keeps the
+  0.10 `Handler`.
+- *(field)* access modes `Owned`, `Ref` and `Mut` with the mode-generic `ModeExtractor` and
+  `ModeFields`, implemented through the existing `HasExtractor*` and `ToFields*` traits.
+- *(compat)* `cgp_fork::compat` (`compat-0.10` feature): `Compat`, `CompatTry`, `CompatRef`,
+  `CompatTryRef` and `CompatProducer` turn a 0.10 provider into a unified handler, and
+  `Compat<P>` wires a unified handler to every 0.10 handler component.
+- *(diagnostics)* a `MatchWith` whose handlers miss a variant of the enum reports "still has a
+  variant left: not every variant of the enum is handled" (`FinalizeExtract` carries
+  `#[diagnostic::on_unimplemented]`).
+
+### Changed
+
+- *(field)* `MapTypeRef` is merged into the access-mode trait: `Mode` (implemented by `Owned`,
+  `Ref` and `Mut`) now carries `type Map<'a, T: 'a>`, the borrow-aware type map `MapTypeRef`
+  provided, so one set of marker types selects both the extractor (`ModeExtractor`) and the
+  mapped field type. The derived extractors (`#[derive(CgpData)]`, `ExtractField`, …) are generic
+  over `__R__: Mode` and use `<__R__ as Mode>::Map<'a, T>`. `MapType` stays for the state and
+  type-function maps (`MapFields`, `ToMerge`): a GAT `Map<T>` cannot be `&'a T` (E0309), so the
+  two cannot share one trait.
+- *(macro)* `#[cgp_auto_dispatch]` expands to the unified family (`MatchValues<_, All | First,
+  Owned | Ref | Mut>` called through `Handler`/`AsyncHandler`), so it works without `compat-0.10`
+  and names no deprecated item. With `compat-0.10` the generated provider is also wired to the
+  0.10 components through `Compat`, so code that calls it as a `Computer` keeps compiling.
+
+### Deprecated
+
+All since 0.11.0, each with its replacement in the note. Internal uses (the 0.10 modules, the
+`compat` bridges, the 0.10 tests) allow the lint locally; generated code does not warn.
+
+- *(handler)* the nine 0.10 components (`CanCompute`/`Computer`, `CanComputeRef`, `CanTryCompute`,
+  `CanTryComputeRef`, `CanComputeAsync`, `CanComputeAsyncRef`, the 0.10 `CanHandle`/`Handler`,
+  `CanHandleRef`, `CanProduce`/`Producer`, with their provider traits and component structs) in
+  favour of `cgp_fork::handler::{Handler, AsyncHandler}`; the 0.10 adapters `Promote`,
+  `PromoteAsync`, `PromoteRef`, `TryPromote`, `ReturnInput`, `PipeHandlers`, `ComposeHandlers` and
+  `Promote{Computer,TryComputer,Producer,AsyncComputer,Handler}` in favour of `IgnoreInput`,
+  `PromoteOk`, `Promote`, `PromoteDeref`, `ReturnInput`, `Pipe`/`TryPipe` and `Compat`.
+- *(dispatch)* the 0.10 dispatchers (`MatchWithHandlers*`, `MatchFirstWithHandlers*`,
+  `MatchWith{Field,Value}Handlers*`, `MatchFirstWith{Field,Value}Handlers*` and their `*Inputs*`
+  forms, `ExtractFieldAndHandle`, `ExtractFirstFieldAndHandle`, `HandleFieldValue`,
+  `HandleFirstFieldValue`, `DowncastAndHandle`, `DispatchMatchers`, `BuildWithHandlers`,
+  `BuildAndSetField`, `BuildAndMerge`, `BuildAndMergeOutputs`, `ToBuildAndMergeHandler`,
+  `HasFieldHandlers`, `ToFieldHandlers`, `MapFieldHandler`, `MapExtract*`) in favour of
+  `MatchWith`, `MatchFields`, `MatchValues`, `OnField`, `FieldValue`, `Downcast`,
+  `DispatchHandlers`, `BuildWith`, `SetField`, `Merge`, `MergeOutputs`, `ToMerge` and
+  `VariantHandlers`.
+- *(macro)* `#[cgp_computer]` and `#[cgp_producer]` in favour of `#[cgp_handler]`, and
+  `#[derive_promote]` in favour of `#[derive_handler]` (the warning points at the attribute).
+- *(field)* `MapTypeRef` in favour of `Mode`, and `IsRef`, `IsMut` and `IsOwned` (now aliases) in
+  favour of `Ref`, `Mut` and `Owned`. Being type aliases of unit structs, the old names still
+  work as types but no longer as values.
+- The monad layer (`cgp_fork::extra::monad`) is not deprecated: the unified family has no
+  replacement for it yet.
+
+### Fixed
+
+- *(macro)* attribute errors in wiring tables are all reported at once. `delegate_components!`,
+  `cgp_namespace!`, `cgp_preset!` and `delegate_and_check_components!` report every illegal
+  attribute on the table and its keys (every attribute on a node, every node in the table)
+  instead of stopping at the first. `cgp_preset!` and `delegate_and_check_components!` now check
+  attributes in the validate stage instead of while generating code;
+  `delegate_and_check_components!` still accepts `#[check_trait]` on the table and
+  `#[check_params]`/`#[skip_check]` on a checked key, and now also rejects attributes on the keys
+  of a nested inner table, which it used to drop silently. `Struct!` and `Enum!` report every
+  attribute on a field or variant.
+- *(macro)* `#[derive_provider(WithProvider)]` rejects a getter with more than one method in the
+  validate stage, together with any other validation error of the component.
+- *(macro)* `#[cgp_auto_getter]`, `#[cgp_auto_impl]`, `#[cgp_auto_error]` and `#[cgp_auto_log]`
+  point "does not accept any attribute argument" at the argument instead of the call site, like
+  `#[async_trait]`.
+- *(macro)* `Symbol!("…")` rejects a string longer than 255 characters, the cap identifiers already
+  had; the string becomes the same per-character `Chars<…>` nest.
+- *(macro)* deeply nested input no longer crashes the compiler. `syn` parses nested generics,
+  brackets, reference chains (`&&&&T`) and closures recursively, and a few hundred levels
+  overflowed the stack, so rustc stopped with `SIGSEGV`. Every macro now rejects input nested more
+  than 128 levels or containing an identifier longer than 255 characters with an error (a name
+  becomes a type-level string nested once per character; rustc's default `recursion_limit`
+  already stops at 128 characters), and `Symbol<…>` types are built without re-parsing them.
+  Found with `cargo fuzz`.
+- *(macro)* a raw provider trait (`impl r#Greeter` in `#[cgp_impl]` or `#[cgp_provider]`) and a
+  raw `cgp_namespace!` name no longer make the macro panic. Found with `cargo fuzz`.
+- *(macro)* the macros work when the dependency is renamed
+  (`cgp = { package = "cgp-fork" }`). Generated code used to name `::cgp_fork` and failed with
+  `E0433`; it now uses the name the caller's `Cargo.toml` imports `cgp-fork` under, including
+  through `workspace = true`. `CGP_FORK_CRATE` overrides the detection for non-Cargo builds.
+  Expansion is unchanged for crates that use the default name. A `[dependencies]` entry wins over
+  a dev-dependency, a build-dependency, and a target-specific table whose `cfg` does not match;
+  a keyword rename such as `type` is emitted as `r#type`. A preset used from another crate follows
+  that crate's name for the facade.
+
+### Changed
+
+- *(features)* the 0.10 handler family (`extra::handler`, `extra::dispatch`, `extra::monad`) and
+  the macros `#[cgp_computer]` and `#[cgp_producer]` need the `compat-0.10` feature. It is part
+  of `full`, so default builds are unchanged; a crate with `default-features = false` that uses
+  them adds `features = ["compat-0.10"]`. Those names are deprecated since 0.11.0.
+  `#[cgp_auto_dispatch]` emits the unified family with or without the feature.
+- *(diagnostics)* readable compiler errors for common wiring mistakes, without an external tool.
+  `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField` and `HasFieldMut` carry
+  `#[diagnostic::on_unimplemented]` messages, so a failed `check_components!` starts with
+  "`App` cannot use the component `GreeterComponent`". The traits generated by
+  `#[cgp_component]`, `#[cgp_type]` and `#[cgp_getter]` name the component to wire, and a
+  `#[cgp_auto_getter]` trait names the fields it reads. A message you write on a component's
+  consumer trait is kept and is no longer copied onto the generated provider trait.
+  Generated code gains these attributes and is otherwise unchanged.
+- *(diagnostics)* a missing `delegate_components!` entry no longer lists unrelated wiring tables
+  as "other types that implement `DelegateComponent<Key>`": generated `DelegateComponent` impls
+  carry `#[diagnostic::do_not_recommend]` (stable since Rust 1.85; MSRV unchanged).
+- *(macro)* every macro entrypoint runs one `parse → validate → emit` pipeline. An input with
+  several mistakes now reports more of them at once (for example every undeclared parameter in a
+  component's `name:`), with the same first error as before. Internally each entrypoint parses
+  into one of seven shared IR families; generated code is unchanged.
+- *(macro)* the parsers and code generators moved into a new crate, `cgp-fork-macro-impl`, an
+  internal dependency of `cgp-fork-macro` with no stability guarantee. Users still depend only on
+  `cgp-fork`; macro names and output are unchanged.
+- *(fuzz)* one cargo-fuzz target per macro entrypoint, generated from the shared entrypoint
+  registry, alongside the all-entrypoints target.
+
+### Fixed (CI)
+
+- `scripts/test-packages.sh` and the package job no longer try to package the unpublished
+  `cgp-fork-preset-consumer` test crate.
+
+### Documentation
+
+- ADR 0004 (the shared macro pipeline) and ADR 0005 (diagnostics); the rewrite plan marks phases
+  1b and 2 done.
+- `docs/baseline/2026-10-31-after-phase-1b-final.md`: coverage (95.0% of lines), `cargo audit`,
+  `cargo deny`, `cargo semver-checks` (no semver update required against 0.10.0) and a final
+  three-minute pass over every fuzz target, with every fuzz finding fixed on this branch. One slow
+  input in `syn`'s printer is kept as a known finding under `fuzz/known/`.
+- The 1.0 rewrite plan (`docs/rewrite-plan.md`), architecture decision records (`docs/adr/`), and
+  a measured baseline (`docs/baseline/`, `scripts/baseline.sh`).
+
+## [0.10.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.10.0...v0.10.1) - 2026-10-28
+
+No breaking changes: the public API of both crates is unchanged (checked with
+`cargo semver-checks` against 0.10.0), and macro output is unchanged except for the raw-identifier
+fix below. This is the first release published only after the full Tests workflow passes on
+`main`.
+
+### Fixed
+
+- *(macro)* a raw identifier in a name a macro derives from (`check_components! { r#Person {..} }`,
+  `#[cgp_component(r#Greeter)]`, `#[cgp_fn] fn r#type`, `struct r#Person` with
+  `#[derive(BuildField)]`, and six more) panicked with "`…r#…` is not a valid Ident". The derived
+  name now uses the unrawed spelling (`__CheckPerson`, `GreeterComponent`, `Type`).
+- *(package)* `cargo test` on the published `cgp-fork-macro` failed: the package left out
+  `src/macro_tests/`, which `lib.rs` declares under `cfg(test)`. The tests ship again, and CI now
+  runs the test suites from the packaged `.crate` files.
+- *(package)* both crates now include the `LICENSE` file.
+- *(docs)* the `check_components!` and `delegate_and_check_components!` examples used an old
+  `CanUsePerson for Person` syntax; they now use `#[check_trait(CanUsePerson)]`. The
+  `#[blanket_trait]` example used `#[trait_alias]` and a trait that named itself as a supertrait.
+- *(docs)* `Index`'s `HasField` example left out the `PhantomData<Tag>` parameter; `UseDelegate`
+  keyed on a parenthesized `(SourceError)`; `UseField`'s example returned a `&&str`.
+
+### Changed
+
+- *(deps)* `cgp-fork-macro` no longer enables syn's `extra-traits` feature for normal builds, so
+  downstream builds compile a smaller syn. The `itertools` dependency is gone.
+- *(docs)* every documentation example is now compiled. The facade's 11 "generated code" blocks are
+  doctests. The macro crate's examples compile in a workspace-only crate (45 of 56; the other 11
+  are grammar sketches or abridged expansions and say so). The repository README compiles there
+  too, with no cfg flag to forget.
+- *(build)* the pinned toolchain is Rust 1.99.1. The MSRV is still 1.89.
+- *(ci)* publishing waits for the Tests workflow on `main`. CI also enforces a 90% line-coverage
+  floor, tracks compile time against a rolling median, adds stable/beta toolchain canaries, a
+  weekly upstream-sync check, a knowledge-base reference check, and weekly coverage-guided fuzzing
+  with cargo-fuzz (`fuzz/`).
+
+## [0.10.0](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.3...v0.10.0) - 2026-10-27
+
+### Breaking changes
+
+- *(async-trait)* `#[async_trait]` now rejects attribute arguments. `#[async_trait(?Send)]` and any
+  other argument used to be accepted and silently ignored; remove the argument (the desugared future
+  was never `Send`-bounded, and `CanSendRun` is the component that asks for a `Send` future).
+- *(features)* `extern crate alloc` is now behind the `alloc` feature. With
+  `default-features = false` and without `alloc`, `cgp-fork` needs only `core` and no longer links
+  `alloc` for you. Enable `alloc` (or any of `anyhow`, `eyre`, `std-error`, which now imply it) if
+  you relied on that.
+- *(features)* `anyhow`, `eyre`, and `std-error` now enable `alloc`. This changes nothing for builds
+  that already used the default features.
+
+### Fixed
+
+- *(async-trait)* a trait whose `async fn` has a default body failed to compile with
+  "`{integer}` is not a future"; the body is now wrapped in `async move { … }`
+- *(cgp-provider)* `#[cgp_provider(Greeter)]` (the provider trait instead of `GreeterComponent`)
+  now explains the mistake instead of rustc suggesting `dyn Greeter`
+- *(macro)* internal invariants (named-field idents, the last path segment, `#[use_type]`
+  grounding) are reported as compile errors instead of proc-macro panics
+- *(docs)* the `Symbol!` expansion includes the length (`Symbol<5, Chars<…>>`); `#[cgp_provider]`
+  examples take the component type; the `IsProviderFor` example declared no `Context` and returned
+  `&u64` as `u64`; `delegate_component!` is `delegate_components!`; `Index`'s example code block was
+  never closed; `#[cgp_component]`'s default context identifier is `__Context__`
+
+### Changed
+
+- *(build)* the facade no longer has a build script; the error-backend README examples are doctests
+- *(build)* the published packages no longer include the test suites (`tests/`, `src/macro_tests/`)
+  or examples
+- *(macro)* the macro implementation moved from `shared/` (included through `#[path]`) to ordinary
+  modules under `src/`, and dead code the blanket `allow(dead_code)` hid was removed
+- *(lints)* a curated `clippy::pedantic` subset is enforced across the workspace
+- *(deps)* `Cargo.lock` updated (syn 3.0.9 and other compatible releases)
+- *(release)* release-plz cuts a release for `feat`, `fix`, `perf`, and breaking commits only (no
+  longer for `refactor`)
+
+### Added
+
+- *(docs)* 23 compiled doctests in the facade (previously 0), including the README examples, a
+  feature table, a `UseDelegate` dispatch example, and the generated code of `#[cgp_component]`
+- *(examples)* `hello`, `swap_context`, `error_backends`, `async_component`
+- *(tests)* a trybuild `tests/ui` suite for common mistakes, `#[async_trait]` regression tests, and a
+  deterministic fuzzer asserting no macro entrypoint panics
+- *(ci)* SHA-pinned actions, checksum-verified nextest, and jobs for `--no-default-features`,
+  doctests, macOS/Windows, rustdoc, MSRV 1.89, `cargo hack`, `cargo deny`, `cargo audit`,
+  `cargo semver-checks`, `cargo package`, coverage, deep fuzzing, and a compile-time budget;
+  Dependabot for cargo and actions
+- *(repo)* `CONTRIBUTING.md`, `SECURITY.md`, issue and PR templates, `UPSTREAM_COMMIT`, and
+  `scripts/` for upstream sync, knowledge-base reference checks, and the compile-time budget
+
+## [0.9.3](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.2...v0.9.3) - 2026-10-10
+
+### Added
+
+- *(runtime)* `HasRuntimeMut` mutably borrows the context runtime
+- *(runtime)* cover a mutable runtime field update
+- *(runtime)* register the has_runtime_mut module
+- *(runtime)* add the runtime concept entrypoint
+- *(runtime)* export HasRuntimeMut from runtime
+- *(runtime)* export HasRuntimeMut from traits
+- *(runtime)* add HasRuntimeMut
+
+### Changed
+
+- *(bind-ok)* name the async Ok arm ok
+- *(bind-ok)* name the Ok arm ok
+
+### Documentation
+
+- *(handlers)* describe Promote as a TryComputer step
+- *(promote)* document the AsyncComputer lift; `Promote` lifts an `AsyncComputer` into a `Handler`
+- *(error)* name `HasErrorType` in the abstract-error guide
+- *(readme)* drop the crate version; it lives in `Cargo.toml`
+
+## [0.9.2](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.1...v0.9.2) - 2026-10-09
+
+### Added
+
+- *(cgp-provider)* copy rustdoc onto the generated provider struct
+- *(cgp-component)* document the generated component marker
+
+### Changed
+
+- *(empty-struct)* build generated markers with EmptyStruct::new
+
+### Documentation
+
+- *(cgp-fork)* point readers at the knowledge base
+- *(wrap)* document WrapError::source
+- *(wrap)* document WrapError::detail
+- *(string)* document StringError::message
+- *(src-prelude)* document the module
+- *(cgp-fork)* document prelude
+- *(cgp-fork)* document extra
+- *(cgp-fork)* document core
+- *(has-runtime-type)* document RuntimeOf
+- *(has-runtime-type)* document HasRuntimeType::Runtime
+- *(has-runtime-type)* document HasRuntimeType
+- *(has-runtime)* document HasRuntime::runtime
+- *(has-runtime)* document HasRuntime
+- *(run)* document CanSendRun::send_run
+- *(run)* document CanSendRun
+- *(run)* document CanRun::run
+- *(run)* document CanRun
+- *(extra-prelude)* document the module
+- *(value)* document ContainsValue::Value
+- *(value)* document ContainsValue
+- *(monadic-trans)* document MonadicTrans::M
+- *(monadic-trans)* document MonadicTrans
+- *(lift)* document LiftValue::lift_output
+- *(lift)* document LiftValue::lift_value
+- *(lift)* document LiftValue::Output
+- *(lift)* document LiftValue
+- *(bind)* document MonadicBind::Provider
+- *(bind)* document MonadicBind
+- *(pipe-monadic)* document TryPromoteProviders
+- *(pipe-monadic)* document PipeMonadic
+- *(ok)* document BindOk
+- *(ok)* document OkMonadicTrans
+- *(ok)* document OkMonadic
+- *(monadic)* document ok
+- *(monadic)* document ident
+- *(monadic)* document err
+- *(ident)* document IdentMonadic
+- *(err)* document BindErr
+- *(err)* document ErrMonadicTrans
+- *(err)* document ErrMonadic
+- *(monad)* document traits
+- *(monad)* document providers
+- *(monad)* document monadic
+- *(extra)* document runtime
+- *(extra)* document run
+- *(extra)* document monad
+- *(extra)* document log
+- *(extra)* document handler
+- *(extra)* document field
+- *(extra)* document error
+- *(extra)* document dispatch
+- *(extra)* document prelude
+- *(can-log)* document CanLog::log
+- *(types)* document UseInputDelegate
+- *(types)* document NoCode
+- *(try-promote)* document TryPromote
+- *(return-input)* document ReturnInput
+- *(promote-ref)* document PromoteRef
+- *(promote-async)* document PromoteAsync
+- *(promote-all)* document PromoteHandler
+- *(promote-all)* document PromoteAsyncComputer
+- *(promote-all)* document PromoteProducer
+- *(promote-all)* document PromoteTryComputer
+- *(promote-all)* document PromoteComputer
+- *(promote)* document Promote
+- *(pipe)* document PipeHandlers
+- *(compose)* document ComposeHandlers
+- *(try-compute)* document CanTryComputeRef::try_compute_ref
+- *(try-compute)* document CanTryComputeRef::Output
+- *(try-compute)* document CanTryComputeRef
+- *(try-compute)* document CanTryCompute::try_compute
+- *(try-compute)* document CanTryCompute::Output
+- *(try-compute)* document CanTryCompute
+- *(produce)* document CanProduce::produce
+- *(produce)* document CanProduce::Output
+- *(produce)* document CanProduce
+- *(handler)* document CanHandleRef::handle_ref
+- *(handler)* document CanHandleRef::Output
+- *(handler)* document CanHandleRef
+- *(handler)* document CanHandle::handle
+- *(handler)* document CanHandle::Output
+- *(handler)* document CanHandle
+- *(computer)* document CanComputeRef::compute_ref
+- *(computer)* document CanComputeRef::Output
+- *(computer)* document CanComputeRef
+- *(computer)* document CanCompute::compute
+- *(computer)* document CanCompute::Output
+- *(computer)* document CanCompute
+- *(async-computer)* document CanComputeAsyncRef::compute_async_ref
+- *(async-computer)* document CanComputeAsyncRef::Output
+- *(async-computer)* document CanComputeAsyncRef
+- *(async-computer)* document CanComputeAsync::compute_async
+- *(async-computer)* document CanComputeAsync::Output
+- *(async-computer)* document CanComputeAsync
+- *(extra-field)* document impls
+- *(to-optional)* document TransformOptional
+- *(to-optional)* document ToOptional::to_optional
+- *(to-optional)* document ToOptional::Output
+- *(to-optional)* document ToOptional
+- *(to-optional)* document HasOptionalBuilder::optional_builder
+- *(to-optional)* document HasOptionalBuilder::Builder
+- *(to-optional)* document HasOptionalBuilder
+- *(set-optional)* document SetOptional::set_optional
+- *(set-optional)* document SetOptional::set
+- *(set-optional)* document SetOptional::Value
+- *(set-optional)* document SetOptional
+- *(finalize-optional)* document FinalizeOptional::finalize_optional
+- *(finalize-optional)* document FinalizeOptional
+- *(build-default)* document TransformMapDefault
+- *(build-default)* document CanFinalizeWithDefault::finalize_with_default
+- *(build-default)* document CanFinalizeWithDefault::Output
+- *(build-default)* document CanFinalizeWithDefault
+- *(build-default)* document CanBuildWithDefault::build_with_default
+- *(build-default)* document CanBuildWithDefault
+- *(return-error)* document ReturnError
+- *(raise-from)* document RaiseFrom
+- *(panic-error)* document PanicOnError
+- *(infallible)* document RaiseInfallible
+- *(discard-detail)* document DiscardDetail
+- *(display-error)* document DisplayError
+- *(debug-error)* document DebugError
+- *(match-with-handlers-ref)* document MatchWithHandlersRef
+- *(match-with-handlers-mut)* document MatchWithHandlersMut
+- *(match-with-handlers)* document MatchWithHandlers
+- *(match-first-with-handlers-ref)* document MatchFirstWithHandlersRef
+- *(match-first-with-handlers-mut)* document MatchFirstWithHandlersMut
+- *(match-first-with-handlers)* document MatchFirstWithHandlers
+- *(build-with-handlers)* document BuildWithHandlers
+- *(match-with-field-handlers)* document MatchWithFieldHandlersInputsMut
+- *(match-with-field-handlers)* document MatchWithFieldHandlersInputsRef
+- *(match-with-field-handlers)* document MatchWithFieldHandlersInputs
+- *(match-with-field-handlers)* document MatchWithValueHandlersMut
+- *(match-with-field-handlers)* document MatchWithValueHandlersRef
+- *(match-with-field-handlers)* document MatchWithFieldHandlersRef
+- *(match-with-field-handlers)* document MatchWithValueHandlers
+- *(match-with-field-handlers)* document MatchWithFieldHandlers
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersInputsMut
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersInputsRef
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersInputs
+- *(match-first-with-field-handlers)* document MatchFirstWithValueHandlersMut
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersMut
+- *(match-first-with-field-handlers)* document MatchFirstWithValueHandlersRef
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlersRef
+- *(match-first-with-field-handlers)* document MatchFirstWithValueHandlers
+- *(match-first-with-field-handlers)* document MatchFirstWithFieldHandlers
+- *(first-field-value)* document HandleFirstFieldValue
+- *(field-value)* document HandleFieldValue
+- *(extract-handle)* document DowncastAndHandle
+- *(extract-first-field)* document ExtractFirstFieldAndHandle
+- *(extract-field)* document ExtractFieldAndHandle
+- *(build-and-set-field)* document BuildAndSetField
+- *(build-and-merge)* document BuildAndMerge
+- *(dispatch-matchers)* document DispatchMatchers
+- *(build-and-merge-outputs)* document ToBuildAndMergeHandler
+- *(build-and-merge-outputs)* document BuildAndMergeOutputs
+- *(has-type)* document TypeOf
+- *(has-type)* document HasType::Type
+- *(has-type)* document HasType
+- *(use-type)* document WithType
+- *(use-delegated-type)* document WithDelegatedType
+- *(use-delegated-type)* document UseDelegatedType
+- *(core-prelude)* document the module
+- *(core)* document types
+- *(core)* document field
+- *(core)* document error
+- *(core)* document base
+- *(core)* document prelude
+- *(sum)* link Either to crate::core::field::types::Either in Read more about sum types in
+- *(sum)* link Either to crate::core::field::types::Either in Void is commonly used as the
+- *(sum)* document Either::Right
+- *(sum)* document Either::Left
+- *(sum)* link Void to crate::core::field::types::Void in by combining a chain of Either
+- *(mref)* document MRef::get_or_clone
+- *(mref)* document MRef::Owned
+- *(mref)* document MRef::Ref
+- *(mref)* document MRef
+- *(life)* document Life
+- *(field)* document Field::phantom
+- *(field)* document Field::value
+- *(update-field)* document UpdateField::update_field
+- *(update-field)* document UpdateField::Output
+- *(update-field)* document UpdateField::Mapper
+- *(update-field)* document UpdateField::Value
+- *(update-field)* document UpdateField
+- *(transform-map)* document TransformMapFields::transform_map_fields
+- *(transform-map)* document TransformMapFields::Output
+- *(transform-map)* document TransformMapFields
+- *(transform-map)* document TransformMap::transform_mapped
+- *(transform-map)* clarify TransformMap
+- *(to-fields)* document ToFieldsRef::to_fields_ref
+- *(to-fields)* document ToFieldsRef
+- *(to-fields)* document ToFields::to_fields
+- *(to-fields)* document ToFields
+- *(take-field)* document TakeField::take_field
+- *(take-field)* document TakeField::Remainder
+- *(take-field)* document TakeField::Value
+- *(take-field)* document TakeField
+- *(static-string)* document StaticString::VALUE
+- *(static-string)* document StaticString
+- *(partial-data)* document PartialData::Target
+- *(partial-data)* document PartialData
+- *(map-type-ref)* document MapTypeRef::Map
+- *(map-type-ref)* document MapTypeRef
+- *(map-type)* document MapType::Map
+- *(map-type)* document MapType
+- *(map-fields)* document MapFields::Mapped
+- *(map-fields)* document MapFields
+- *(map-field)* document FieldMapper::map_field
+- *(map-field)* document MapField::map_field
+- *(has-fields)* document HasFieldsRef::FieldsRef
+- *(has-fields)* document HasFieldsRef
+- *(has-fields)* document HasFields::Fields
+- *(has-fields)* document HasFields
+- *(has-field-mut)* document MutFieldGetter::get_field_mut
+- *(has-field-mut)* document MutFieldGetter
+- *(has-field-mut)* document HasFieldMut::get_field_mut
+- *(has-field-mut)* document HasFieldMut
+- *(has-field)* document FieldGetter::get_field
+- *(has-field)* document FieldGetter::Value
+- *(has-field)* document FieldGetter
+- *(has-field)* document HasField::get_field
+- *(has-field)* document HasField::Value
+- *(has-builder)* document IntoBuilder::into_builder
+- *(has-builder)* document IntoBuilder::Builder
+- *(has-builder)* document IntoBuilder
+- *(has-builder)* document HasBuilder::builder
+- *(has-builder)* document HasBuilder::Builder
+- *(has-builder)* document HasBuilder
+- *(from-variant)* document FromVariant::from_variant
+- *(from-variant)* document FromVariant::Value
+- *(from-variant)* document FromVariant
+- *(from-fields)* document FromFields::from_fields
+- *(from-fields)* document FromFields
+- *(extract-field)* document FinalizeExtractResult::finalize_extract_result
+- *(extract-field)* document FinalizeExtractResult::Output
+- *(extract-field)* document FinalizeExtractResult
+- *(extract-field)* document FinalizeExtract::finalize_extract
+- *(extract-field)* document FinalizeExtract
+- *(extract-field)* document ExtractField::extract_field
+- *(extract-field)* document ExtractField::Remainder
+- *(extract-field)* document ExtractField::Value
+- *(extract-field)* document ExtractField
+- *(extract-field)* document HasExtractorMut::extractor_mut
+- *(extract-field)* document HasExtractorMut::ExtractorMut
+- *(extract-field)* document HasExtractorMut
+- *(extract-field)* document HasExtractorRef::extractor_ref
+- *(extract-field)* document HasExtractorRef::ExtractorRef
+- *(extract-field)* document HasExtractorRef
+- *(extract-field)* document HasExtractor::from_extractor
+- *(extract-field)* document HasExtractor::to_extractor
+- *(extract-field)* document HasExtractor::Extractor
+- *(extract-field)* document HasExtractor
+- *(concat-product)* document ConcatProduct::Output
+- *(concat-product)* document ConcatProduct
+- *(build-field)* document FinalizeBuild::finalize_build
+- *(build-field)* document FinalizeBuild
+- *(build-field)* document BuildField::build_field
+- *(build-field)* document BuildField::Output
+- *(build-field)* document BuildField::Value
+- *(build-field)* document BuildField
+- *(append-product)* document AppendProduct::Output
+- *(append-product)* document AppendProduct
+- *(field)* document types
+- *(field)* document traits
+- *(core-field)* document impls
+- *(use-ref)* document WithFieldRef
+- *(use-ref)* document UseFieldRef
+- *(use-field)* document WithField
+- *(map-type-ref)* document IsOwned
+- *(map-type-ref)* document IsMut
+- *(map-type-ref)* document IsRef
+- *(map-type)* document IsOptional
+- *(map-type)* document IsVoid
+- *(map-type)* document IsNothing
+- *(map-type)* document IsPresent
+- *(chain)* document ChainGetters
+- *(cast)* document FieldsExtractor::extract_from
+- *(cast)* document FieldsExtractor::Remainder
+- *(cast)* document FieldsExtractor
+- *(cast)* document CanDowncastFields::downcast_fields
+- *(cast)* document CanDowncastFields::Remainder
+- *(cast)* document CanDowncastFields
+- *(cast)* document CanDowncast::downcast
+- *(cast)* document CanDowncast::Remainder
+- *(cast)* document CanDowncast
+- *(cast)* document CanUpcast::upcast
+- *(cast)* document CanUpcast
+- *(build-from)* document CanBuildFrom::build_from
+- *(build-from)* document CanBuildFrom::Output
+- *(build-from)* document CanBuildFrom
+- *(has-error-type)* document ErrorOf
+- *(has-error-type)* document HasErrorType::Error
+- *(error-only)* document ErrorOnly
+- *(delegate-component)* document DelegateComponent::Delegate
+- *(with-provider)* document WithProvider
+- *(use-fields)* document UseFields
+- *(use-default)* document UseDefault
+- *(use-context)* document WithContext
+- *(redirect-lookup)* document RedirectLookup
+- *(namespaces)* document DefaultImpls2::Delegate
+- *(namespaces)* document DefaultImpls2
+- *(namespaces)* document DefaultImpls1::Delegate
+- *(namespaces)* document DefaultImpls1
+- *(namespaces)* document DefaultNamespace::Delegate
+- *(namespaces)* document DefaultNamespace
+- *(component)* document macro_prelude
+- *(symbol)* document Symbol
+- *(path)* document PathCons
+- *(nil)* link Cons to super::Cons in Read more about type-level lists, a.k.a
+- *(nil)* link Cons to super::Cons in Nil is commonly used as the
+- *(cons)* link Nil to super::Nil in Cons is used together with Nil
+- *(static-format)* document StaticFormat::fmt
+- *(static-format)* document StaticFormat
+- *(concat-path)* document ConcatPath::Output
+- *(concat-path)* document ConcatPath
+- *(base-types)* document types
+- *(base-types)* document traits
+- *(base-types)* document macro_prelude
+- *(base)* document macro_prelude
+- *(redirect-lookup)* expect the CanDoFoo marker doc
+- *(prefix-default-namespace)* expect the Foo marker doc
+- *(namespace-type-path)* expect the Bar marker doc
+- *(namespace-symbol-path)* expect the Bar marker doc
+- *(namespace-multi)* expect the Bar marker doc
+- *(namespace-basic)* expect the Bar marker doc
+- *(default-impls)* expect the Show marker doc
+- *(string-custom-spec)* expect the HasFoo marker doc
+- *(string-custom-name)* expect the HasFoo marker doc
+- *(string)* expect the HasFoo marker doc
+- *(slice)* expect the HasFoo marker doc
+- *(option)* expect the HasFoo marker doc
+- *(non-self)* expect the HasFooBar marker doc
+- *(mut-slice)* expect the HasItems marker doc
+- *(mut-getter)* expect the HasCount marker doc
+- *(mref)* expect the HasFoo marker doc
+- *(clone)* expect the HasName marker doc
+- *(assoc-type-self-referential)* expect the HasName marker doc
+- *(assoc-type-getter)* expect the HasScalar marker doc
+- *(abstract-type-use-type)* expect the HasRectangleFields marker doc
+- *(abstract-type-extend)* expect the HasRectangleFields marker doc
+- *(component-type-param)* expect the CanCalculateArea marker doc
+- *(component-lifetime)* expect the HasReference marker doc
+- *(use-delegate-getter)* expect the HasFooAt marker doc
+- *(use-delegate-getter)* expect the HasFooTypeAt marker doc
+- *(derive-promote)* expect the HasArea marker doc
+- *(default-methods)* expect the CanGreet marker doc
+- *(component-macro)* expect the CanDoFoo marker doc
+- *(component-assoc-const)* expect the HasLimit marker doc
+- *(component-async)* expect the CanFetch marker doc
+- *(cgp-type-unsized)* expect the HasFooType marker doc
+- *(cgp-type-self-referential)* expect the HasScalarType marker doc
+- *(cgp-type-macro)* expect the HasScalarType marker doc
+- *(cgp-type-bounded)* expect the HasTypes marker doc
+- *(parser-rejections)* drop the agent guide pointer
+- *(macro-core)* remove the agent guide
+- *(extra-macro-core)* remove the agent guide
+- *(cgp-fork-macro)* clarify async_trait
+- *(cgp-fork-macro)* document derive_cgp_data
+- *(cgp-fork-macro)* document derive_cgp_record
+- *(cgp-fork-macro)* document derive_cgp_variant
+- *(cgp-fork-macro)* document derive_from_variant
+- *(cgp-fork-macro)* document derive_extractor
+- *(cgp-fork-macro)* document derive_builder
+- *(cgp-fork-macro)* document derive_has_fields
+- *(cgp-fork-macro)* document derive_fields
+- *(cgp-fork-macro)* document Path
+- *(cgp-fork-macro)* document product
+- *(cgp-fork-macro)* document cgp_namespace
+- *(cgp-fork-macro)* document cgp_fn
+
+## [0.9.1](https://github.com/Just-Replicant/cgp-fork/compare/v0.9.0...v0.9.1) - 2026-10-08
+
+### Changed
+
+- *(delegate-component)* stop clearing the removed const eq token
+- *(derive-extractor)* build tuple fields with syn 3 field modifiers
+- *(visitors)* ignore the attrs field on syn 3 type paths
+- *(elaborate-lifetimes)* visit syn 3 function-pointer types
+- *(replace-self)* expand syn 3 receiver kinds into context parameters
+- *(implicits)* take receiver mutability from syn 3 reference kinds
+- *(getter)* reject unsafe and owned receivers through syn 3
+- *(cgp-auto-dispatch)* match syn 3 receiver kinds and fn modifiers
+- *(cgp-fn)* add syn 3 trait-fn modifiers and name item variants
+- *(cgp-auto-log)* follow syn 3 items, safety, and receivers
+- *(cgp-auto-error)* follow syn 3 impl, safety, and type-path shapes
+- *(blanket-trait)* emit syn 3 traits, impls, and item modifiers
+- *(macro)* name syn 3 item variants instead of Into
+- *(provider-impl)* clear defaultness through syn 3 impl modifiers
+- *(cgp-provider)* read the syn 3 impl trait pair
+- *(cgp-impl)* read the syn 3 impl trait pair
+- *(macro)* build item impls with syn 3 headers
+- *(cgp-auto-impl)* fill syn 3 impl-item modifiers
+- *(delegated-impls)* fill syn 3 impl-item modifiers
+- *(cgp-fork-macro)* compile the shared sources from inside the crate
+- *(test-util)* move the snapshot helper library under cgp-fork-macro/shared
+- *(extra-macro-lib)* move the extra macro entries under cgp-fork-macro/shared
+- *(extra-macro-core)* move the extra macro parsers under cgp-fork-macro/shared
+- *(macro-lib)* move the macro entries under cgp-fork-macro/shared
+- *(macro-core)* move the parser sources under cgp-fork-macro/shared
+
+## v0.9.0 (2026-09-29)
+
+New features:
+
+- In `delegate_components!`, write a type or getter component as the value alone when the provider is `UseType` or `UseField` - [#188](https://github.com/contextgeneric/cgp/issues/188)
+- Introduce `cgp_preset!`, so one preset entry expands to many `DelegateComponent` impls and two presets can be combined - [#26](https://github.com/contextgeneric/cgp/issues/26)
+- Introduce `#[derive_provider(WithProvider)]`, deriving the `WithProvider` impl instead of writing it by hand - [#30](https://github.com/contextgeneric/cgp/issues/30)
+- Introduce `#[cgp_auto_impl]`, turning a trait method body into a blanket provider - [#181](https://github.com/contextgeneric/cgp/issues/181)
+- Introduce `#[cgp_auto_error]`, generating `HasErrorType` / `CanRaiseError` / `CanWrapError` providers from one error definition - [#182](https://github.com/contextgeneric/cgp/issues/182)
+- Allow a `#[cgp_getter]` / `#[cgp_auto_getter]` trait to consist of an associated type, reusing the `#[cgp_type]` path - [#183](https://github.com/contextgeneric/cgp/issues/183)
+- Allow `#[helper]` methods inside `#[cgp_impl]` that are not part of the provider trait - [#184](https://github.com/contextgeneric/cgp/issues/184)
+- Introduce `CanLog` and `#[cgp_auto_log]`, a logger component with a blanket impl parallel to `#[cgp_auto_getter]` - [#185](https://github.com/contextgeneric/cgp/issues/185)
+- Read `#[implicit]` and `#[field]` arguments from the context in `#[cgp_fn]` and `#[cgp_computer]`, and add `#[derive_promote]` to wrap a `Computer` as a component provider - [#193](https://github.com/contextgeneric/cgp/issues/193)
+- Introduce `Struct!` and `Enum!`, writing a struct or enum shape as its declaration instead of a `Product!` or `Sum!` of `Field` entries - [#276](https://github.com/contextgeneric/cgp/pull/276)
+- Accept variants with no fields in `#[derive(CgpVariant)]`, `#[derive(CgpData)]`, `#[derive(ExtractField)]`, and `#[derive(FromVariant)]`, with payload `Nil` - [#278](https://github.com/contextgeneric/cgp/pull/278)

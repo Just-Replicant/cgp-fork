@@ -1,0 +1,41 @@
+error: use of deprecated type alias `cgp_fork::prelude::IsRef`: use the access mode `Ref` (`cgp_fork::core::field::types::Ref`)
+ --> tests/ui/deprecated_map_type_ref.rs:4:35
+  |
+4 | use cgp_fork::core::field::impls::IsRef;
+  |                                   ^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_map_type_ref.rs:2:9
+  |
+2 | #![deny(deprecated)]
+  |         ^^^^^^^^^^
+
+error: use of deprecated trait `cgp_fork::prelude::MapTypeRef`: merged into the access-mode trait: use `Mode` (`cgp_fork::core::field::traits::Mode`) and `<M as Mode>::Map<'a, T>`
+ --> tests/ui/deprecated_map_type_ref.rs:5:36
+  |
+5 | use cgp_fork::core::field::traits::MapTypeRef;
+  |                                    ^^^^^^^^^^
+
+error: use of deprecated trait `cgp_fork::prelude::MapTypeRef`: merged into the access-mode trait: use `Mode` (`cgp_fork::core::field::traits::Mode`) and `<M as Mode>::Map<'a, T>`
+ --> tests/ui/deprecated_map_type_ref.rs:7:16
+  |
+7 | fn lend<'a, M: MapTypeRef>(value: M::Map<'a, u8>) -> M::Map<'a, u8> {
+  |                ^^^^^^^^^^
+
+error: use of deprecated type alias `cgp_fork::prelude::IsRef`: use the access mode `Ref` (`cgp_fork::core::field::types::Ref`)
+  --> tests/ui/deprecated_map_type_ref.rs:13:20
+   |
+13 |     let _ = lend::<IsRef>(&number);
+   |                    ^^^^^
+
+error: use of deprecated associated type `cgp_fork::prelude::MapTypeRef::Map`: merged into the access-mode trait: use `Mode` (`cgp_fork::core::field::traits::Mode`) and `<M as Mode>::Map<'a, T>`
+ --> tests/ui/deprecated_map_type_ref.rs:7:35
+  |
+7 | fn lend<'a, M: MapTypeRef>(value: M::Map<'a, u8>) -> M::Map<'a, u8> {
+  |                                   ^^^^^^^^^^^^^^
+
+error: use of deprecated associated type `cgp_fork::prelude::MapTypeRef::Map`: merged into the access-mode trait: use `Mode` (`cgp_fork::core::field::traits::Mode`) and `<M as Mode>::Map<'a, T>`
+ --> tests/ui/deprecated_map_type_ref.rs:7:54
+  |
+7 | fn lend<'a, M: MapTypeRef>(value: M::Map<'a, u8>) -> M::Map<'a, u8> {
+  |                                                      ^^^^^^^^^^^^^^

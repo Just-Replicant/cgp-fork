@@ -1,0 +1,56 @@
+/**
+    The `Either` type is used to represent an _anonymous sum type_.
+
+    Similar to [`Cons`](crate::core::field::types::Cons), `Either` is used to form a sum type
+    by combining a chain of `Either` types, and terminated with a [`Void`](crate::core::field::types::Void) type.
+    But unlike product types, a sum type has values that belong to one
+    of the variants in the list.
+
+    `Either` is most often used through the `Sum!` macro, which accepts a list of
+    types and turns them into a chain of `Either` types.
+
+    ## Example
+
+    Given the following sum type definition:
+
+    ```rust
+    # use cgp_fork::prelude::*;
+    type MyUnion = Sum![u32, String, bool];
+    ```
+
+    The following type would be generated:
+
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # use cgp_fork::core::field::types::{Either, Void};
+    type MyUnion = Either<u32, Either<String, Either<bool, Void>>>;
+    # let _: PhantomData<MyUnion> = PhantomData::<Sum![u32, String, bool]>;
+    ```
+*/
+#[derive(Eq, PartialEq, Debug, Clone)]
+pub enum Either<Head, Tail> {
+    /// The value is the head of the sum.
+    Left(Head),
+    /// The value is somewhere in the rest of the sum.
+    Right(Tail),
+}
+
+/**
+    The `Void` type is used to represent the end of an _anonymous sum type_,
+    or an _empty_ sum type.
+
+    `Void` is commonly used as the `Tail` of an [`Either`](crate::core::field::types::Either) type, to terminate the list.
+    When used on its own, it represents an empty sum type, which can _never be constructed_.
+
+    `Void` is functionally the same as the
+    [_never_ type](https://doc.rust-lang.org/std/primitive.never.html), `!`,
+    or otherwise
+    [`Infallible`](https://doc.rust-lang.org/std/convert/enum.Infallible.html).
+    However, we define a separate `Void` type, to make it more clear that it is
+    specifically used for terminating a sum type.
+
+    Read more about sum types in [`Either`](crate::core::field::types::Either).
+*/
+#[derive(Eq, PartialEq, Debug, Clone)]
+pub enum Void {}

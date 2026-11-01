@@ -1,0 +1,24 @@
+//! Entrypoint for the `handlers` concept.
+//!
+//! Covers CGP's computation family: defining `Computer`/`Producer` providers
+//! from functions with `#[cgp_computer]`/`#[cgp_producer]`, reading `#[field]` and
+//! `#[implicit]` arguments from the context, wrapping a `Computer` as a component
+//! provider with `#[derive_promote]`, the automatic promotion between the
+//! synchronous `Computer`, the input-free `Producer`, and the async, fallible
+//! `Handler`, and composing handlers into pipelines with the `PipeHandlers`
+//! combinator.
+//!
+//! This concept does *not* own `#[cgp_component]`, `#[cgp_provider]`,
+//! `check_components!`, or `delegate_components!` snapshots — those live in their
+//! owning targets — so the scaffolding here uses the plain macros.
+//!
+//! See cgp-knowledge-base-fork/cgp/reference/components/computer.md,
+//! cgp-knowledge-base-fork/cgp/reference/components/producer.md,
+//! cgp-knowledge-base-fork/cgp/reference/components/handler.md, and
+//! cgp-knowledge-base-fork/cgp/reference/providers/handler_combinators.md.
+//!
+//! The 0.10 handler family needs the `compat-0.10` feature (on by default).
+#![cfg(feature = "compat-0.10")]
+#![allow(dead_code)]
+
+pub mod handlers;

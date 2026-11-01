@@ -1,0 +1,71 @@
+use crate::core::prelude::*;
+use crate::extra::handler::{
+    Computer, ComputerComponent, Handler, HandlerComponent, PipeHandlers, TryComputer,
+    TryComputerComponent,
+};
+
+/// Builds an `Output` by starting from `Output::builder()` and piping `Handlers` over that builder.
+///
+/// The pipe's result must implement [`FinalizeBuild`](crate::core::field::traits::FinalizeBuild).
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::BuildWith` (or `cgp_fork::handler::TryBuildWith` for handlers that return `Result`)"
+)]
+pub struct BuildWithHandlers<Output, Handlers>(pub PhantomData<(Output, Handlers)>);
+
+#[cgp_provider]
+impl<Context, Code, Input, Output, Builder, Handlers, Res> Computer<Context, Code, Input>
+    for BuildWithHandlers<Output, Handlers>
+where
+    Output: HasBuilder<Builder = Builder>,
+    PipeHandlers<Handlers>: Computer<Context, Code, Builder, Output = Res>,
+    Res: FinalizeBuild<Target = Output>,
+{
+    type Output = Output;
+
+    fn compute(context: &Context, code: PhantomData<Code>, _input: Input) -> Self::Output {
+        PipeHandlers::compute(context, code, Output::builder()).finalize_build()
+    }
+}
+
+#[cgp_provider]
+impl<Context, Code, Input, Output, Builder, Handlers, Res> TryComputer<Context, Code, Input>
+    for BuildWithHandlers<Output, Handlers>
+where
+    Context: HasErrorType,
+    Output: HasBuilder<Builder = Builder>,
+    PipeHandlers<Handlers>: TryComputer<Context, Code, Builder, Output = Res>,
+    Res: FinalizeBuild<Target = Output>,
+{
+    type Output = Output;
+
+    fn try_compute(
+        context: &Context,
+        code: PhantomData<Code>,
+        _input: Input,
+    ) -> Result<Self::Output, Context::Error> {
+        Ok(PipeHandlers::try_compute(context, code, Output::builder())?.finalize_build())
+    }
+}
+
+#[cgp_provider]
+impl<Context, Code, Input, Output, Builder, Handlers, Res> Handler<Context, Code, Input>
+    for BuildWithHandlers<Output, Handlers>
+where
+    Context: HasErrorType,
+    Output: HasBuilder<Builder = Builder>,
+    PipeHandlers<Handlers>: Handler<Context, Code, Builder, Output = Res>,
+    Res: FinalizeBuild<Target = Output>,
+{
+    type Output = Output;
+
+    async fn handle(
+        context: &Context,
+        code: PhantomData<Code>,
+        _input: Input,
+    ) -> Result<Self::Output, Context::Error> {
+        Ok(PipeHandlers::handle(context, code, Output::builder())
+            .await?
+            .finalize_build())
+    }
+}

@@ -1,0 +1,115 @@
+use core::marker::PhantomData;
+
+use crate::core::component::{IsProviderFor, WithProvider};
+use crate::core::field::traits::{FieldGetter, HasField, HasFieldMut, MutFieldGetter};
+use crate::core::types::{TypeProvider, TypeProviderComponent};
+
+/**
+    The `UseField` pattern is used to implement a CGP getter trait by reading
+    the `Tag` field from `Context` via the [`HasField`] trait.
+
+    When a CGP getter component contains only one getter method and is defined
+    using the `#[cgp_getter]` macro, a `UseField` implementation is automatically
+    generated.
+
+    Typically, the `Tag` type would be a type-level string defined through
+    the `Symbol!` macro, such as `Symbol!("name")`. It may also be a type-level
+    integer that is wrapped in the `Index` type, such as `Index<0>`.
+    The `HasField` implementation for these tag types would be automatically
+    implemented following the field names in the struct when `#[derive(HasField)]`
+    is used.
+
+    However, users are free to use any type as the `Tag` type, as there is no
+    additional constraints on what the type should be. The only consequence is
+    that such manual tags would not be automatically implemented by
+    `#[derive(HasField)]`, and so users would have to manually implement the
+    `HasField` instances, or generate them from a different macro.
+
+    `UseField` allows users to easily implement a getter trait for a context
+    by only having to derive the [`HasField`] trait, and specifying the field
+    name through `UseField`. This reduces the amount of boilerplate code required
+    to manually implement the getter trait for each concrete context.
+
+    ## Example
+
+    Given the following getter component definition:
+
+    ```rust
+    # use cgp_fork::prelude::*;
+    #[cgp_getter(NameGetter)]
+    pub trait HasName {
+        fn name(&self) -> &str;
+    }
+
+    #[derive(HasField)]
+    pub struct Person {
+        pub full_name: String,
+    }
+
+    delegate_components! {
+        Person {
+            NameGetterComponent: UseField<Symbol!("full_name")>,
+        }
+    }
+
+    let person = Person { full_name: "Alice".to_owned() };
+    assert_eq!(person.name(), "Alice");
+    ```
+
+    The following `UseField` implementation would be generated (written out by hand against stand-ins for the generated traits, and compiled):
+
+    ```rust
+    # use core::marker::PhantomData;
+    # use cgp_fork::prelude::*;
+    # // Stand-in for the provider trait `#[cgp_getter]` generates.
+    # pub trait NameGetter<Context> {
+    #     fn name(context: &Context) -> &str;
+    # }
+    impl<Context, Tag> NameGetter<Context> for UseField<Tag>
+    where
+        Context: HasField<Tag, Value = String>,
+    {
+        fn name(context: &Context) -> &str {
+            context.get_field(PhantomData).as_str()
+        }
+    }
+    ```
+*/
+pub struct UseField<Tag>(pub PhantomData<Tag>);
+
+/// [`WithProvider`]`<`[`UseField`]`<Tag>>`, so a getter consumer can be filled from the `Tag` field.
+pub type WithField<Tag> = WithProvider<UseField<Tag>>;
+
+impl<Context, TypeTag, FieldTag, Field> TypeProvider<Context, TypeTag> for UseField<FieldTag>
+where
+    Context: HasField<FieldTag, Value = Field>,
+{
+    type Type = Field;
+}
+
+impl<Context, TypeTag, FieldTag, Field> IsProviderFor<TypeProviderComponent, Context, TypeTag>
+    for UseField<FieldTag>
+where
+    Context: HasField<FieldTag, Value = Field>,
+{
+}
+
+impl<Context, OutTag, Tag, Value> FieldGetter<Context, OutTag> for UseField<Tag>
+where
+    Context: HasField<Tag, Value = Value>,
+{
+    type Value = Value;
+
+    fn get_field(context: &Context, _tag: PhantomData<OutTag>) -> &Value {
+        context.get_field(PhantomData)
+    }
+}
+
+impl<Context, OutTag, Tag, Value> MutFieldGetter<Context, OutTag> for UseField<Tag>
+where
+    Context: HasFieldMut<Tag, Value = Value>,
+{
+    fn get_field_mut(context: &mut Context, _tag: PhantomData<OutTag>) -> &mut Value {
+        context.get_field_mut(PhantomData)
+    }
+}

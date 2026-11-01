@@ -1,0 +1,19 @@
+error: use of deprecated trait `cgp_fork::prelude::Computer`: use the unified `Handler` component (`cgp_fork::handler::Handler`, called through `cgp_fork::handler::CanHandle`)
+ --> tests/ui/deprecated_computer.rs:7:21
+  |
+7 | impl<Context, Code> Computer<Context, Code, u64> for Double {
+  |                     ^^^^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_computer.rs:2:9
+  |
+2 | #![deny(deprecated)]
+  |         ^^^^^^^^^^
+
+error: use of deprecated struct `cgp_fork::prelude::ComputerComponent`: use the unified `Handler` component (`cgp_fork::handler::Handler`, called through `cgp_fork::handler::CanHandle`)
+ --> tests/ui/deprecated_computer.rs:6:1
+  |
+6 | #[cgp_new_provider]
+  | ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the attribute macro `cgp_new_provider` (in Nightly builds, run with -Z macro-backtrace for more info)

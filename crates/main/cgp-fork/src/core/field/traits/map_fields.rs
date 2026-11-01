@@ -1,0 +1,33 @@
+use crate::core::field::traits::MapType;
+use crate::core::field::types::{Cons, Either, Nil, Void};
+
+/// Applies `Mapper` to every element of a [`Cons`](crate::core::field::types::Cons) or
+/// [`Either`](crate::core::field::types::Either) chain.
+pub trait MapFields<Mapper> {
+    /// The chain with [`MapType::Map`](crate::core::field::traits::MapType::Map) applied to each element.
+    type Mapped;
+}
+
+impl<Mapper, Current, Rest> MapFields<Mapper> for Cons<Current, Rest>
+where
+    Mapper: MapType,
+    Rest: MapFields<Mapper>,
+{
+    type Mapped = Cons<Mapper::Map<Current>, Rest::Mapped>;
+}
+
+impl<Mapper> MapFields<Mapper> for Nil {
+    type Mapped = Nil;
+}
+
+impl<Mapper, Current, Rest> MapFields<Mapper> for Either<Current, Rest>
+where
+    Mapper: MapType,
+    Rest: MapFields<Mapper>,
+{
+    type Mapped = Either<Mapper::Map<Current>, Rest::Mapped>;
+}
+
+impl<Mapper> MapFields<Mapper> for Void {
+    type Mapped = Void;
+}
