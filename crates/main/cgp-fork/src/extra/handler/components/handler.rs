@@ -4,7 +4,7 @@ use crate::core::component::UseDelegate;
 use crate::core::prelude::*;
 use crate::extra::handler::UseInputDelegate;
 
-#[async_trait]
+#[cgp_async]
 #[cgp_component(Handler)]
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
@@ -26,7 +26,7 @@ pub trait CanHandle<Code, Input> {
     async fn handle(&self, _tag: PhantomData<Code>, input: Input) -> Result<Self::Output, Error>;
 }
 
-#[async_trait]
+#[cgp_async]
 #[cgp_component(HandlerRef)]
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
