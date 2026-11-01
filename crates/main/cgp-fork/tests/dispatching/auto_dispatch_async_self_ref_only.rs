@@ -9,7 +9,7 @@ use futures::executor::block_on;
 use super::types::{Bar, Foo, FooBar};
 
 #[cgp_auto_dispatch]
-#[async_trait]
+#[cgp_async]
 pub trait CanCall {
     async fn call(&self) -> &'static str;
 }
