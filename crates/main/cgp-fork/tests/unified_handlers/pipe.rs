@@ -4,6 +4,7 @@ use cgp_fork::core::error::ErrorTypeProviderComponent;
 use cgp_fork::handler::prelude::*;
 use cgp_fork::handler::{CanHandle, Handler, HandlerComponent};
 use cgp_fork::prelude::*;
+use futures::executor::block_on;
 
 #[cgp_new_provider]
 impl<Context, Code, Field> Handler<Context, Code, u64> for Multiply<Field>
@@ -99,4 +100,26 @@ fn try_pipe_stops_at_the_first_error() {
         Err("3 is odd".to_owned())
     );
     assert_eq!(TryPipe::<Nil>::handle(&context, NoCode, 1), Ok(1));
+
+    // The same list, each stage promoted so `TryPipe` runs through `AsyncHandler`.
+    type AsyncHalves = TryPipe<
+        Product![
+            Promote<CheckedHalf>,
+            Promote<CheckedHalf>,
+            Promote<PromoteOk<Add<Symbol!("bar")>>>,
+        ],
+    >;
+
+    assert_eq!(
+        block_on(AsyncHalves::handle_async(&context, NoCode, 12)),
+        Ok(6)
+    );
+    assert_eq!(
+        block_on(AsyncHalves::handle_async(&context, NoCode, 6)),
+        Err("3 is odd".to_owned())
+    );
+    assert_eq!(
+        block_on(TryPipe::<Nil>::handle_async(&context, NoCode, 1)),
+        Ok(1)
+    );
 }
