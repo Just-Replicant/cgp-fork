@@ -4,6 +4,14 @@
 
 ### Added
 
+- *(async)* `#[cgp_async]` desugars `async fn` in a trait to `impl Future`. `#[cgp_async(Send)]`
+  adds `+ Send` to every desugared future. On an impl the attribute does nothing. It replaces
+  `#[async_trait]` (rewrite plan phase 4, ADR 0007).
+- *(runtime)* `AsyncRuntime` (spawn, sleep, timeout) and `HasAsyncRuntime`, implemented for any
+  context whose runtime type implements it. `SleepWithRuntime`, `SpawnWithRuntime`, and
+  `TimeoutWithRuntime` are the providers. A timeout raises `TimeoutElapsed` through `CanRaiseError`.
+- *(runtime)* features `tokio` and `smol`, off by default. `tokio::runtime::Handle` and
+  `SmolRuntime` implement `AsyncRuntime`. Sleep and timeout futures are polled on that runtime.
 - *(handler)* `#[cgp_handler]`: a function becomes a unified `Handler` provider (an `async`
   function, an `AsyncHandler`), also wired as an `AsyncHandler` through `Promote`. It takes the
   same arguments as `#[cgp_computer]` (`#[field]`/`#[implicit]` context arguments, an optional
@@ -74,6 +82,10 @@ All since 0.11.0, each with its replacement in the note. Internal uses (the 0.10
   `VariantHandlers`.
 - *(macro)* `#[cgp_computer]` and `#[cgp_producer]` in favour of `#[cgp_handler]`, and
   `#[derive_promote]` in favour of `#[derive_handler]` (the warning points at the attribute).
+- *(async)* `#[async_trait]` in favour of `#[cgp_async]`. It still rejects arguments. Under
+  `#[cgp_component]` or `#[cgp_fn]` the attribute is rewritten, and the warning is reported once.
+- *(run)* `CanSendRun` / `SendRunner` in favour of `#[cgp_async(Send)]` on the component that is
+  spawned. `CanRun` stays the runner and is not `Send`.
 - *(field)* `MapTypeRef` in favour of `Mode`, and `IsRef`, `IsMut` and `IsOwned` (now aliases) in
   favour of `Ref`, `Mut` and `Owned`. Being type aliases of unit structs, the old names still
   work as types but no longer as values.
@@ -82,6 +94,9 @@ All since 0.11.0, each with its replacement in the note. Internal uses (the 0.10
 
 ### Fixed
 
+- *(tests)* building a 5000-character `Symbol` in `long_names_do_not_overflow_the_stack` no longer
+  quotes or drops that type. Both walks recurse once per character and abort a debug test on
+  Windows. The check walks the type in a loop, and still quotes a name of `MAX_IDENT_LEN`.
 - *(macro)* attribute errors in wiring tables are all reported at once. `delegate_components!`,
   `cgp_namespace!`, `cgp_preset!` and `delegate_and_check_components!` report every illegal
   attribute on the table and its keys (every attribute on a node, every node in the table)
