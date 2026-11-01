@@ -73,6 +73,14 @@ fn mut_mode_changes_the_variant_in_place() {
             height: 6.0
         })
     );
+
+    let mut async_shape = Shape::Circle(Circle { radius: 2.0 });
+    block_on(MatchValues::<Promote<ScaleBy>, First, Mut>::handle_async(
+        &(),
+        NoCode,
+        (&mut async_shape, 0.5),
+    ));
+    assert_eq!(async_shape, Shape::Circle(Circle { radius: 1.0 }));
 }
 
 /// A blanket impl drives dispatch from a trait method, for every enum whose variants scale.
