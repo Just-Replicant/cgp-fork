@@ -27,7 +27,7 @@ pub trait HasBarType {
 snapshot_cgp_fn! {
     #[cgp_fn]
     #[allow(unused)]
-    #[async_trait]
+    #[cgp_async]
     #[use_type(HasFooType<X>.{Foo as FooX}, HasFooType<Y>.{Foo as FooY}, HasBarType.{Bar, Baz})]
     pub async fn do_foo_bar<X, Y>(
         &self,
@@ -46,12 +46,12 @@ snapshot_cgp_fn! {
     expand_do_foo_bar(output) {
         insta::assert_snapshot!(output, @"
         #[allow(unused)]
-        #[async_trait]
+        #[cgp_async]
         pub trait DoFooBar<X, Y>: HasFooType<X> + HasFooType<Y> + HasBarType {
             async fn do_foo_bar(&self, x: X, y: Y) -> Option<<Self as HasBarType>::Baz>;
         }
         #[allow(unused)]
-        #[async_trait]
+        #[cgp_async]
         impl<__Context__, X, Y> DoFooBar<X, Y> for __Context__
         where
             <Self as HasFooType<X>>::Foo: Display,
