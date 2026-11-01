@@ -13,18 +13,18 @@ use cgp_fork_macro::snapshot_cgp_fn;
 
 snapshot_cgp_fn! {
     #[cgp_fn]
-    #[async_trait]
+    #[cgp_async]
     pub async fn greet(&self, #[implicit] name: &str) -> String {
         format!("Hello, {name}!")
     }
 
     expand_greet(output) {
         insta::assert_snapshot!(output, @r#"
-        #[async_trait]
+        #[cgp_async]
         pub trait Greet {
             async fn greet(&self) -> String;
         }
-        #[async_trait]
+        #[cgp_async]
         impl<__Context__> Greet for __Context__
         where
             Self: HasField<
