@@ -7,6 +7,7 @@
 // interfaces carry no explicit `Send` bounds. The Send bound is recovered by a
 // proxy `SendRunner` impl on the concrete context.
 pub mod spawn;
+pub mod spawn_with_send_flag;
 
 // Async `#[cgp_fn]` expansion: this concept owns the async variant of the
 // `#[cgp_fn]` macro snapshot (the `#[async_trait]` handling is the feature).
