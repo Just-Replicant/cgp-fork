@@ -106,7 +106,7 @@ where
 }
 
 /// [`MatchHandlers`] for [`AsyncHandler`]s.
-#[async_trait]
+#[cgp_async]
 pub trait AsyncMatchHandlers<Context, Code, Input> {
     /// What a matching handler returns.
     type Output;
