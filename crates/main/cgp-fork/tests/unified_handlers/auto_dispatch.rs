@@ -75,7 +75,7 @@ impl IntoName for Square {
 }
 
 #[cgp_auto_dispatch]
-#[async_trait]
+#[cgp_async]
 pub trait CanDescribe {
     async fn describe(&self) -> String;
 }
