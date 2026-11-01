@@ -1,8 +1,8 @@
 use syn::{Item, ItemImpl, ItemTrait};
 
 use crate::macro_core::functions::{
-    add_on_unimplemented, allow_deprecated_in, consumer_on_unimplemented, deprecated_attrs,
-    provider_on_unimplemented,
+    add_on_unimplemented, allow_deprecated_in, async_trait_deprecation, consumer_on_unimplemented,
+    deprecated_attrs, provider_on_unimplemented,
 };
 use crate::macro_core::types::attributes::CgpComponentAttributes;
 use crate::macro_core::types::cgp_component::CgpComponentArgs;
@@ -67,6 +67,12 @@ impl EvaluatedCgpComponent {
                     allow_deprecated_in(core::slice::from_mut(item));
                 }
             }
+        }
+
+        // After `allow_deprecated_in`, which only touches traits and impls. The marker stays so
+        // a rewritten `#[async_trait]` warns once.
+        if let Some(span) = self.attributes.async_trait_span {
+            items.push(async_trait_deprecation(span));
         }
 
         Ok(items)
