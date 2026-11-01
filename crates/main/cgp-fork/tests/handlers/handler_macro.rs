@@ -13,6 +13,9 @@
 //! See cgp-knowledge-base-fork/cgp/reference/components/handler.md and
 //! cgp-knowledge-base-fork/cgp/reference/components/computer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use core::fmt::Display;
 
 use cgp_fork::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};

@@ -1,6 +1,6 @@
 use syn::{Arm, GenericArgument, Ident, ItemEnum, ItemImpl, Type};
 
-use crate::macro_core::exports::{ExtractField, IsPresent, IsVoid, MapType, MapTypeRef};
+use crate::macro_core::exports::{ExtractField, IsPresent, IsVoid, MapType, Mode};
 use crate::macro_core::functions::override_item_span;
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::cgp_data::{
@@ -33,7 +33,7 @@ pub fn derive_extract_field_impls(
             generics.params.insert(
                 1,
                 parse_internal! {
-                    __R__: #MapTypeRef
+                    __R__: #Mode
                 },
             );
         }
@@ -84,7 +84,7 @@ pub fn derive_extract_field_impls(
             let value_type = get_variant_type(current_variant)?;
 
             if is_ref {
-                parse_internal! { <__R__ as #MapTypeRef>::Map<'__a__, #value_type> }
+                parse_internal! { <__R__ as #Mode>::Map<'__a__, #value_type> }
             } else {
                 value_type
             }

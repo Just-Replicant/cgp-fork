@@ -2,8 +2,102 @@
 
 ## Unreleased
 
+### Added
+
+- *(handler)* `#[cgp_handler]`: a function becomes a unified `Handler` provider (an `async`
+  function, an `AsyncHandler`), also wired as an `AsyncHandler` through `Promote`. It takes the
+  same arguments as `#[cgp_computer]` (`#[field]`/`#[implicit]` context arguments, an optional
+  provider name); the output is the return type as written, so a `Result` stays a `Result`, and a
+  function without parameters handles `()`. Available without `compat-0.10`.
+- *(component)* `#[derive_handler(Name)]` on `#[cgp_component]`: a provider `Name<P>` that forwards
+  the component's single method to the unified `Handler` `P`, packing the method arguments into
+  its input. Replaces `#[derive_promote]`.
+- *(handler)* `Downcast<Inner, P>` (runs `P` on a downcast subset of an extensible enum, output
+  `Result<P::Output, Remainder>`) and `DispatchHandlers<Handlers>` (tries a list of
+  `Result<_, Remainder>` handlers, keeping the remainder), the unified `DowncastAndHandle` and
+  `DispatchMatchers`.
+- *(component)* a `#[deprecated]` consumer trait deprecates its component: `#[cgp_component]`
+  copies the attribute to the component struct (the provider trait already inherits it) and puts
+  `#[allow(deprecated)]` on the generated impls, so only users are warned.
+- *(handler)* a unified handler family in `cgp_fork::handler` (rewrite plan phase 3,
+  ADR 0006). Two components, `Handler` and `AsyncHandler`, replace the nine 0.10 ones: borrowing
+  is in the input type (`&'a T`), fallibility in `Output = Result<_, Context::Error>`, a producer
+  takes `()`. One adapter family (`Promote`, `PromoteOk`, `PromoteDeref`, `IgnoreInput`,
+  `ReturnInput`), `Pipe` and `TryPipe`, and one dispatcher, `MatchWith<Handlers, All | First,
+  Owned | Ref | Mut>`, with `OnField`, `FieldValue`, `MatchFields`/`MatchValues` and the record
+  builders `BuildWith`, `TryBuildWith`, `SetField`, `Merge` and `MergeOutputs`. Import them with
+  `use cgp_fork::handler::prelude::*;`; they are not in `cgp_fork::prelude`, which keeps the
+  0.10 `Handler`.
+- *(field)* access modes `Owned`, `Ref` and `Mut` with the mode-generic `ModeExtractor` and
+  `ModeFields`, implemented through the existing `HasExtractor*` and `ToFields*` traits.
+- *(compat)* `cgp_fork::compat` (`compat-0.10` feature): `Compat`, `CompatTry`, `CompatRef`,
+  `CompatTryRef` and `CompatProducer` turn a 0.10 provider into a unified handler, and
+  `Compat<P>` wires a unified handler to every 0.10 handler component.
+- *(diagnostics)* a `MatchWith` whose handlers miss a variant of the enum reports "still has a
+  variant left: not every variant of the enum is handled" (`FinalizeExtract` carries
+  `#[diagnostic::on_unimplemented]`).
+
+### Changed
+
+- *(field)* `MapTypeRef` is merged into the access-mode trait: `Mode` (implemented by `Owned`,
+  `Ref` and `Mut`) now carries `type Map<'a, T: 'a>`, the borrow-aware type map `MapTypeRef`
+  provided, so one set of marker types selects both the extractor (`ModeExtractor`) and the
+  mapped field type. The derived extractors (`#[derive(CgpData)]`, `ExtractField`, …) are generic
+  over `__R__: Mode` and use `<__R__ as Mode>::Map<'a, T>`. `MapType` stays for the state and
+  type-function maps (`MapFields`, `ToMerge`): a GAT `Map<T>` cannot be `&'a T` (E0309), so the
+  two cannot share one trait.
+- *(macro)* `#[cgp_auto_dispatch]` expands to the unified family (`MatchValues<_, All | First,
+  Owned | Ref | Mut>` called through `Handler`/`AsyncHandler`), so it works without `compat-0.10`
+  and names no deprecated item. With `compat-0.10` the generated provider is also wired to the
+  0.10 components through `Compat`, so code that calls it as a `Computer` keeps compiling.
+
+### Deprecated
+
+All since 0.11.0, each with its replacement in the note. Internal uses (the 0.10 modules, the
+`compat` bridges, the 0.10 tests) allow the lint locally; generated code does not warn.
+
+- *(handler)* the nine 0.10 components (`CanCompute`/`Computer`, `CanComputeRef`, `CanTryCompute`,
+  `CanTryComputeRef`, `CanComputeAsync`, `CanComputeAsyncRef`, the 0.10 `CanHandle`/`Handler`,
+  `CanHandleRef`, `CanProduce`/`Producer`, with their provider traits and component structs) in
+  favour of `cgp_fork::handler::{Handler, AsyncHandler}`; the 0.10 adapters `Promote`,
+  `PromoteAsync`, `PromoteRef`, `TryPromote`, `ReturnInput`, `PipeHandlers`, `ComposeHandlers` and
+  `Promote{Computer,TryComputer,Producer,AsyncComputer,Handler}` in favour of `IgnoreInput`,
+  `PromoteOk`, `Promote`, `PromoteDeref`, `ReturnInput`, `Pipe`/`TryPipe` and `Compat`.
+- *(dispatch)* the 0.10 dispatchers (`MatchWithHandlers*`, `MatchFirstWithHandlers*`,
+  `MatchWith{Field,Value}Handlers*`, `MatchFirstWith{Field,Value}Handlers*` and their `*Inputs*`
+  forms, `ExtractFieldAndHandle`, `ExtractFirstFieldAndHandle`, `HandleFieldValue`,
+  `HandleFirstFieldValue`, `DowncastAndHandle`, `DispatchMatchers`, `BuildWithHandlers`,
+  `BuildAndSetField`, `BuildAndMerge`, `BuildAndMergeOutputs`, `ToBuildAndMergeHandler`,
+  `HasFieldHandlers`, `ToFieldHandlers`, `MapFieldHandler`, `MapExtract*`) in favour of
+  `MatchWith`, `MatchFields`, `MatchValues`, `OnField`, `FieldValue`, `Downcast`,
+  `DispatchHandlers`, `BuildWith`, `SetField`, `Merge`, `MergeOutputs`, `ToMerge` and
+  `VariantHandlers`.
+- *(macro)* `#[cgp_computer]` and `#[cgp_producer]` in favour of `#[cgp_handler]`, and
+  `#[derive_promote]` in favour of `#[derive_handler]` (the warning points at the attribute).
+- *(field)* `MapTypeRef` in favour of `Mode`, and `IsRef`, `IsMut` and `IsOwned` (now aliases) in
+  favour of `Ref`, `Mut` and `Owned`. Being type aliases of unit structs, the old names still
+  work as types but no longer as values.
+- The monad layer (`cgp_fork::extra::monad`) is not deprecated: the unified family has no
+  replacement for it yet.
+
 ### Fixed
 
+- *(macro)* attribute errors in wiring tables are all reported at once. `delegate_components!`,
+  `cgp_namespace!`, `cgp_preset!` and `delegate_and_check_components!` report every illegal
+  attribute on the table and its keys (every attribute on a node, every node in the table)
+  instead of stopping at the first. `cgp_preset!` and `delegate_and_check_components!` now check
+  attributes in the validate stage instead of while generating code;
+  `delegate_and_check_components!` still accepts `#[check_trait]` on the table and
+  `#[check_params]`/`#[skip_check]` on a checked key, and now also rejects attributes on the keys
+  of a nested inner table, which it used to drop silently. `Struct!` and `Enum!` report every
+  attribute on a field or variant.
+- *(macro)* `#[derive_provider(WithProvider)]` rejects a getter with more than one method in the
+  validate stage, together with any other validation error of the component.
+- *(macro)* `#[cgp_auto_getter]`, `#[cgp_auto_impl]`, `#[cgp_auto_error]` and `#[cgp_auto_log]`
+  point "does not accept any attribute argument" at the argument instead of the call site, like
+  `#[async_trait]`.
+- *(macro)* `Symbol!("…")` rejects a string longer than 255 characters, the cap identifiers already
+  had; the string becomes the same per-character `Chars<…>` nest.
 - *(macro)* deeply nested input no longer crashes the compiler. `syn` parses nested generics,
   brackets, reference chains (`&&&&T`) and closures recursively, and a few hundred levels
   overflowed the stack, so rustc stopped with `SIGSEGV`. Every macro now rejects input nested more
@@ -24,6 +118,11 @@
 
 ### Changed
 
+- *(features)* the 0.10 handler family (`extra::handler`, `extra::dispatch`, `extra::monad`) and
+  the macros `#[cgp_computer]` and `#[cgp_producer]` need the `compat-0.10` feature. It is part
+  of `full`, so default builds are unchanged; a crate with `default-features = false` that uses
+  them adds `features = ["compat-0.10"]`. Those names are deprecated since 0.11.0.
+  `#[cgp_auto_dispatch]` emits the unified family with or without the feature.
 - *(diagnostics)* readable compiler errors for common wiring mistakes, without an external tool.
   `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField` and `HasFieldMut` carry
   `#[diagnostic::on_unimplemented]` messages, so a failed `check_components!` starts with

@@ -3,15 +3,16 @@
 Analysis of `main` @ `33842521` (2026-10-28, v0.10.1 prepared, unreleased).
 Every claim below cites a file in that checkout. Effort figures are estimates.
 
-## Status (2026-10-31, branch `phase-1b-2`)
+## Status (2026-10-31, branch `phase-3-fixes`)
 
 | Phase | Status | Notes |
 |---|---|---|
 | 0 Decide and baseline | Done; the hard-fork decision is waiting for the maintainer | [ADR 0001](adr/0001-hard-fork.md) is *Proposed* (hybrid now, hard fork before phase 3); nothing upstream-related was removed. Baseline in [docs/baseline/2026-10-30.md](baseline/2026-10-30.md), `scripts/baseline.sh`. |
 | 1 Internals split | Done, except the shared IR (moved to phase 1b) | `cgp-fork-macro-impl` crate ([ADR 0002](adr/0002-macro-impl-crate.md)); crate-path resolution ([ADR 0003](adr/0003-crate-path-resolution.md)); `crates/tests/renamed-dep`; 38 per-entrypoint fuzz targets. Snapshots unchanged; 867 tests pass ([after phase 1](baseline/2026-10-30-after-phase-1.md)). |
-| 1b Shared IR | Done | All 38 entrypoints implement `ir::Pipeline` (parse only) into one of seven shared family IR types (the six of §7.1 plus `TraitRewrite`), which implement `ir::FamilyIr` (`validate → emit`, errors combined). Ported one entrypoint, then one family, per commit with every snapshot unchanged ([ADR 0004](adr/0004-shared-ir-pipeline.md)); the registry is generated from the pipelines and its families from the IR types. Input depth and identifier-length limits checked before parsing (fuzz findings). Coverage 95.0% of lines, `cargo audit`/`cargo deny` clean, no semver update required; 909 tests pass ([final baseline](baseline/2026-10-31-after-phase-1b-final.md)). Open: JSON wiring metadata, moving the last checks out of `emit`. |
+| 1b Shared IR | Done | All 38 entrypoints implement `ir::Pipeline` (parse only) into one of seven shared family IR types (the six of §7.1 plus `TraitRewrite`), which implement `ir::FamilyIr` (`validate → emit`, errors combined). Ported one entrypoint, then one family, per commit with every snapshot unchanged ([ADR 0004](adr/0004-shared-ir-pipeline.md)); the registry is generated from the pipelines and its families from the IR types. Input depth and identifier-length limits checked before parsing (fuzz findings). Coverage 95.0% of lines, `cargo audit`/`cargo deny` clean, no semver update required; 909 tests pass ([final baseline](baseline/2026-10-31-after-phase-1b-final.md)). Open: JSON wiring metadata. The last checks in `emit` (wiring-table attributes, the `WithProvider` method count) moved to `validate` before phase 3. |
 | 2 Diagnostics | Done | `#[diagnostic::do_not_recommend]` on generated `DelegateComponent` impls trims the lower error lines; what stable Rust cannot fix is listed in ADR 0005. `#[diagnostic::on_unimplemented]` on `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField`, `HasFieldMut` and on the consumer, provider and auto-getter traits the macros generate ([ADR 0005](adr/0005-diagnostics.md)). Every `tests/ui` case starts without a type-level string; three new cases. 895 tests pass ([after phase 2](baseline/2026-10-31-after-phase-2.md)). |
-| 3 to 6 | Not started | |
+| 3 Handler/data unification | Done, with the 0.11 deprecations | `cgp_fork::handler`: `Handler`/`AsyncHandler`, one `Promote` family, `Pipe`/`TryPipe`, `MatchWith<Handlers, All\|First, Owned\|Ref\|Mut>` and record builders; access modes `Owned`/`Ref`/`Mut` with `ModeExtractor`/`ModeFields`. The 0.10 family is behind `compat-0.10` (on by default) and `cgp_fork::compat` bridges both ways ([ADR 0006](adr/0006-handler-unification.md)). Old tests pass with `compat-0.10`; ported tests in `tests/unified_handlers/`. Follow-up: the 0.10 names are `#[deprecated(since = "0.11.0")]` with replacements in the notes; `#[cgp_handler]` and `#[derive_handler]` replace the deprecated `#[cgp_computer]`/`#[cgp_producer]` and `#[derive_promote]`, `#[cgp_auto_dispatch]` emits the unified API (works without `compat-0.10`), `Downcast`/`DispatchHandlers` added; `MapTypeRef` merged into `Mode` (deprecated alias kept; `MapType` stays, E0309); 969 tests pass with all features, 475 for `-p cgp-fork --no-default-features`. Open: `unstable-monad` (no unified monad replacement, so the monad layer is not deprecated). ([after phase 3](baseline/2026-10-31-after-phase-3.md)) |
+| 4 to 6 | Not started | |
 
 What changed from the plan as written:
 
@@ -177,7 +178,7 @@ the prerequisite listed in `IMPROVEMENT_PLAN.md` I-9 for per-entrypoint fuzzing.
 
 ### 7.3 Data (`cgp-fork-data`)
 - Merge `HasExtractor` / `HasExtractorRef` / `HasExtractorMut` into `HasExtractor<M: Mode>` with `Owned`, `Ref<'a>`,
-  `Mut<'a>`; same for `HasFields`/`HasFieldsRef`, `ToFields`/`ToFieldsRef`, `MapType`/`MapTypeRef`.
+  `Mut<'a>`; same for `HasFields`/`HasFieldsRef`, `ToFields`/`ToFieldsRef`, `MapType`/`MapTypeRef` (done: `MapTypeRef` merged into the access-mode trait `Mode`; `MapType` stays for type-function maps, see ADR 0006).
 - Keep `Symbol<LEN, Chars<…>>` (const `&str` generics are not stable); add an optional nightly
   `cfg(cgp_unstable_adt_const)` experiment for `Symbol<"name">`.
 - New: `serde` feature to (de)serialize any `HasFields` record; `Default`-filling builder kept from `extra/field`.
@@ -235,7 +236,7 @@ the prerequisite listed in `IMPROVEMENT_PLAN.md` I-9 for per-entrypoint fuzzing.
 | 1 Internals split (**done**, IR moved to 1b) | 3 | `macro-impl` crate, IR, crate-path override | all existing tests + snapshots unchanged; renamed-dep test passes; per-entrypoint fuzz targets |
 | 1b Shared IR (**done**) | 3 | one IR for every entrypoint | snapshots unchanged after each ported entrypoint |
 | 2 Diagnostics (**done**) | 2 | `on_unimplemented` everywhere, new UI tests | every `tests/ui` case reads without type-level strings in the first line |
-| 3 Handler/data unification | 4 | `Handler`/`AsyncHandler`, mode-generic extractors/dispatch, compat aliases | old tests pass via `compat-0.10`; new tests ported |
+| 3 Handler/data unification (**done**) | 4 | `Handler`/`AsyncHandler`, mode-generic extractors/dispatch, compat aliases | old tests pass via `compat-0.10`; new tests ported |
 | 4 Async/run/runtime | 2 | `#[cgp_async]`, tokio/smol adapters | async tests on 3 OS |
 | 5 New capabilities | 4 | checked-by-default, mocks, wiring graph, tracing | each feature has guide page + example + tests |
 | 6 Docs & 1.0 | 2 | `book/`, migration guide, codemod, 1.0-rc | semver-checks report reviewed; examples compiled |

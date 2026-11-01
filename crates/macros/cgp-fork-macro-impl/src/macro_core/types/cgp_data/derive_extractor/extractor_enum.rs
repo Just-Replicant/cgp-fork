@@ -1,7 +1,7 @@
 use proc_macro2::Span;
 use syn::{GenericParam, Ident, ItemEnum, Lifetime, LifetimeParam, Type, TypeParam};
 
-use crate::macro_core::exports::{MapType, MapTypeRef};
+use crate::macro_core::exports::{MapType, Mode};
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::cgp_data::{
     get_variant_type, index_to_generic_ident, type_to_variant_fields,
@@ -45,7 +45,7 @@ pub fn derive_extractor_enum(
 
 /// Build the borrowed `__PartialRef{Name}` enum, the ref counterpart of
 /// [`derive_extractor_enum`]: it prepends a `'__a__` lifetime and an
-/// `__R__: MapTypeRef` parameter that selects a shared or mutable borrow of each
+/// `__R__: Mode` parameter that selects a shared or mutable borrow of each
 /// payload, and bounds the enum's own type parameters by `'__a__`.
 pub fn derive_extractor_enum_ref(
     context_enum: &ItemEnum,
@@ -58,7 +58,7 @@ pub fn derive_extractor_enum_ref(
     extractor_enum.ident = extractor_ident.clone();
 
     // A variantless enum borrows nothing, so the `'__a__` lifetime and the
-    // `__R__: MapTypeRef` selector would be unused parameters (`E0392`). Emit the
+    // `__R__: Mode` selector would be unused parameters (`E0392`). Emit the
     // borrowed partial enum as a bare empty enum instead, and the impls that
     // reference it drop the same two parameters in lockstep.
     if extractor_enum.variants.is_empty() {
@@ -96,7 +96,7 @@ pub fn derive_extractor_enum_ref(
     generics.params.insert(
         1,
         parse_internal! {
-            __R__: #MapTypeRef
+            __R__: #Mode
         },
     );
 
@@ -113,7 +113,7 @@ pub fn derive_extractor_enum_ref(
 
         let mapped_type: Type = parse_internal! {
             <#generic_param_name as #MapType>::Map<
-                <__R__ as #MapTypeRef>::Map<'__a__ , #field_type >
+                <__R__ as #Mode>::Map<'__a__ , #field_type >
             >
         };
 

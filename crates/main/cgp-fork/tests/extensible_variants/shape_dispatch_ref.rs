@@ -11,6 +11,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/concepts/extensible-variants.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use std::f64::consts::PI;
 
 use cgp_fork::extra::dispatch::MatchFirstWithValueHandlersMut;

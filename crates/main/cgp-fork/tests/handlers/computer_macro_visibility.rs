@@ -5,6 +5,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_computer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::extra::handler::Computer;
 use cgp_fork::prelude::*;
 

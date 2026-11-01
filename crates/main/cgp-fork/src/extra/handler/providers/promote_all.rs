@@ -6,6 +6,10 @@ use crate::extra::handler::{
 };
 
 /// Promotes a `Computer` provider to the ref, try, async, and handler components.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::compat::Compat<P>`, or wire `AsyncHandlerComponent: cgp_fork::handler::Promote<P>`"
+)]
 pub struct PromoteComputer<Provider>(pub PhantomData<Provider>);
 
 delegate_components! {
@@ -22,6 +26,10 @@ delegate_components! {
 }
 
 /// Promotes a `TryComputer`, and forwards the other handler components through [`PromoteComputer`].
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::compat::Compat<P>`, or wire `AsyncHandlerComponent: cgp_fork::handler::Promote<P>`"
+)]
 pub struct PromoteTryComputer<Provider>(pub PhantomData<Provider>);
 
 delegate_components! {
@@ -41,6 +49,10 @@ delegate_components! {
 }
 
 /// Promotes a `Producer` to `Computer`, then through [`PromoteComputer`].
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::compat::Compat<P>`, or wire `AsyncHandlerComponent: cgp_fork::handler::Promote<P>`"
+)]
 pub struct PromoteProducer<Provider>(pub PhantomData<Provider>);
 
 delegate_components! {
@@ -61,6 +73,10 @@ delegate_components! {
 }
 
 /// Promotes an `AsyncComputer` to the ref and handler components.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::compat::Compat<P>`, or wire `AsyncHandlerComponent` to the unified `AsyncHandler` directly"
+)]
 pub struct PromoteAsyncComputer<Provider>(pub PhantomData<Provider>);
 
 delegate_components! {
@@ -73,6 +89,10 @@ delegate_components! {
 }
 
 /// Promotes a `Handler`, and forwards the ref components through [`PromoteAsyncComputer`].
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::compat::Compat<P>`, or wire `AsyncHandlerComponent` to the unified `AsyncHandler` directly"
+)]
 pub struct PromoteHandler<Provider>(pub PhantomData<Provider>);
 
 delegate_components! {

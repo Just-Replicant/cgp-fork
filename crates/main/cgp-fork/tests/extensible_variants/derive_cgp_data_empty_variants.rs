@@ -335,16 +335,16 @@ snapshot_derive_cgp_data! {
         }
         pub enum __PartialRefStatus<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F0__: MapType,
             __F1__: MapType,
             __F2__: MapType,
             __F3__: MapType,
         > {
-            Active(<__F0__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, u64>>),
-            Closed(<__F1__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Nil>>),
-            Paused(<__F2__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Nil>>),
-            Archived(<__F3__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, Nil>>),
+            Active(<__F0__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, u64>>),
+            Closed(<__F1__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Nil>>),
+            Paused(<__F2__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Nil>>),
+            Archived(<__F3__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Nil>>),
         }
         impl<__F0__: MapType, __F1__: MapType, __F2__: MapType, __F3__: MapType> PartialData
         for __PartialStatus<__F0__, __F1__, __F2__, __F3__> {
@@ -352,7 +352,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F0__: MapType,
             __F1__: MapType,
             __F2__: MapType,
@@ -382,7 +382,7 @@ snapshot_derive_cgp_data! {
         impl HasExtractorRef for Status {
             type ExtractorRef<'__a__> = __PartialRefStatus<
                 '__a__,
-                IsRef,
+                Ref,
                 IsPresent,
                 IsPresent,
                 IsPresent,
@@ -402,7 +402,7 @@ snapshot_derive_cgp_data! {
         impl HasExtractorMut for Status {
             type ExtractorMut<'__a__> = __PartialRefStatus<
                 '__a__,
-                IsMut,
+                Mut,
                 IsPresent,
                 IsPresent,
                 IsPresent,
@@ -426,7 +426,7 @@ snapshot_derive_cgp_data! {
                 match self {}
             }
         }
-        impl<'__a__, __R__: MapTypeRef> FinalizeExtract
+        impl<'__a__, __R__: Mode> FinalizeExtract
         for __PartialRefStatus<'__a__, __R__, IsVoid, IsVoid, IsVoid, IsVoid> {
             fn finalize_extract<__T__>(self) -> __T__ {
                 match self {}
@@ -580,7 +580,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F1__: MapType,
             __F2__: MapType,
             __F3__: MapType,
@@ -590,7 +590,7 @@ snapshot_derive_cgp_data! {
                 Chars<'A', Chars<'c', Chars<'t', Chars<'i', Chars<'v', Chars<'e', Nil>>>>>>,
             >,
         > for __PartialRefStatus<'__a__, __R__, IsPresent, __F1__, __F2__, __F3__> {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, u64>;
+            type Value = <__R__ as Mode>::Map<'__a__, u64>;
             type Remainder = __PartialRefStatus<'__a__, __R__, IsVoid, __F1__, __F2__, __F3__>;
             fn extract_field(
                 self,
@@ -616,7 +616,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F0__: MapType,
             __F2__: MapType,
             __F3__: MapType,
@@ -626,7 +626,7 @@ snapshot_derive_cgp_data! {
                 Chars<'C', Chars<'l', Chars<'o', Chars<'s', Chars<'e', Chars<'d', Nil>>>>>>,
             >,
         > for __PartialRefStatus<'__a__, __R__, __F0__, IsPresent, __F2__, __F3__> {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Nil>;
+            type Value = <__R__ as Mode>::Map<'__a__, Nil>;
             type Remainder = __PartialRefStatus<'__a__, __R__, __F0__, IsVoid, __F2__, __F3__>;
             fn extract_field(
                 self,
@@ -652,7 +652,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F0__: MapType,
             __F1__: MapType,
             __F3__: MapType,
@@ -662,7 +662,7 @@ snapshot_derive_cgp_data! {
                 Chars<'P', Chars<'a', Chars<'u', Chars<'s', Chars<'e', Chars<'d', Nil>>>>>>,
             >,
         > for __PartialRefStatus<'__a__, __R__, __F0__, __F1__, IsPresent, __F3__> {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Nil>;
+            type Value = <__R__ as Mode>::Map<'__a__, Nil>;
             type Remainder = __PartialRefStatus<'__a__, __R__, __F0__, __F1__, IsVoid, __F3__>;
             fn extract_field(
                 self,
@@ -688,7 +688,7 @@ snapshot_derive_cgp_data! {
         }
         impl<
             '__a__,
-            __R__: MapTypeRef,
+            __R__: Mode,
             __F0__: MapType,
             __F1__: MapType,
             __F2__: MapType,
@@ -707,7 +707,7 @@ snapshot_derive_cgp_data! {
                 >,
             >,
         > for __PartialRefStatus<'__a__, __R__, __F0__, __F1__, __F2__, IsPresent> {
-            type Value = <__R__ as MapTypeRef>::Map<'__a__, Nil>;
+            type Value = <__R__ as Mode>::Map<'__a__, Nil>;
             type Remainder = __PartialRefStatus<'__a__, __R__, __F0__, __F1__, __F2__, IsVoid>;
             fn extract_field(
                 self,

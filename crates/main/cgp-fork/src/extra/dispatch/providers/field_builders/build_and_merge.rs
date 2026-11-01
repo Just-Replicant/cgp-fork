@@ -5,6 +5,10 @@ use crate::extra::handler::{
 };
 
 /// Runs `Provider` on a builder, then [`CanBuildFrom`](crate::core::field::impls::CanBuildFrom) merges that output back in.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::Merge` (or `cgp_fork::handler::TryMerge`)"
+)]
 pub struct BuildAndMerge<Provider = UseContext>(pub PhantomData<Provider>);
 
 #[cgp_provider]

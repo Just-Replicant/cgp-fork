@@ -1,6 +1,6 @@
 use syn::{Ident, ItemEnum, ItemImpl};
 
-use crate::macro_core::exports::{MapType, MapTypeRef, PartialData};
+use crate::macro_core::exports::{MapType, Mode, PartialData};
 use crate::macro_core::functions::override_item_span;
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::cgp_data::index_to_generic_ident;
@@ -30,7 +30,7 @@ pub fn derive_partial_data_impl_from_enum(
         generics.params.insert(
             0,
             parse_internal! {
-                __R__: #MapTypeRef
+                __R__: #Mode
             },
         );
     }

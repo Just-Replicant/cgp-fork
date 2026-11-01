@@ -7,6 +7,10 @@ use crate::extra::handler::{
 };
 
 /// Builds `Output` by merging the result of each handler in `Handlers`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::MergeOutputs` (or `cgp_fork::handler::TryMergeOutputs` for handlers that return `Result`)"
+)]
 pub struct BuildAndMergeOutputs<Output, Handlers>(pub PhantomData<(Output, Handlers)>);
 
 delegate_components! {
@@ -25,6 +29,10 @@ delegate_components! {
 }
 
 /// [`MapType`](crate::core::field::traits::MapType) that wraps each handler in [`BuildAndMerge`](crate::extra::dispatch::BuildAndMerge).
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::ToMerge` (or `cgp_fork::handler::ToTryMerge`)"
+)]
 pub struct ToBuildAndMergeHandler;
 
 impl MapType for ToBuildAndMergeHandler {

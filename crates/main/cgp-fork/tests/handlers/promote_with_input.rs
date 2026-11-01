@@ -7,6 +7,9 @@
 //! See cgp-knowledge-base-fork/cgp/reference/macros/cgp_component.md and
 //! cgp-knowledge-base-fork/cgp/reference/macros/cgp_computer.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::prelude::*;
 
 #[cgp_component(Scaler)]

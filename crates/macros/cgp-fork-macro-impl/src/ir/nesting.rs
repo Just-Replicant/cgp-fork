@@ -22,6 +22,8 @@ use proc_macro2::{Spacing, Span, TokenStream, TokenTree};
 use syn::Error;
 use syn::ext::IdentExt;
 
+use crate::macro_core::types::field::Symbol;
+
 /// The deepest nesting a macro input may have. Far above anything written by hand, and well
 /// below the depth at which `syn` overflows a compiler thread's stack.
 pub const MAX_NESTING_DEPTH: usize = 128;
@@ -50,6 +52,25 @@ pub fn check_nesting_depth(tokens: &TokenStream) -> syn::Result<()> {
                  type-level strings nested once per character, so use a shorter name"
             ),
         )),
+    }
+}
+
+/// Returns an error when the string of a type-level symbol is longer than [`MAX_IDENT_LEN`]
+/// characters, the same cap identifiers get, spanned on the string literal.
+///
+/// `Symbol!("…")` takes a string literal, which [`check_nesting_depth`] does not measure,
+/// yet its `ToTokens` builds the same `Chars<…>` nest, one level per character.
+pub fn check_symbol_len(symbol: &Symbol) -> syn::Result<()> {
+    if symbol.ident.chars().count() > MAX_IDENT_LEN {
+        Err(Error::new(
+            symbol.span,
+            format!(
+                "this string is longer than {MAX_IDENT_LEN} characters; CGP turns it into a \
+                 type-level string nested once per character, so use a shorter one"
+            ),
+        ))
+    } else {
+        Ok(())
     }
 }
 

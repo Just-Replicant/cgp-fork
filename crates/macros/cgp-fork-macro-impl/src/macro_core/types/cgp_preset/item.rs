@@ -8,8 +8,7 @@ use syn::{Ident, Path, Type, braced};
 
 use crate::macro_core::functions::to_snake_case_str;
 use crate::macro_core::types::delegate_component::{
-    DelegateEntries, EvalDelegateEntries, ValidateAttributes, define_with_components_macro,
-    invoke_with_components,
+    DelegateEntries, EvalDelegateEntries, define_with_components_macro, invoke_with_components,
 };
 use crate::macro_core::types::empty_struct::EmptyStruct;
 
@@ -52,9 +51,9 @@ impl Parse for ItemCgpPreset {
 }
 
 impl ItemCgpPreset {
+    /// Generates the preset. Its attributes are checked by the `WiringTable` validate
+    /// stage, which runs first.
     pub fn expand(&self) -> syn::Result<TokenStream> {
-        self.entries.validate_attributes()?;
-
         let name = &self.name;
         let provider_ty: Type = syn::parse_quote!(#name::Provider);
         let own_impls = self

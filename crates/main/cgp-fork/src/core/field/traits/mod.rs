@@ -1,3 +1,4 @@
+mod access_mode;
 mod append_product;
 mod build_field;
 mod concat_product;
@@ -19,6 +20,7 @@ mod to_fields;
 mod transform_map;
 mod update_field;
 
+pub use access_mode::*;
 pub use append_product::*;
 pub use build_field::*;
 pub use concat_product::*;

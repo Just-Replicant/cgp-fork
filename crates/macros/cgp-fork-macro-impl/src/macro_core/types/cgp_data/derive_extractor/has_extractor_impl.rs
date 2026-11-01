@@ -2,7 +2,7 @@ use quote::quote;
 use syn::{Arm, Ident, ItemEnum, ItemImpl};
 
 use crate::macro_core::exports::{
-    HasExtractor, HasExtractorMut, HasExtractorRef, IsMut, IsPresent, IsRef,
+    HasExtractor, HasExtractorMut, HasExtractorRef, IsPresent, Mut, Ref,
 };
 use crate::macro_core::functions::override_item_span;
 use crate::macro_core::parse_internal;
@@ -75,7 +75,7 @@ pub fn derive_has_extractor_impl(
     override_item_span(context_ident.span(), &item_impl)
 }
 
-/// Emit the `HasExtractorRef` impl over the borrowed partial enum (`IsRef`). Its
+/// Emit the `HasExtractorRef` impl over the borrowed partial enum (`Ref`). Its
 /// GAT and method use the reserved `'__a__` lifetime rather than a bare `'a` so
 /// they never collide with an enum whose own lifetime parameter is named `'a`.
 pub fn derive_has_extractor_ref_impl(
@@ -105,7 +105,7 @@ pub fn derive_has_extractor_ref_impl(
         extractor_generics.args.insert(
             1,
             parse_internal! {
-                #IsRef
+                #Ref
             },
         );
     }
@@ -155,7 +155,7 @@ pub fn derive_has_extractor_ref_impl(
     override_item_span(context_ident.span(), &item_impl)
 }
 
-/// Emit the `HasExtractorMut` impl: the `IsMut` mirror of
+/// Emit the `HasExtractorMut` impl: the `Mut` mirror of
 /// [`derive_has_extractor_ref_impl`], likewise using the reserved `'__a__`.
 pub fn derive_has_extractor_mut_impl(
     context_enum: &ItemEnum,
@@ -182,7 +182,7 @@ pub fn derive_has_extractor_mut_impl(
         extractor_generics.args.insert(
             1,
             parse_internal! {
-                #IsMut
+                #Mut
             },
         );
     }

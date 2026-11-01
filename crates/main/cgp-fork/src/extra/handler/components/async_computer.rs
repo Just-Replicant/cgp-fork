@@ -10,6 +10,10 @@ use crate::extra::handler::UseInputDelegate;
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 /// Async form of [`CanCompute`](crate::extra::handler::CanCompute): an owned `Input` in, a future out.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `AsyncHandler` component (`cgp_fork::handler::AsyncHandler`, called through `cgp_fork::handler::CanHandleAsync`)"
+)]
 pub trait CanComputeAsync<Code, Input> {
     /// The value the future resolves to.
     type Output;
@@ -24,6 +28,10 @@ pub trait CanComputeAsync<Code, Input> {
 #[derive_delegate(UseDelegate<Code>)]
 #[derive_delegate(UseInputDelegate<Input>)]
 /// Async form of [`CanComputeRef`](crate::extra::handler::CanComputeRef).
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `AsyncHandler` component (`cgp_fork::handler::AsyncHandler`) with a `&T` input"
+)]
 pub trait CanComputeAsyncRef<Code, Input> {
     /// The value the future resolves to.
     type Output;

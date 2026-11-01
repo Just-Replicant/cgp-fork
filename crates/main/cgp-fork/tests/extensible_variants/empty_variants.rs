@@ -13,6 +13,9 @@
 //! See cgp-knowledge-base-fork/cgp/reference/derives/derive_cgp_variant.md and
 //! cgp-knowledge-base-fork/cgp/implementation/entrypoints/derive_extract_field.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use core::convert::Infallible;
 use core::marker::PhantomData;
 

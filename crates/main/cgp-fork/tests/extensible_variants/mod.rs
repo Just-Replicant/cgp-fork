@@ -36,10 +36,14 @@ pub mod derive_cgp_data_lifetime;
 
 // Variants with no fields (`V`, `V()`, `V {}`), carrying the payload `Nil`
 // through construction, extraction, casts, and both kinds of dispatch.
+#[cfg(feature = "compat-0.10")]
 pub mod empty_variants;
 
 // Dispatching an extensible-variant input to per-variant handlers (the derives
 // here are plain scaffolding — the dispatch combinators are owned elsewhere).
+#[cfg(feature = "compat-0.10")]
 pub mod shape_dispatch;
+#[cfg(feature = "compat-0.10")]
 pub mod shape_dispatch_ref;
+#[cfg(feature = "compat-0.10")]
 pub mod variant_dispatch;

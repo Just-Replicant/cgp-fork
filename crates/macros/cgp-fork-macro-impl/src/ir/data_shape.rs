@@ -3,7 +3,7 @@
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 
-use crate::ir::{Diagnostics, FamilyIr, IrFamily};
+use crate::ir::{Diagnostics, FamilyIr, IrFamily, check_symbol_len};
 use crate::macro_core::types::cgp_data::{ItemCgpData, ItemCgpRecord, ItemCgpVariant};
 use crate::macro_core::types::field::Symbol;
 use crate::macro_core::types::product::{ProductExpr, ProductType};
@@ -71,9 +71,14 @@ impl From<ItemCgpData> for DataShape {
 impl FamilyIr for DataShape {
     const FAMILY: IrFamily = IrFamily::DataShape;
 
-    /// No family-wide checks yet; each shape still checks while generating.
+    /// `Symbol!("…")` gets the identifier-length cap: its string becomes one `Chars<…>`
+    /// level per character exactly like a field name, but a string literal is not an
+    /// identifier, so [`check_nesting_depth`](crate::ir::check_nesting_depth) does not
+    /// measure it. The other shapes still check while generating.
     fn validate(&self, diagnostics: &mut Diagnostics) {
-        let _ = diagnostics;
+        if let DataShape::Symbol(symbol) = self {
+            diagnostics.check(check_symbol_len(symbol));
+        }
     }
 
     /// Generates the derived impls or the type-level expression.

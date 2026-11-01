@@ -6,6 +6,7 @@
 // the full record spine — field access, field lists, and the extensible builder.
 pub mod generic_record;
 pub mod optional_builder;
+#[cfg(feature = "compat-0.10")]
 pub mod person_record;
 pub mod point_cast;
 pub mod record_derive;
@@ -23,6 +24,7 @@ pub mod cgp_record_derive;
 // handler pipelines. These reuse `#[derive(CgpData)]` as plain scaffolding —
 // the derive expansion is already pinned by `record_derive`.
 pub mod record_build_from;
+#[cfg(feature = "compat-0.10")]
 pub mod record_build_with_handlers;
 
 // The type-level product operations: growing, splicing, and re-marking a field list.

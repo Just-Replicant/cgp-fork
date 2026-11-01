@@ -23,7 +23,7 @@ impl FamilyIr for Namespace {
     /// attributes, so any on its entries are rejected, matching `delegate_components!`.
     fn validate(&self, diagnostics: &mut Diagnostics) {
         if let Namespace::Table(table) = self {
-            diagnostics.check(table.entries.validate_attributes());
+            table.entries.validate_attributes(diagnostics);
         }
     }
 

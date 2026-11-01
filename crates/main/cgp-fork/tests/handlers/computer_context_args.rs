@@ -8,6 +8,9 @@
 //! See cgp-knowledge-base-fork/cgp/reference/macros/cgp_computer.md and
 //! cgp-knowledge-base-fork/cgp/reference/attributes/implicit.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::prelude::*;
 use futures::executor::block_on;
 

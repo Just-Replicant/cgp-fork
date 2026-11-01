@@ -1,22 +1,22 @@
-use crate::core::field::traits::MapTypeRef;
+//! The 0.10 names of the access modes.
 
-/// [`MapTypeRef`](crate::core::field::traits::MapTypeRef) for a shared borrow: `Map<'a, T> = &'a T`.
-pub struct IsRef;
+/// A shared borrow: `Map<'a, T> = &'a T`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the access mode `Ref` (`cgp_fork::core::field::types::Ref`)"
+)]
+pub type IsRef = crate::core::field::types::Ref;
 
-impl MapTypeRef for IsRef {
-    type Map<'a, T: 'a> = &'a T;
-}
+/// A mutable borrow: `Map<'a, T> = &'a mut T`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the access mode `Mut` (`cgp_fork::core::field::types::Mut`)"
+)]
+pub type IsMut = crate::core::field::types::Mut;
 
-/// [`MapTypeRef`](crate::core::field::traits::MapTypeRef) for a mutable borrow: `Map<'a, T> = &'a mut T`.
-pub struct IsMut;
-
-impl MapTypeRef for IsMut {
-    type Map<'a, T: 'a> = &'a mut T;
-}
-
-/// [`MapTypeRef`](crate::core::field::traits::MapTypeRef) that returns the owned value: `Map<'a, T> = T`.
-pub struct IsOwned;
-
-impl MapTypeRef for IsOwned {
-    type Map<'a, T: 'a> = T;
-}
+/// The owned value: `Map<'a, T> = T`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the access mode `Owned` (`cgp_fork::core::field::types::Owned`)"
+)]
+pub type IsOwned = crate::core::field::types::Owned;

@@ -142,26 +142,21 @@ snapshot_derive_cgp_data! {
             }
             pub enum __PartialRefFooBarBaz<
                 '__a__,
-                __R__: MapTypeRef,
+                __R__: Mode,
                 __F0__: MapType,
                 __F1__: MapType,
                 __F2__: MapType,
             > {
-                Foo(<__F0__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, u64>>),
-                Bar(<__F1__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, String>>),
-                Baz(<__F2__ as MapType>::Map<<__R__ as MapTypeRef>::Map<'__a__, bool>>),
+                Foo(<__F0__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, u64>>),
+                Bar(<__F1__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, String>>),
+                Baz(<__F2__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, bool>>),
             }
             impl<__F0__: MapType, __F1__: MapType, __F2__: MapType> PartialData
             for __PartialFooBarBaz<__F0__, __F1__, __F2__> {
                 type Target = FooBarBaz;
             }
-            impl<
-                '__a__,
-                __R__: MapTypeRef,
-                __F0__: MapType,
-                __F1__: MapType,
-                __F2__: MapType,
-            > PartialData for __PartialRefFooBarBaz<'__a__, __R__, __F0__, __F1__, __F2__> {
+            impl<'__a__, __R__: Mode, __F0__: MapType, __F1__: MapType, __F2__: MapType> PartialData
+            for __PartialRefFooBarBaz<'__a__, __R__, __F0__, __F1__, __F2__> {
                 type Target = FooBarBaz;
             }
             impl HasExtractor for FooBarBaz {
@@ -184,7 +179,7 @@ snapshot_derive_cgp_data! {
             impl HasExtractorRef for FooBarBaz {
                 type ExtractorRef<'__a__> = __PartialRefFooBarBaz<
                     '__a__,
-                    IsRef,
+                    Ref,
                     IsPresent,
                     IsPresent,
                     IsPresent,
@@ -202,7 +197,7 @@ snapshot_derive_cgp_data! {
             impl HasExtractorMut for FooBarBaz {
                 type ExtractorMut<'__a__> = __PartialRefFooBarBaz<
                     '__a__,
-                    IsMut,
+                    Mut,
                     IsPresent,
                     IsPresent,
                     IsPresent,
@@ -222,7 +217,7 @@ snapshot_derive_cgp_data! {
                     match self {}
                 }
             }
-            impl<'__a__, __R__: MapTypeRef> FinalizeExtract
+            impl<'__a__, __R__: Mode> FinalizeExtract
             for __PartialRefFooBarBaz<'__a__, __R__, IsVoid, IsVoid, IsVoid> {
                 fn finalize_extract<__T__>(self) -> __T__ {
                     match self {}
@@ -290,12 +285,12 @@ snapshot_derive_cgp_data! {
             }
             impl<
                 '__a__,
-                __R__: MapTypeRef,
+                __R__: Mode,
                 __F1__: MapType,
                 __F2__: MapType,
             > ExtractField<Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>>
             for __PartialRefFooBarBaz<'__a__, __R__, IsPresent, __F1__, __F2__> {
-                type Value = <__R__ as MapTypeRef>::Map<'__a__, u64>;
+                type Value = <__R__ as Mode>::Map<'__a__, u64>;
                 type Remainder = __PartialRefFooBarBaz<'__a__, __R__, IsVoid, __F1__, __F2__>;
                 fn extract_field(
                     self,
@@ -312,12 +307,12 @@ snapshot_derive_cgp_data! {
             }
             impl<
                 '__a__,
-                __R__: MapTypeRef,
+                __R__: Mode,
                 __F0__: MapType,
                 __F2__: MapType,
             > ExtractField<Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>>
             for __PartialRefFooBarBaz<'__a__, __R__, __F0__, IsPresent, __F2__> {
-                type Value = <__R__ as MapTypeRef>::Map<'__a__, String>;
+                type Value = <__R__ as Mode>::Map<'__a__, String>;
                 type Remainder = __PartialRefFooBarBaz<'__a__, __R__, __F0__, IsVoid, __F2__>;
                 fn extract_field(
                     self,
@@ -334,12 +329,12 @@ snapshot_derive_cgp_data! {
             }
             impl<
                 '__a__,
-                __R__: MapTypeRef,
+                __R__: Mode,
                 __F0__: MapType,
                 __F1__: MapType,
             > ExtractField<Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>>
             for __PartialRefFooBarBaz<'__a__, __R__, __F0__, __F1__, IsPresent> {
-                type Value = <__R__ as MapTypeRef>::Map<'__a__, bool>;
+                type Value = <__R__ as Mode>::Map<'__a__, bool>;
                 type Remainder = __PartialRefFooBarBaz<'__a__, __R__, __F0__, __F1__, IsVoid>;
                 fn extract_field(
                     self,

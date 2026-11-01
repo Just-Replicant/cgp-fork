@@ -10,6 +10,7 @@ pub mod delegate_array_key;
 pub mod delegate_components_macro;
 pub mod delegate_generic_table;
 pub mod delegate_shorthand;
+#[cfg(feature = "compat-0.10")]
 pub mod derive_promote;
 pub mod provider_component_override;
 pub mod provider_macro;

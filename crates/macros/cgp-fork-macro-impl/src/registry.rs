@@ -49,6 +49,7 @@ pub fn pipelines() -> Vec<(&'static str, IrFamily, EntrypointFn)> {
         lib::DeriveProviderMacro,
         extra::CgpComputerMacro,
         extra::CgpProducerMacro,
+        extra::CgpHandlerMacro,
         extra::CgpAutoDispatchMacro,
         extra::CgpAutoLogMacro,
         lib::DelegateComponentsMacro,

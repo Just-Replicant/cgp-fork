@@ -11,6 +11,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/concepts/extensible-variants.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use core::convert::Infallible;
 use core::fmt::Display;
 use core::marker::PhantomData;

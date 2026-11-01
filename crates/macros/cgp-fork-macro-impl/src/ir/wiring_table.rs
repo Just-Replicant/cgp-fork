@@ -27,11 +27,18 @@ pub enum WiringTable {
 impl FamilyIr for WiringTable {
     const FAMILY: IrFamily = IrFamily::WiringTable;
 
-    /// `delegate_components!` supports no attributes on the table or its keys, so they are
-    /// rejected instead of silently parsed and discarded.
+    /// Records every illegal attribute of a wiring table.
+    ///
+    /// `delegate_components!` and `cgp_preset!` support no attributes on the table or its
+    /// keys, so every one is rejected instead of silently parsed and discarded.
+    /// `delegate_and_check_components!` allows `#[check_trait]` on the table and
+    /// `#[check_params]`/`#[skip_check]` on a checked key, and rejects everything else.
     fn validate(&self, diagnostics: &mut Diagnostics) {
-        if let WiringTable::Delegate(table) = self {
-            diagnostics.check(table.validate_attributes());
+        match self {
+            WiringTable::Delegate(table) => table.validate_attributes(diagnostics),
+            WiringTable::DelegateAndCheck(item) => item.validate(diagnostics),
+            WiringTable::Preset(item) => item.entries.validate_attributes(diagnostics),
+            WiringTable::Check(_) | WiringTable::ForEach(_) => {}
         }
     }
 

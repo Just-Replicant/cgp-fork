@@ -178,6 +178,14 @@ pub fn snapshot_cgp_computer(body: TokenStream) -> TokenStream {
 
 #[doc(hidden)]
 #[proc_macro]
+pub fn snapshot_cgp_handler(body: TokenStream) -> TokenStream {
+    entrypoints::snapshot_cgp_handler(body.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+#[doc(hidden)]
+#[proc_macro]
 pub fn snapshot_cgp_producer(body: TokenStream) -> TokenStream {
     entrypoints::snapshot_cgp_producer(body.into())
         .unwrap_or_else(syn::Error::into_compile_error)

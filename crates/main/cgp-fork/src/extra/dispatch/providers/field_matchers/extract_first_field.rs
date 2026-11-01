@@ -6,6 +6,10 @@ use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, Com
 /// Unlike [`ExtractFieldAndHandle`](super::extract_field::ExtractFieldAndHandle), a miss does not
 /// keep looking through the rest of a handler list by itself. [`MatchFirstWithHandlers`](crate::extra::dispatch::MatchFirstWithHandlers)
 /// does that around it.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::OnField<Tag, P, cgp_fork::handler::First>`"
+)]
 pub struct ExtractFirstFieldAndHandle<Tag, Provider = UseContext>(pub PhantomData<(Tag, Provider)>);
 
 #[cgp_provider]

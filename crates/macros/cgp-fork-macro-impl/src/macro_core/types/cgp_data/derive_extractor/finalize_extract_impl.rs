@@ -1,6 +1,6 @@
 use syn::{Ident, ItemEnum, ItemImpl, Type};
 
-use crate::macro_core::exports::{FinalizeExtract, IsVoid, MapTypeRef};
+use crate::macro_core::exports::{FinalizeExtract, IsVoid, Mode};
 use crate::macro_core::functions::override_item_span;
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::cgp_data::to_generic_args;
@@ -30,7 +30,7 @@ pub fn derive_finalize_extract_impl(
             generics.params.insert(
                 0,
                 parse_internal! {
-                    __R__: #MapTypeRef
+                    __R__: #Mode
                 },
             );
         }

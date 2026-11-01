@@ -7,6 +7,10 @@ use crate::extra::handler::{
 ///
 /// A `Computer` becomes an `AsyncComputer` whose future is ready immediately. A `TryComputer`
 /// becomes a `Handler`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::Promote`, which lifts a unified `Handler` into an `AsyncHandler`"
+)]
 pub struct PromoteAsync<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

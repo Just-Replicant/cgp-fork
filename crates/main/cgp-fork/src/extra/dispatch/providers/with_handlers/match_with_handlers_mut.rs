@@ -6,6 +6,10 @@ use crate::extra::dispatch::DispatchMatchers;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
 /// [`MatchWithHandlers`](super::match_with_handlers::MatchWithHandlers) for a mutable borrow of the enum.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::MatchWith<H, All, Mut>` (`cgp_fork::handler::MatchWith`)"
+)]
 pub struct MatchWithHandlersMut<Handlers>(pub PhantomData<Handlers>);
 
 #[cgp_provider]

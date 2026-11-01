@@ -8,6 +8,10 @@ use crate::extra::handler::{
 ///
 /// A `Computer` that returns `Result<T, Error>` becomes a `TryComputer` that returns that same
 /// result. The async form turns it into a `Handler`.
+#[deprecated(
+    since = "0.11.0",
+    note = "a unified `Handler` whose output is already `Result` needs no adapter: use the provider itself"
+)]
 pub struct TryPromote<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

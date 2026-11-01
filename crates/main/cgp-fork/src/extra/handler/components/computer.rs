@@ -12,6 +12,10 @@ use crate::extra::handler::UseInputDelegate;
 ///
 /// `Code` selects which computation this is when one context runs several. Wire
 /// `ComputerComponent` to a provider, or derive one with `#[cgp_computer]`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`, called through `cgp_fork::handler::CanHandle`)"
+)]
 pub trait CanCompute<Code, Input> {
     /// The value `compute` returns.
     type Output;
@@ -27,6 +31,10 @@ pub trait CanCompute<Code, Input> {
 /// Computes a shared borrow of `Input`.
 ///
 /// The borrowed mirror of [`CanCompute`]. The same `Code` selects the computation.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `Handler` component (`cgp_fork::handler::Handler`) with a `&T` input"
+)]
 pub trait CanComputeRef<Code, Input> {
     /// The value `compute_ref` returns.
     type Output;

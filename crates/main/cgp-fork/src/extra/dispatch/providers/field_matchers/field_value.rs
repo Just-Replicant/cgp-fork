@@ -2,6 +2,7 @@ use crate::core::prelude::*;
 use crate::extra::handler::{AsyncComputer, AsyncComputerComponent, Computer, ComputerComponent};
 
 /// Unwraps a [`Field`](crate::core::field::types::Field) and runs `Provider` on the value, dropping the tag.
+#[deprecated(since = "0.11.0", note = "use `cgp_fork::handler::FieldValue<P>`")]
 pub struct HandleFieldValue<Provider = UseContext>(pub PhantomData<Provider>);
 
 #[cgp_provider]

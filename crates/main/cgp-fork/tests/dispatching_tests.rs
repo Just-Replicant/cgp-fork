@@ -15,6 +15,9 @@
 //! cgp-knowledge-base-fork/cgp/reference/providers/use_delegate.md,
 //! cgp-knowledge-base-fork/cgp/reference/providers/dispatch_combinators.md, and
 //! cgp-knowledge-base-fork/cgp/concepts/dispatching.md.
+//!
+//! The 0.10 dispatch family needs the `compat-0.10` feature (on by default).
+#![cfg(feature = "compat-0.10")]
 #![allow(dead_code)]
 #![allow(clippy::needless_lifetimes)]
 

@@ -56,6 +56,11 @@ pub trait ExtractField<Tag> {
 ///
 /// Implemented for [`Void`](crate::core::field::types::Void) and `Infallible`. Calling it means
 /// every variant was consumed, so the remainder cannot exist.
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` still has a variant left: not every variant of the enum is handled",
+    label = "a variant of the matched enum has no handler",
+    note = "a partial enum marks each variant `IsPresent` or `IsVoid`; give each `IsPresent` variant a handler in the list"
+)]
 pub trait FinalizeExtract {
     /// Diverges. `self` is uninhabited.
     fn finalize_extract<T>(self) -> T;
@@ -70,6 +75,17 @@ impl FinalizeExtract for Void {
 impl FinalizeExtract for Infallible {
     fn finalize_extract<T>(self) -> T {
         match self {}
+    }
+}
+
+/// A remainder paired with the arguments a first-match dispatcher threads through
+/// (`MatchWith<_, First>` in [`crate::handler`]) is uninhabited when the remainder is.
+impl<Remainder, Args> FinalizeExtract for (Remainder, Args)
+where
+    Remainder: FinalizeExtract,
+{
+    fn finalize_extract<T>(self) -> T {
+        self.0.finalize_extract()
     }
 }
 

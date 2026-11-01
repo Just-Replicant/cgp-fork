@@ -53,8 +53,8 @@ help: the trait `IsProviderFor<GreeterComponent, App>` is not implemented for `A
              `BindOk<M, Cont>` implements `IsProviderFor<AsyncComputerComponent, Context, (Code, Result<T, E1>)>`
              `BindOk<M, Cont>` implements `IsProviderFor<ComputerComponent, Context, (Code, Result<T, E1>)>`
              `BuildAndMerge<Provider>` implements `IsProviderFor<ComputerComponent, Context, (Code, Builder)>`
-             `BuildAndMerge<Provider>` implements `IsProviderFor<HandlerComponent, Context, (Code, Builder)>`
              `BuildAndMerge<Provider>` implements `IsProviderFor<TryComputerComponent, Context, (Code, Builder)>`
+             `BuildAndMerge<Provider>` implements `IsProviderFor<cgp_fork::prelude::HandlerComponent, Context, (Code, Builder)>`
              `BuildAndMergeOutputs<Output, Handlers>` implements `IsProviderFor<ComputerComponent, __Context__, __Params__>`
            and $N others
 note: required for `App` to implement `Greeter<App>`

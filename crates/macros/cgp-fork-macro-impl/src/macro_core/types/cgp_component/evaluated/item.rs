@@ -1,7 +1,8 @@
 use syn::{Item, ItemImpl, ItemTrait};
 
 use crate::macro_core::functions::{
-    add_on_unimplemented, consumer_on_unimplemented, provider_on_unimplemented,
+    add_on_unimplemented, allow_deprecated_in, consumer_on_unimplemented, deprecated_attrs,
+    provider_on_unimplemented,
 };
 use crate::macro_core::types::attributes::CgpComponentAttributes;
 use crate::macro_core::types::cgp_component::CgpComponentArgs;
@@ -25,21 +26,48 @@ impl EvaluatedCgpComponent {
     /// Emit the five core items in fixed order (consumer trait, consumer impl,
     /// provider trait, provider impl, marker struct), then the provider impls.
     pub fn to_items(&self) -> syn::Result<Vec<Item>> {
+        // A `#[deprecated]` consumer trait deprecates the whole component: the provider
+        // trait already carries the attribute (it is derived from the consumer trait),
+        // and the component struct gets it here.
+        let deprecated = deprecated_attrs(&self.consumer_trait.attrs);
+
+        let mut component_struct = self.component_struct.to_item_struct();
+        component_struct.attrs.extend(deprecated.iter().cloned());
+
         let mut items = vec![
             Item::Trait(self.to_consumer_trait_with_diagnostics()),
             Item::Impl(self.consumer_impl.clone()),
             Item::Trait(self.to_provider_trait_with_diagnostics()),
             Item::Impl(self.provider_impl.clone()),
-            Item::Struct(self.component_struct.to_item_struct()),
+            Item::Struct(component_struct),
         ];
 
         if let Some(promote) = &self.attributes.derive_promote {
             items.push(Item::Struct(promote.to_struct().to_item_struct()));
+            items.extend(promote.deprecation_marker());
         }
 
         let item_impls = self.to_item_impls()?.into_iter().map(Item::Impl);
 
         items.extend(item_impls);
+
+        // The impls name the deprecated traits and struct (or, for `#[derive_promote]`, the
+        // deprecated `Computer`); they must not warn the crate that declares the component.
+        if !deprecated.is_empty() {
+            allow_deprecated_in(&mut items);
+        } else if let Some(promote) = &self.attributes.derive_promote
+            && !promote.unified
+        {
+            // Only the `#[derive_promote]` impls name the deprecated `Computer`.
+            for item in &mut items {
+                if let Item::Impl(item_impl) = item
+                    && matches!(&*item_impl.self_ty, syn::Type::Path(path)
+                        if path.path.segments.last().is_some_and(|segment| segment.ident == promote.provider))
+                {
+                    allow_deprecated_in(core::slice::from_mut(item));
+                }
+            }
+        }
 
         Ok(items)
     }

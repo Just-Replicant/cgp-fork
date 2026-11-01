@@ -14,6 +14,10 @@ use crate::extra::handler::UseInputDelegate;
 ///
 /// `Error` comes from [`HasErrorType`](crate::core::error::HasErrorType). This is the fallible
 /// async member of the handler family.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `AsyncHandler` component (`cgp_fork::handler::AsyncHandler`) with `Output = Result<T, Context::Error>`"
+)]
 pub trait CanHandle<Code, Input> {
     /// The success value.
     type Output;
@@ -29,6 +33,10 @@ pub trait CanHandle<Code, Input> {
 #[derive_delegate(UseInputDelegate<Input>)]
 #[use_type(HasErrorType.Error)]
 /// [`CanHandle`] for a shared borrow of `Input`.
+#[deprecated(
+    since = "0.11.0",
+    note = "use the unified `AsyncHandler` component (`cgp_fork::handler::AsyncHandler`) with a `&T` input and `Output = Result<T, Context::Error>`"
+)]
 pub trait CanHandleRef<Code, Input> {
     /// The success value.
     type Output;

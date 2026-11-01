@@ -12,6 +12,9 @@
 //! See cgp-knowledge-base-fork/cgp/concepts/monadic-handlers.md and
 //! cgp-knowledge-base-fork/cgp/reference/providers/monad_providers.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use cgp_fork::extra::handler::PipeHandlers;
 use cgp_fork::extra::monad::monadic::ident::IdentMonadic;
 use cgp_fork::extra::monad::monadic::ok::{BindOk, OkMonadic};

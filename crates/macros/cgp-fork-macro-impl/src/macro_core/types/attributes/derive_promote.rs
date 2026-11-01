@@ -1,25 +1,33 @@
-use syn::parse::{Parse, ParseStream};
+use quote::quote_spanned;
+use syn::parse::ParseStream;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::token::Comma;
 use syn::{
-    Error, Expr, FnArg, Generics, Ident, ImplItem, ItemImpl, ItemTrait, Pat, Signature, TraitItem,
-    Type,
+    Error, Expr, FnArg, Generics, Ident, ImplItem, Item, ItemImpl, ItemTrait, Pat, Signature,
+    TraitItem, Type,
 };
 
+use crate::extra_macro_core::exports::UnifiedHandler;
 use crate::macro_core::exports::Computer;
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::empty_struct::EmptyStruct;
 
-/// `#[derive_promote(PromoteAreaCalculator)]` on `#[cgp_component]`.
+/// `#[derive_handler(PromoteAreaCalculator)]` (and the deprecated
+/// `#[derive_promote(…)]`) on `#[cgp_component]`.
 ///
 /// Generates a provider struct that implements the component by calling
-/// `Computer::compute` on an inner provider. Wire it as
-/// `PromoteAreaCalculator<SomeComputer>`. The same shape as the `Promote…`
-/// adapters in `cgp_fork::extra::handler`, aimed at a component instead of another handler.
+/// `Handler::handle` (with `#[derive_promote]`, the 0.10 `Computer::compute`) on an
+/// inner provider. Wire it as `PromoteAreaCalculator<SomeHandler>`. The same shape as
+/// the `Promote…` adapters in `cgp_fork::handler`, aimed at a component instead of
+/// another handler.
 #[derive(Clone)]
 pub struct DerivePromoteAttribute {
     pub provider: Ident,
+    /// `#[derive_handler]`: call the unified `Handler`. `false` is `#[derive_promote]`.
+    pub unified: bool,
+    /// The attribute's name, for the deprecation warning on `#[derive_promote]`.
+    pub attr_ident: Ident,
 }
 
 impl DerivePromoteAttribute {
@@ -32,6 +40,32 @@ impl DerivePromoteAttribute {
 
     /// The provider impl, plus the `IsProviderFor` impl the caller derives from it.
     pub fn to_provider_impl(&self, provider_trait: &ItemTrait) -> syn::Result<ItemImpl> {
+        // With `#[derive_promote]` the impl names the deprecated `Computer`; the caller
+        // allows that on the generated impls, and the user is warned once, at the
+        // attribute, by `deprecation_marker`.
+        let item_impl = self.to_provider_impl_inner(provider_trait);
+        if self.unified {
+            item_impl.map_err(rename_errors_for_derive_handler)
+        } else {
+            item_impl
+        }
+    }
+
+    /// For `#[derive_promote]`, an item that names a deprecated marker at the attribute,
+    /// so the user is warned there with the replacement. Nothing for `#[derive_handler]`.
+    pub fn deprecation_marker(&self) -> Option<Item> {
+        if self.unified {
+            return None;
+        }
+        let root = crate::crate_path::crate_root();
+        let span = self.attr_ident.span();
+        let marker = quote_spanned! { span => #root::macro_prelude::DERIVE_PROMOTE };
+        Some(syn::parse_quote! {
+            const _: () = #marker;
+        })
+    }
+
+    fn to_provider_impl_inner(&self, provider_trait: &ItemTrait) -> syn::Result<ItemImpl> {
         let method = single_method(provider_trait)?;
         let inputs = method_inputs(&method.sig)?;
         let output = output_type(&method.sig)?;
@@ -48,12 +82,22 @@ impl DerivePromoteAttribute {
         let input_type = tuple_type(&input_types)?;
         let input_expr = tuple_expr(&input_exprs)?;
 
-        let call: Expr = parse_internal! {
-            < __Provider__ as #Computer < #context_type, (), #input_type > >::compute(
-                #context_ident,
-                ::core::marker::PhantomData::< () >,
-                #input_expr,
-            )
+        let call: Expr = if self.unified {
+            parse_internal! {
+                < __Provider__ as #UnifiedHandler < #context_type, (), #input_type > >::handle(
+                    #context_ident,
+                    ::core::marker::PhantomData::< () >,
+                    #input_expr,
+                )
+            }
+        } else {
+            parse_internal! {
+                < __Provider__ as #Computer < #context_type, (), #input_type > >::compute(
+                    #context_ident,
+                    ::core::marker::PhantomData::< () >,
+                    #input_expr,
+                )
+            }
         };
 
         let block: syn::Block = parse_internal! {
@@ -80,8 +124,14 @@ impl DerivePromoteAttribute {
         generics
             .make_where_clause()
             .predicates
-            .push(parse_internal! {
-                __Provider__ : #Computer < #context_type, (), #input_type, Output = #output >
+            .push(if self.unified {
+                parse_internal! {
+                    __Provider__ : #UnifiedHandler < #context_type, (), #input_type, Output = #output >
+                }
+            } else {
+                parse_internal! {
+                    __Provider__ : #Computer < #context_type, (), #input_type, Output = #output >
+                }
             });
 
         item_impl.generics = generics;
@@ -103,19 +153,53 @@ struct MethodInputs {
     args: Vec<ForwardedArg>,
 }
 
-impl Parse for DerivePromoteAttribute {
-    fn parse(input: ParseStream) -> syn::Result<Self> {
-        let provider: Ident = input.parse()?;
+impl DerivePromoteAttribute {
+    /// Parses the arguments of `#[derive_handler(…)]` (`unified`) or `#[derive_promote(…)]`.
+    pub fn parse_args(
+        attr_ident: &Ident,
+        unified: bool,
+    ) -> impl Fn(ParseStream) -> syn::Result<Self> {
+        let attr_ident = attr_ident.clone();
+        move |input: ParseStream| {
+            let provider: Ident = input.parse()?;
 
-        if !input.is_empty() {
-            return Err(Error::new(
-                input.span(),
-                "`#[derive_promote]` takes only the provider name, as in `#[derive_promote(PromoteAreaCalculator)]`",
-            ));
+            if !input.is_empty() {
+                let name = attr_ident.to_string();
+                return Err(Error::new(
+                    input.span(),
+                    format!(
+                        "`#[{name}]` takes only the provider name, as in `#[{name}(PromoteAreaCalculator)]`"
+                    ),
+                ));
+            }
+
+            Ok(Self {
+                provider,
+                unified,
+                attr_ident: attr_ident.clone(),
+            })
         }
-
-        Ok(Self { provider })
     }
+}
+
+/// The shared checks are worded for `#[derive_promote]` and the 0.10 `Computer`; reword
+/// them for `#[derive_handler]`.
+fn rename_errors_for_derive_handler(error: Error) -> Error {
+    let mut renamed: Option<Error> = None;
+    for error in error {
+        let message = error
+            .to_string()
+            .replace("`#[derive_promote]`", "`#[derive_handler]`")
+            .replace("`Computer::compute`", "`Handler::handle`")
+            .replace("a Computer has one `compute`", "a Handler has one `handle`")
+            .replace("a Computer exposes", "a Handler exposes");
+        let error = Error::new(error.span(), message);
+        match &mut renamed {
+            Some(renamed) => renamed.combine(error),
+            None => renamed = Some(error),
+        }
+    }
+    renamed.expect("a syn::Error holds at least one message")
 }
 
 fn single_method(provider_trait: &ItemTrait) -> syn::Result<&syn::TraitItemFn> {

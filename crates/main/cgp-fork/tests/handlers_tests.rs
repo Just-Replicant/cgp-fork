@@ -16,6 +16,9 @@
 //! cgp-knowledge-base-fork/cgp/reference/components/producer.md,
 //! cgp-knowledge-base-fork/cgp/reference/components/handler.md, and
 //! cgp-knowledge-base-fork/cgp/reference/providers/handler_combinators.md.
+//!
+//! The 0.10 handler family needs the `compat-0.10` feature (on by default).
+#![cfg(feature = "compat-0.10")]
 #![allow(dead_code)]
 
 pub mod handlers;

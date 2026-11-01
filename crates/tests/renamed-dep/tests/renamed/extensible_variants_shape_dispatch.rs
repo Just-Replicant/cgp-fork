@@ -13,6 +13,9 @@
 //!
 //! See cgp-knowledge-base-fork/cgp/concepts/extensible-variants.md.
 
+// Exercises the deprecated 0.10 handler family.
+#![allow(deprecated)]
+
 use core::marker::PhantomData;
 use std::f64::consts::PI;
 

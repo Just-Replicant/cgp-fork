@@ -72,3 +72,6 @@ mod symbol_tests;
 #[cfg(test)]
 #[path = "macro_tests/token_rewrite_tests.rs"]
 mod token_rewrite_tests;
+#[cfg(test)]
+#[path = "macro_tests/validation_tests.rs"]
+mod validation_tests;

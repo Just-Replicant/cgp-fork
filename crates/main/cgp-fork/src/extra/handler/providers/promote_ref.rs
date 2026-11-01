@@ -11,6 +11,7 @@ use crate::extra::handler::{
 /// Calls a `*Ref` provider with `input.deref()`, so an owned input can use a borrowed handler.
 ///
 /// `Input` must implement `Deref`. The target of that deref is what `Provider` borrows.
+#[deprecated(since = "0.11.0", note = "use `cgp_fork::handler::PromoteDeref`")]
 pub struct PromoteRef<Provider>(pub PhantomData<Provider>);
 
 #[cgp_provider]

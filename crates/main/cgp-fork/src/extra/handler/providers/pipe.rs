@@ -6,6 +6,10 @@ use crate::extra::handler::ComposeHandlers;
 /// Folds a [`Cons`](crate::core::field::types::Cons) list of providers into one [`ComposeHandlers`] chain.
 ///
 /// A one-element list is that provider. A longer list composes from the head toward the tail.
+#[deprecated(
+    since = "0.11.0",
+    note = "use `cgp_fork::handler::Pipe` (or `cgp_fork::handler::TryPipe` for handlers that return `Result`)"
+)]
 pub struct PipeHandlers<Providers>(pub PhantomData<Providers>);
 
 delegate_components! {

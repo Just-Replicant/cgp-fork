@@ -3,6 +3,8 @@ use syn::spanned::Spanned;
 use syn::token::Comma;
 use syn::{Attribute, Error, Type};
 
+use crate::ir::Diagnostics;
+
 #[derive(Clone)]
 pub enum CheckParamsAttribute {
     Default,
@@ -30,20 +32,34 @@ impl CheckParamsAttribute {
         Ok(res)
     }
 
-    pub fn parse_attributes(attributes: &[Attribute]) -> syn::Result<Self> {
-        if attributes.is_empty() {
-            return Ok(Self::Default);
+    /// Parses the check control of one key and records an error for every illegal
+    /// attribute instead of stopping at the first. Only `#[check_params(..)]` and
+    /// `#[skip_check]` are legal, and at most one of them; every attribute after the
+    /// first is reported.
+    pub fn record_attributes(attributes: &[Attribute], diagnostics: &mut Diagnostics) -> Self {
+        let mut result = Self::Default;
+
+        for (index, attribute) in attributes.iter().enumerate() {
+            let parsed = Self::parse_attribute(attribute);
+
+            if index == 0 {
+                if let Some(parsed) = diagnostics.check(parsed) {
+                    result = parsed;
+                }
+            } else if parsed.is_ok() {
+                diagnostics.push(Error::new(
+                    attribute.span(),
+                    "Expected at most one `#[check_params]` or `#[skip_check]` attribute",
+                ));
+            } else {
+                diagnostics.check(parsed);
+            }
         }
 
-        if attributes.len() > 1 {
-            return Err(Error::new(
-                attributes[1].span(),
-                "Expected at most one `#[check_params]` or `#[skip_check]` attribute",
-            ));
-        }
+        result
+    }
 
-        let attribute = &attributes[0];
-
+    fn parse_attribute(attribute: &Attribute) -> syn::Result<Self> {
         if attribute.path().is_ident("check_params") {
             let params = attribute.parse_args_with(Punctuated::parse_terminated)?;
             Ok(CheckParamsAttribute::Multi(params))
