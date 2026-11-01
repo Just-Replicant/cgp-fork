@@ -1,7 +1,9 @@
+use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::token::Comma;
 use syn::{Attribute, GenericParam, TypeParamBound, WherePredicate};
 
+use crate::macro_core::functions::rewrite_bare_async_trait;
 use crate::macro_core::types::attributes::{
     UseProviderAttribute, UseProviderAttributes, UseTypeAttribute, UseTypeAttributes,
 };
@@ -15,6 +17,8 @@ pub struct FunctionAttributes {
     pub use_provider: UseProviderAttributes,
     pub impl_generics: Vec<GenericParam>,
     pub raw_attributes: Vec<Attribute>,
+    /// Span of a bare `#[async_trait]` rewritten to `#[cgp_async]`, so the expansion can warn once.
+    pub async_trait_span: Option<Span>,
 }
 
 impl FunctionAttributes {
@@ -58,13 +62,22 @@ impl FunctionAttributes {
 
                     parsed_attributes.impl_generics.extend(impl_generics);
                 } else {
-                    parsed_attributes.raw_attributes.push(attribute);
+                    push_raw_attribute(&mut parsed_attributes, attribute);
                 }
             } else {
-                parsed_attributes.raw_attributes.push(attribute);
+                push_raw_attribute(&mut parsed_attributes, attribute);
             }
         }
 
         Ok(parsed_attributes)
     }
+}
+
+fn push_raw_attribute(parsed: &mut FunctionAttributes, mut attribute: Attribute) {
+    if let Some(span) = rewrite_bare_async_trait(&mut attribute)
+        && parsed.async_trait_span.is_none()
+    {
+        parsed.async_trait_span = Some(span);
+    }
+    parsed.raw_attributes.push(attribute);
 }
