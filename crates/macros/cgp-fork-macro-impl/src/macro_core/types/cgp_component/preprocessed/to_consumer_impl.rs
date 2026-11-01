@@ -63,6 +63,7 @@ impl PreprocessedCgpComponent {
             &consumer_trait.items,
             &parse_internal!(#context_type_ident),
             &provider_trait_path,
+            crate::macro_core::functions::is_cgp_async_send(&consumer_trait.attrs),
         )?;
 
         let consumer_trait_path: Path = parse_internal!( #consumer_name #consumer_type_generics );

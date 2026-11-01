@@ -1,0 +1,5 @@
+error: `#[cgp_async]` accepts no arguments, or `Send` (`#[cgp_async(Send)]` adds `+ Send` to every desugared future)
+ --> tests/ui/cgp_async_arguments.rs:4:13
+  |
+4 | #[cgp_async(?Send)]
+  |             ^^^^^

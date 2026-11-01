@@ -2,9 +2,11 @@
 
 pub use core::marker::PhantomData;
 
+#[allow(deprecated)]
+pub use cgp_fork_macro::async_trait;
 pub use cgp_fork_macro::{
     BuildField, CgpData, CgpRecord, CgpVariant, Enum, ExtractField, FromVariant, HasField,
-    HasFields, Path, Product, Struct, Sum, Symbol, async_trait, cgp_auto_error, cgp_auto_getter,
+    HasFields, Path, Product, Struct, Sum, Symbol, cgp_async, cgp_auto_error, cgp_auto_getter,
     cgp_auto_impl, cgp_component, cgp_fn, cgp_for_each, cgp_getter, cgp_impl, cgp_namespace,
     cgp_new_provider, cgp_preset, cgp_provider, cgp_type, check_components,
     delegate_and_check_components, delegate_components, derive_provider, product,

@@ -1538,10 +1538,37 @@ pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
 
 /// Rewrites `async fn` in a trait to a method that returns `impl Future`.
 ///
-/// The desugared method is what `#[cgp_component]` forwards. A provided (default) method body
-/// is wrapped in `async move { … }`. The future is not automatically `Send`; `CanSendRun` is
-/// the component that asks for a `Send` future. The attribute takes no arguments, so
-/// `#[async_trait(?Send)]` is rejected rather than silently ignored.
+/// `#[cgp_async(Send)]` adds `+ Send` to every desugared future, so the future can be spawned
+/// on a work-stealing runtime. Without `Send` the future is not `Send`. A provided (default)
+/// method body is wrapped in `async move { … }`. Any other argument is rejected.
+///
+/// `#[cgp_component]` and `#[cgp_fn]` copy this attribute onto the traits and impls they
+/// generate. On an impl it does nothing: a native `async fn` already matches the desugared
+/// trait method, and the `Send` bound is checked against that trait method.
+///
+/// ```rust,ignore
+/// #[cgp_component(Fetcher)]
+/// #[cgp_async(Send)]
+/// pub trait CanFetch {
+///     async fn fetch(&self, id: u32) -> String;
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn cgp_async(attr: TokenStream, stream: TokenStream) -> TokenStream {
+    async_impl::impl_cgp_async(attr.into(), stream.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Rewrites `async fn` in a trait to a method that returns `impl Future`.
+///
+/// This is the old name of [`cgp_async`](macro@cgp_async). It takes no arguments and never
+/// adds `Send`; `#[async_trait(?Send)]` is rejected rather than silently ignored. A provided
+/// method body is wrapped in `async move { … }`.
+#[deprecated(
+    since = "0.11.0",
+    note = "renamed to `#[cgp_async]`; use `#[cgp_async(Send)]` when the future must be `Send`"
+)]
 #[proc_macro_attribute]
 pub fn async_trait(attr: TokenStream, stream: TokenStream) -> TokenStream {
     async_impl::impl_async(attr.into(), stream.into())

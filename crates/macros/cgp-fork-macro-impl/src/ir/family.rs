@@ -24,7 +24,7 @@ pub enum IrFamily {
     Namespace,
     /// A data shape: field derives, records, variants and type-level constructors.
     DataShape,
-    /// A trait rewritten in place (`#[async_trait]`, `#[blanket_trait]`, `#[cgp_auto_impl]`).
+    /// A trait rewritten in place (`#[cgp_async]`, `#[async_trait]`, `#[blanket_trait]`, `#[cgp_auto_impl]`).
     TraitRewrite,
 }
 

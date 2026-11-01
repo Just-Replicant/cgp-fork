@@ -4,7 +4,7 @@ use crate::core::component::UseDelegate;
 use crate::core::prelude::*;
 use crate::extra::handler::UseInputDelegate;
 
-#[async_trait]
+#[cgp_async]
 #[cgp_component(AsyncComputer)]
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]
@@ -22,7 +22,7 @@ pub trait CanComputeAsync<Code, Input> {
     async fn compute_async(&self, _code: PhantomData<Code>, input: Input) -> Self::Output;
 }
 
-#[async_trait]
+#[cgp_async]
 #[cgp_component(AsyncComputerRef)]
 #[prefix(@cgp.extra.handler in DefaultNamespace)]
 #[derive_delegate(UseDelegate<Code>)]

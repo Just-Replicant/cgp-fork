@@ -1,4 +1,6 @@
 // `#[async_trait]` takes no arguments; `?Send` used to be silently ignored.
+#![allow(deprecated)]
+
 use cgp_fork::prelude::*;
 
 #[async_trait(?Send)]

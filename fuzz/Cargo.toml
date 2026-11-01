@@ -47,6 +47,13 @@ doc   = false
 bench = false
 
 [[bin]]
+name  = "cgp_async"
+path  = "fuzz_targets/cgp_async.rs"
+test  = false
+doc   = false
+bench = false
+
+[[bin]]
 name  = "blanket_trait"
 path  = "fuzz_targets/blanket_trait.rs"
 test  = false

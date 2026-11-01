@@ -10,7 +10,7 @@
 use cgp::prelude::*;
 use futures::executor::block_on;
 
-#[async_trait]
+#[cgp_async]
 pub trait HasDefaultValue {
     async fn base(&self) -> u32;
 

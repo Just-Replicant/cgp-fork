@@ -1,0 +1,11 @@
+error: use of deprecated constant `cgp_fork::macro_prelude::ASYNC_TRAIT`: `#[async_trait]` is now `#[cgp_async]`. Write `#[cgp_async(Send)]` when the future must be `Send`
+ --> tests/ui/deprecated_async_trait_component.rs:7:3
+  |
+7 | #[async_trait]
+  |   ^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_async_trait_component.rs:2:9
+  |
+2 | #![deny(deprecated)]
+  |         ^^^^^^^^^^

@@ -37,6 +37,7 @@ impl EvaluatedCgpComponent {
             &provider_trait.items,
             &parse_internal!(#context_type_ident),
             &consumer_trait_path,
+            crate::macro_core::functions::is_cgp_async_send(&provider_trait.attrs),
         )?;
 
         let provider_trait_path: Path = parse_internal!( #provider_trait_ident #provider_generics );
