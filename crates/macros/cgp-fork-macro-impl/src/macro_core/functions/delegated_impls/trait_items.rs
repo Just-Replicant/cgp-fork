@@ -14,11 +14,12 @@ pub fn trait_items_to_delegated_impl_items(
     trait_items: &[TraitItem],
     delegate_type: &Type,
     provider_trait_path: &Type,
+    send: bool,
 ) -> syn::Result<Vec<ImplItem>> {
     trait_items
         .iter()
         .map(|trait_item| {
-            trait_item_to_delegated_impl_items(trait_item, delegate_type, provider_trait_path)
+            trait_item_to_delegated_impl_items(trait_item, delegate_type, provider_trait_path, send)
         })
         .collect()
 }
@@ -30,10 +31,11 @@ pub fn trait_item_to_delegated_impl_items(
     trait_item: &TraitItem,
     delegate_type: &Type,
     provider_trait_path: &Type,
+    send: bool,
 ) -> syn::Result<ImplItem> {
     let impl_item = match trait_item {
         TraitItem::Fn(trait_fn) => {
-            let impl_fn = signature_to_delegated_impl_item_fn(&trait_fn.sig, delegate_type)?;
+            let impl_fn = signature_to_delegated_impl_item_fn(&trait_fn.sig, delegate_type, send)?;
 
             ImplItem::Fn(impl_fn)
         }
