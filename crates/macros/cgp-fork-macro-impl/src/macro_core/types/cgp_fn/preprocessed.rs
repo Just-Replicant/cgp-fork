@@ -5,7 +5,7 @@ use syn::{
     Visibility,
 };
 
-use crate::macro_core::functions::parse_internal;
+use crate::macro_core::functions::{async_trait_deprecation, parse_internal};
 use crate::macro_core::traits::AddTypeParamBounds;
 use crate::macro_core::types::attributes::FunctionAttributes;
 use crate::macro_core::types::implicits::ImplicitArgFields;
@@ -24,7 +24,11 @@ impl PreprocessedItemCgpFn {
         let item_trait = self.to_item_trait()?;
         let item_impl = self.to_item_impl()?;
 
-        Ok(vec![Item::Trait(item_trait), Item::Impl(item_impl)])
+        let mut items = vec![Item::Trait(item_trait), Item::Impl(item_impl)];
+        if let Some(span) = self.attributes.async_trait_span {
+            items.push(async_trait_deprecation(span));
+        }
+        Ok(items)
     }
 
     pub fn to_item_trait(&self) -> syn::Result<ItemTrait> {
