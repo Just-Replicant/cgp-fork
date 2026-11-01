@@ -1,10 +1,12 @@
 use core::mem;
 
+use proc_macro2::Span;
 use syn::parse::Parse;
 use syn::punctuated::Punctuated;
 use syn::token::Comma;
 use syn::{Attribute, ItemTrait, TypeParamBound};
 
+use crate::macro_core::functions::rewrite_bare_async_trait;
 use crate::macro_core::types::attributes::{
     DeriveDelegateAttribute, DeriveDelegateAttributes, DerivePromoteAttribute, PrefixAttribute,
     UseTypeAttribute, UseTypeAttributes,
@@ -17,6 +19,8 @@ pub struct CgpComponentAttributes {
     pub prefixes: Vec<PrefixAttribute>,
     pub derive_delegate_attributes: DeriveDelegateAttributes,
     pub derive_promote: Option<DerivePromoteAttribute>,
+    /// Span of a bare `#[async_trait]` rewritten to `#[cgp_async]`, so the expansion can warn once.
+    pub async_trait_span: Option<Span>,
 }
 
 impl CgpComponentAttributes {
@@ -85,13 +89,28 @@ impl CgpComponentAttributes {
                             .parse_args_with(DerivePromoteAttribute::parse_args(ident, unified))?,
                     );
                 } else {
-                    attributes.push(attribute);
+                    push_forwarded_attribute(&mut parsed_attributes, &mut *attributes, attribute);
                 }
             } else {
-                attributes.push(attribute);
+                push_forwarded_attribute(&mut parsed_attributes, &mut *attributes, attribute);
             }
         }
 
         Ok(parsed_attributes)
     }
+}
+
+/// Keeps an attribute the component macro does not interpret, rewriting a bare
+/// `#[async_trait]` to `#[cgp_async]` so generated items do not repeat the deprecation.
+fn push_forwarded_attribute(
+    parsed: &mut CgpComponentAttributes,
+    attributes: &mut Vec<Attribute>,
+    mut attribute: Attribute,
+) {
+    if let Some(span) = rewrite_bare_async_trait(&mut attribute)
+        && parsed.async_trait_span.is_none()
+    {
+        parsed.async_trait_span = Some(span);
+    }
+    attributes.push(attribute);
 }
