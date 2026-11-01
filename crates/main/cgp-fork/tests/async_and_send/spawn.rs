@@ -10,8 +10,12 @@
 //! is concrete, the compiler can prove `Send` for the produced future. This is
 //! the workaround CGP uses until Rust's Return Type Notation (RTN) is stabilized.
 //!
+//! `CanSendRun` is the deprecated proxy. New code puts `#[cgp_async(Send)]` on the
+//! component it spawns; that form is `spawn_with_send_flag`.
+//!
 //! See cgp-knowledge-base-fork/cgp/reference/components/runner.md and
 //! cgp-knowledge-base-fork/cgp/concepts/send-bounds.md.
+#![allow(deprecated)]
 
 use core::convert::Infallible;
 use core::future::Future;
@@ -45,19 +49,19 @@ pub trait HasBarType {
 }
 
 #[cgp_component(FooFetcher)]
-#[async_trait]
+#[cgp_async]
 pub trait CanFetchFoo: HasFooType + HasErrorType {
     async fn fetch_foo(&self) -> Result<Self::Foo, Self::Error>;
 }
 
 #[cgp_component(BarFetcher)]
-#[async_trait]
+#[cgp_async]
 pub trait CanFetchBar: HasBarType + HasErrorType {
     async fn fetch_bar(&self) -> Result<Self::Bar, Self::Error>;
 }
 
 #[cgp_component(FooBarRunner)]
-#[async_trait]
+#[cgp_async]
 pub trait CanRunFooBar: HasFooType + HasBarType + HasErrorType {
     async fn run_foo_bar(&self, foo: &Self::Foo, bar: &Self::Bar) -> Result<(), Self::Error>;
 }
