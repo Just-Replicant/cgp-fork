@@ -25,4 +25,6 @@ pub mod field;
 pub mod types;
 
 pub use cgp_fork_macro as macros;
+#[allow(deprecated)]
 pub use cgp_fork_macro::async_trait;
+pub use cgp_fork_macro::cgp_async;
