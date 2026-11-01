@@ -1,4 +1,4 @@
-//! An async component: `#[async_trait]` desugars `async fn` so a provider can be async
+//! An async component: `#[cgp_async]` desugars `async fn` so a provider can be async
 //! and a default method body can await the others.
 //!
 //! Run with `cargo run -p cgp-fork --example async_component`.
@@ -7,12 +7,12 @@ use cgp_fork::prelude::*;
 use futures::executor::block_on;
 
 #[cgp_component(Fetcher)]
-#[async_trait]
+#[cgp_async]
 pub trait CanFetch {
     async fn fetch(&self, id: u32) -> String;
 }
 
-#[async_trait]
+#[cgp_async]
 pub trait CanFetchTwo: CanFetch {
     // A provided async method, built on the component.
     async fn fetch_two(&self, first: u32, second: u32) -> (String, String) {
