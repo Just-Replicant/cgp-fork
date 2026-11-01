@@ -1,0 +1,11 @@
+error: use of deprecated macro `async_trait`: renamed to `#[cgp_async]`; use `#[cgp_async(Send)]` when the future must be `Send`
+ --> tests/ui/deprecated_async_trait.rs:6:3
+  |
+6 | #[async_trait]
+  |   ^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> tests/ui/deprecated_async_trait.rs:2:9
+  |
+2 | #![deny(deprecated)]
+  |         ^^^^^^^^^^
