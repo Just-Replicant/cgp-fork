@@ -13,14 +13,14 @@ use cgp_fork_macro::snapshot_cgp_component;
 
 snapshot_cgp_component! {
     #[cgp_component(Fetcher)]
-    #[async_trait]
+    #[cgp_async]
     pub trait CanFetch {
         async fn fetch(&self, id: u32) -> String;
     }
 
     expand_can_fetch(output) {
         insta::assert_snapshot!(output, @r#"
-        #[async_trait]
+        #[cgp_async]
         #[diagnostic::on_unimplemented(
             message = "`{Self}` does not implement `CanFetch`",
             label = "`CanFetch` is not implemented for `{Self}`",
@@ -30,7 +30,7 @@ snapshot_cgp_component! {
         pub trait CanFetch {
             async fn fetch(&self, id: u32) -> String;
         }
-        #[async_trait]
+        #[cgp_async]
         impl<__Context__> CanFetch for __Context__
         where
             __Context__: Fetcher<__Context__>,
@@ -39,7 +39,7 @@ snapshot_cgp_component! {
                 __Context__::fetch(self, id).await
             }
         }
-        #[async_trait]
+        #[cgp_async]
         #[diagnostic::on_unimplemented(
             message = "`{Self}` does not provide `FetcherComponent` for `{__Context__}`",
             label = "`{Self}` neither implements `Fetcher` nor wires `FetcherComponent`",
@@ -49,7 +49,7 @@ snapshot_cgp_component! {
         pub trait Fetcher<__Context__>: IsProviderFor<FetcherComponent, __Context__, ()> {
             async fn fetch(__context__: &__Context__, id: u32) -> String;
         }
-        #[async_trait]
+        #[cgp_async]
         impl<__Provider__, __Context__> Fetcher<__Context__> for __Provider__
         where
             __Provider__: DelegateComponent<FetcherComponent>
@@ -67,7 +67,7 @@ snapshot_cgp_component! {
         }
         /// Component name for [`CanFetch`]. Choose its provider in `delegate_components!`.
         pub struct FetcherComponent;
-        #[async_trait]
+        #[cgp_async]
         impl<__Context__> Fetcher<__Context__> for UseContext
         where
             __Context__: CanFetch,
@@ -80,7 +80,7 @@ snapshot_cgp_component! {
         where
             __Context__: CanFetch,
         {}
-        #[async_trait]
+        #[cgp_async]
         impl<__Context__, __Components__, __Path__> Fetcher<__Context__>
         for RedirectLookup<__Components__, __Path__>
         where
