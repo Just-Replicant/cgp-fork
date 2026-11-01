@@ -36,7 +36,7 @@ impl CanGreet for Bar {
 }
 
 #[cgp_auto_dispatch]
-#[async_trait]
+#[cgp_async]
 pub trait CanCall {
     async fn call(&self) -> &'static str;
 }
