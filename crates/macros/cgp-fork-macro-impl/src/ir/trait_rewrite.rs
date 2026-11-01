@@ -12,9 +12,11 @@ use crate::macro_core::types::cgp_auto_log::ItemCgpAutoLog;
 
 /// A trait rewritten in place.
 pub enum TraitRewrite {
-    /// `#[async_trait]` on a trait: every `async fn` desugared to `-> impl Future`.
-    AsyncTrait(Box<ItemTrait>),
-    /// `#[async_trait]` on any other item: emitted unchanged.
+    /// `#[cgp_async]` or `#[async_trait]` on a trait: every `async fn` desugared to
+    /// `-> impl Future`, plus `Send` when `send` is set (`#[cgp_async(Send)]`).
+    AsyncTrait { item: Box<ItemTrait>, send: bool },
+    /// `#[cgp_async]` or `#[async_trait]` on any other item: emitted unchanged.
+    /// An impl keeps its native `async fn`, which already matches the desugared trait.
     Passthrough(TokenStream),
     /// `#[blanket_trait]`: a trait implied by its supertraits gets a blanket impl.
     Blanket(ItemBlanketTrait),
@@ -35,7 +37,7 @@ impl FamilyIr for TraitRewrite {
     /// Generates the rewritten trait and its impls.
     fn emit(self) -> syn::Result<TokenStream> {
         match self {
-            TraitRewrite::AsyncTrait(item_trait) => Ok(desugar_async_fns(*item_trait)),
+            TraitRewrite::AsyncTrait { item, send } => Ok(desugar_async_fns(*item, send)),
             TraitRewrite::Passthrough(item) => Ok(item),
             TraitRewrite::Blanket(item) => items(item.to_items()?),
             TraitRewrite::AutoImpl(item) => items(item.to_items()?),
@@ -51,7 +53,8 @@ fn items<T: ToTokens>(items: Vec<T>) -> syn::Result<TokenStream> {
 }
 
 /// A default body is wrapped in `async move { … }`, so a trait keeps provided async methods.
-fn desugar_async_fns(mut target_trait: ItemTrait) -> TokenStream {
+/// `send` adds `+ Send` to every desugared future (`#[cgp_async(Send)]`).
+fn desugar_async_fns(mut target_trait: ItemTrait, send: bool) -> TokenStream {
     for trait_item in &mut target_trait.items {
         if let TraitItem::Fn(trait_fn) = trait_item
             && trait_fn.sig.asyncness.is_some()
@@ -61,8 +64,14 @@ fn desugar_async_fns(mut target_trait: ItemTrait) -> TokenStream {
                 ReturnType::Type(_, return_type) => return_type.as_ref().clone(),
             };
 
-            trait_fn.sig.output = parse_quote! {
-                -> impl ::core::future::Future<Output = #return_type>
+            trait_fn.sig.output = if send {
+                parse_quote! {
+                    -> impl ::core::future::Future<Output = #return_type> + ::core::marker::Send
+                }
+            } else {
+                parse_quote! {
+                    -> impl ::core::future::Future<Output = #return_type>
+                }
             };
             trait_fn.sig.asyncness = None;
 
