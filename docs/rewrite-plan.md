@@ -3,7 +3,7 @@
 Analysis of `main` @ `33842521` (2026-10-28, v0.10.1 prepared, unreleased).
 Every claim below cites a file in that checkout. Effort figures are estimates.
 
-## Status (2026-10-31, branch `phase-3-fixes`)
+## Status (2026-11-01, branch `phase-4`)
 
 | Phase | Status | Notes |
 |---|---|---|
@@ -12,7 +12,8 @@ Every claim below cites a file in that checkout. Effort figures are estimates.
 | 1b Shared IR | Done | All 38 entrypoints implement `ir::Pipeline` (parse only) into one of seven shared family IR types (the six of §7.1 plus `TraitRewrite`), which implement `ir::FamilyIr` (`validate → emit`, errors combined). Ported one entrypoint, then one family, per commit with every snapshot unchanged ([ADR 0004](adr/0004-shared-ir-pipeline.md)); the registry is generated from the pipelines and its families from the IR types. Input depth and identifier-length limits checked before parsing (fuzz findings). Coverage 95.0% of lines, `cargo audit`/`cargo deny` clean, no semver update required; 909 tests pass ([final baseline](baseline/2026-10-31-after-phase-1b-final.md)). Open: JSON wiring metadata. The last checks in `emit` (wiring-table attributes, the `WithProvider` method count) moved to `validate` before phase 3. |
 | 2 Diagnostics | Done | `#[diagnostic::do_not_recommend]` on generated `DelegateComponent` impls trims the lower error lines; what stable Rust cannot fix is listed in ADR 0005. `#[diagnostic::on_unimplemented]` on `CanUseComponent`, `IsProviderFor`, `DelegateComponent`, `HasField`, `HasFieldMut` and on the consumer, provider and auto-getter traits the macros generate ([ADR 0005](adr/0005-diagnostics.md)). Every `tests/ui` case starts without a type-level string; three new cases. 895 tests pass ([after phase 2](baseline/2026-10-31-after-phase-2.md)). |
 | 3 Handler/data unification | Done, with the 0.11 deprecations | `cgp_fork::handler`: `Handler`/`AsyncHandler`, one `Promote` family, `Pipe`/`TryPipe`, `MatchWith<Handlers, All\|First, Owned\|Ref\|Mut>` and record builders; access modes `Owned`/`Ref`/`Mut` with `ModeExtractor`/`ModeFields`. The 0.10 family is behind `compat-0.10` (on by default) and `cgp_fork::compat` bridges both ways ([ADR 0006](adr/0006-handler-unification.md)). Old tests pass with `compat-0.10`; ported tests in `tests/unified_handlers/`. Follow-up: the 0.10 names are `#[deprecated(since = "0.11.0")]` with replacements in the notes; `#[cgp_handler]` and `#[derive_handler]` replace the deprecated `#[cgp_computer]`/`#[cgp_producer]` and `#[derive_promote]`, `#[cgp_auto_dispatch]` emits the unified API (works without `compat-0.10`), `Downcast`/`DispatchHandlers` added; `MapTypeRef` merged into `Mode` (deprecated alias kept; `MapType` stays, E0309); 969 tests pass with all features, 475 for `-p cgp-fork --no-default-features`. Open: `unstable-monad` (no unified monad replacement, so the monad layer is not deprecated). ([after phase 3](baseline/2026-10-31-after-phase-3.md)) |
-| 4 to 6 | Not started | |
+| 4 Async/run/runtime | Done | `#[cgp_async]` and `#[cgp_async(Send)]`; `#[async_trait]` is deprecated and rewritten when `#[cgp_component]` or `#[cgp_fn]` forwards it. `CanRun` stays the runner; `CanSendRun` is deprecated in favour of the `Send` flag ([ADR 0007](adr/0007-cgp-async-and-runtimes.md)). `AsyncRuntime` (spawn, sleep, timeout) with `HasAsyncRuntime` and the providers `SleepWithRuntime`, `SpawnWithRuntime`, `TimeoutWithRuntime`. Features `tokio` and `smol`, not in `default`. 979 tests pass with `--all-features`, 977 with `--no-default-features` ([after phase 4](baseline/2026-11-01-after-phase-4.md)). |
+| 5 to 6 | Not started | |
 
 What changed from the plan as written:
 
@@ -27,6 +28,14 @@ What changed from the plan as written:
   family per commit, each with snapshot parity (ADR 0004). A seventh family, `TraitRewrite`,
   covers `async_trait`, `blanket_trait`, `cgp_auto_impl` and `cgp_auto_log`, which rewrite a user
   trait and define no component or provider.
+- `#[cgp_async(Send)]` adds `+ Send` on the desugared future. A component's generated forwarder
+  returns that future instead of awaiting it, because an `async` block would capture `&Context`
+  and require `Context: Sync`. `CanSendRun` stays as a deprecated proxy: return-type notation
+  cannot yet name `CanRun::run(..): Send`, so a second method on the concrete context is still
+  how a generic runner becomes spawnable.
+- The runtime adapters are features of the facade, not a `cgp-fork-std` crate, for the same
+  reason phase 3 left handlers in the facade. They are not part of `full`, so the `no_std`
+  build does not link them.
 - Phase 2's provider-trait message covers both things its `Self` can be, a context or wiring table
   without an entry and a provider without an impl, because rustc reports a method call on an
   unwired context through the provider trait (ADR 0005). Per-symbol readable aliases (§7.2) were
