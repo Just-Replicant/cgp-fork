@@ -318,10 +318,8 @@ where
         code: PhantomData<Code>,
         input: Input,
     ) -> Self::Output {
-        match input.extract_field(PhantomData::<Tag>) {
-            Ok(value) => Ok(Provider::handle_async(context, code, value.into()).await),
-            Err(remainder) => Err(remainder),
-        }
+        let value = input.extract_field(PhantomData::<Tag>)?;
+        Ok(Provider::handle_async(context, code, value.into()).await)
     }
 }
 
@@ -844,9 +842,7 @@ where
         code: PhantomData<Code>,
         input: Input,
     ) -> Result<Provider::Output, Input::Remainder> {
-        match input.downcast_fields(PhantomData::<Inner>) {
-            Ok(inner) => Ok(Provider::handle_async(context, code, inner).await),
-            Err(remainder) => Err(remainder),
-        }
+        let inner = input.downcast_fields(PhantomData::<Inner>)?;
+        Ok(Provider::handle_async(context, code, inner).await)
     }
 }
