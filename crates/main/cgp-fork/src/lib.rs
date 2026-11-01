@@ -54,6 +54,15 @@ pub mod macro_prelude {
         note = "`#[derive_promote(Name)]` forwards to a 0.10 `Computer`; use `#[derive_handler(Name)]`, which forwards to a unified `Handler`"
     )]
     pub const DERIVE_PROMOTE: () = ();
+
+    /// Named when `#[cgp_component]` or `#[cgp_fn]` rewrites `#[async_trait]` to `#[cgp_async]`,
+    /// so the user is warned once, on the attribute they wrote.
+    #[doc(hidden)]
+    #[deprecated(
+        since = "0.11.0",
+        note = "`#[async_trait]` is now `#[cgp_async]`. Write `#[cgp_async(Send)]` when the future must be `Send`"
+    )]
+    pub const ASYNC_TRAIT: () = ();
 }
 
 /// Expands to its input when this crate has the `compat-0.10` feature, and to nothing
@@ -86,3 +95,9 @@ pub mod eyre;
 #[cfg(feature = "std-error")]
 #[doc = include_str!("std_error/README.md")]
 pub mod std_error;
+
+#[cfg(feature = "tokio")]
+pub mod tokio;
+
+#[cfg(feature = "smol")]
+pub mod smol;
