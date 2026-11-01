@@ -35,6 +35,7 @@ pub fn pipelines() -> Vec<(&'static str, IrFamily, EntrypointFn)> {
     use crate::{async_impl as asy, extra_macro_lib as extra, macro_lib as lib};
     pipelines![
         asy::AsyncTraitMacro,
+        asy::CgpAsyncMacro,
         lib::BlanketTraitMacro,
         lib::CgpAutoErrorMacro,
         lib::CgpAutoGetterMacro,
