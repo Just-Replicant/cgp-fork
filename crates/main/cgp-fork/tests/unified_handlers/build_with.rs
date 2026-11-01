@@ -144,6 +144,25 @@ fn merge_outputs_wraps_each_handler() {
     type Merged = MergeOutputs<FooBarBaz, Product![BuildFooBar, BuildBazRecord]>;
 
     assert_eq!(Merged::handle(&App, NoCode, ()), expected());
+
+    // `TryMergeOutputs` is the same wrap, with each handler returning `Result`.
+    type TryMerged =
+        TryMergeOutputs<FooBarBaz, Product![PromoteOk<BuildFooBar>, PromoteOk<BuildBazRecord>]>;
+
+    assert_eq!(TryMerged::handle(&App, NoCode, ()), Ok(expected()));
+
+    type AsyncTryMerged = TryMergeOutputs<
+        FooBarBaz,
+        Product![
+            Promote<PromoteOk<BuildFooBar>>,
+            Promote<PromoteOk<BuildBazRecord>>,
+        ],
+    >;
+
+    assert_eq!(
+        block_on(AsyncTryMerged::handle_async(&App, NoCode, ())),
+        Ok(expected())
+    );
 }
 
 #[test]
@@ -162,6 +181,34 @@ fn try_build_with_returns_the_first_error() {
 
     assert_eq!(
         TryBuildWith::<FooBarBaz, Fails>::handle(&App, NoCode, ()),
+        Err("no baz".to_owned())
+    );
+
+    type AsyncOk = Product![
+        TrySetField<Symbol!("baz"), Promote<PromoteOk<BuildBaz>>>,
+        TryMerge<Promote<PromoteOk<BuildFooBar>>>,
+    ];
+
+    assert_eq!(
+        block_on(TryBuildWith::<FooBarBaz, AsyncOk>::handle_async(
+            &App,
+            NoCode,
+            ()
+        )),
+        Ok(expected())
+    );
+
+    type AsyncFails = Product![
+        TryMerge<Promote<PromoteOk<BuildFooBar>>>,
+        TrySetField<Symbol!("baz"), Promote<FailBaz>>,
+    ];
+
+    assert_eq!(
+        block_on(TryBuildWith::<FooBarBaz, AsyncFails>::handle_async(
+            &App,
+            NoCode,
+            ()
+        )),
         Err("no baz".to_owned())
     );
 }
