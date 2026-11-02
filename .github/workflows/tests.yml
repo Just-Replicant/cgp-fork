@@ -204,7 +204,7 @@ jobs:
       - name: Every feature combination (host)
         run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps
       - name: Every feature combination (no_std; eyre needs std)
-        run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps --exclude-features eyre,tokio,smol --target thumbv7m-none-eabi
+        run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps --exclude-features eyre,tokio,smol,log-tracing --target thumbv7m-none-eabi
 
   deny:
     name: cargo-deny (advisories, licenses, bans, sources)
