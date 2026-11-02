@@ -9,7 +9,7 @@ use crate::extra_macro_core::types::cgp_producer::ItemCgpProducer;
 use crate::extra_macro_lib::handler_fn::lower_handler_fn;
 use crate::ir::{Diagnostics, FamilyIr, IrFamily};
 use crate::macro_core::functions::allow_deprecated_in;
-use crate::macro_core::types::cgp_auto_error::ItemCgpAutoError;
+use crate::macro_core::types::cgp_auto_error::{ItemCgpAutoError, ItemCgpErrorEnum};
 use crate::macro_core::types::cgp_impl::ItemCgpImpl;
 use crate::macro_core::types::cgp_provider::ItemCgpProvider;
 
@@ -28,14 +28,17 @@ pub enum ProviderImpl {
     Handler(Box<ItemCgpHandler>),
     /// `#[cgp_auto_error]`: error-raising methods as error providers.
     AutoError(Box<ItemCgpAutoError>),
+    /// `#[cgp_auto_error]` on an enum: `Display`, `Error`, and `From`.
+    ErrorEnum(Box<ItemCgpErrorEnum>),
 }
 
 impl FamilyIr for ProviderImpl {
     const FAMILY: IrFamily = IrFamily::ProviderImpl;
 
-    /// No family-wide checks yet; each variant still checks while lowering.
     fn validate(&self, diagnostics: &mut Diagnostics) {
-        let _ = diagnostics;
+        if let ProviderImpl::ErrorEnum(item) = self {
+            item.validate(diagnostics);
+        }
     }
 
     /// Generates the provider's items.
@@ -79,6 +82,7 @@ impl FamilyIr for ProviderImpl {
                     #( #items )*
                 })
             }
+            ProviderImpl::ErrorEnum(item) => item.emit(),
         }
     }
 }
