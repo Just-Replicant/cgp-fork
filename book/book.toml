@@ -1,0 +1,14 @@
+[book]
+title = "cgp-fork"
+authors = ["Just Replicant"]
+description = "Compile-time pluggable trait implementations"
+language = "en"
+src = "src"
+
+[rust]
+edition = "2024"
+
+[output.html]
+git-repository-url = "https://github.com/Just-Replicant/cgp-fork"
+edit-url-template = "https://github.com/Just-Replicant/cgp-fork/edit/main/book/{path}"
+default-theme = "navy"

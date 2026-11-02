@@ -1,5 +1,22 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- *(error)* `#[cgp_auto_error]` on an enum derives `Display`, `core::error::Error`,
+  and `From`. `#[error("...")]`, `#[error(transparent)]`, `#[source]`, and `#[from]`
+  follow the usual error-enum shape. The enum form does not build the error
+  providers; the inherent-impl form still does. `#[derive(Debug)]` stays above
+  the attribute (rewrite plan phase 6, ADR 0009).
+- *(xtask)* `cargo xtask migrate` rewrites 0.10 handler imports, paths, and
+  attributes. `--check`, `--guide`, `--explicit-only`, `--keep-async-trait`, and
+  repeatable `--crate`. The migration table in the book is that same list.
+- *(xtask)* `cargo xtask ci` runs nightly fmt, clippy, and tests for both feature sets.
+- *(docs)* `book/` is the guide, the reference, one page per `on_unimplemented`
+  message, and the 0.10 to 1.0 migration page. Its Rust examples compile as
+  doctests.
+
 ## [1.0.0](https://github.com/Just-Replicant/cgp-fork/compare/v0.10.0...v1.0.0) - 2026-11-02
 
 ### Added

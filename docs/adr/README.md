@@ -13,6 +13,7 @@ and its consequences. A record is never rewritten after it is accepted; a later 
 | [0006](0006-handler-unification.md) | One `Handler` and one `AsyncHandler` instead of nine handler components | Accepted |
 | [0007](0007-cgp-async-and-runtimes.md) | `#[cgp_async]` and tokio/smol runtime adapters | Accepted |
 | [0008](0008-new-capabilities.md) | Checked wiring, mocks, profiles, presets, and log backends | Accepted |
+| [0009](0009-docs-and-migration.md) | The book, the migration table, and derived error enums | Accepted |
 
 Statuses: Proposed, Accepted, Superseded by NNNN, Rejected. New records copy the headings of an
 existing one and take the next number.

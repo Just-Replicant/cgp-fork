@@ -11,6 +11,7 @@
 #   bash scripts/compile-time.sh                 # N=200, budget from scripts/compile-budget.txt
 #   N=500 BUDGET_SECS=60 bash scripts/compile-time.sh
 #   RESULT_FILE=secs.txt bash scripts/compile-time.sh   # also write the seconds alone
+#                                                 # (a relative path is the caller's directory)
 #   KEEP_WORK=1 bash scripts/compile-time.sh             # keep the generated crate
 #
 # The trend over time (rolling median of earlier `main` runs) is checked
@@ -102,6 +103,13 @@ RS
   echo "    println!(\"{}\", app.op_${n}(2));"
   echo '}'
 } > "$work/src/main.rs"
+
+# The timed build runs in `$work`, and that directory is removed on exit.
+# A relative RESULT_FILE is the caller's path (CI reads it from the repo root
+# after this script exits), so anchor it before changing directory.
+if [[ -n "${RESULT_FILE:-}" && "$RESULT_FILE" != /* ]]; then
+  RESULT_FILE="$(pwd)/$RESULT_FILE"
+fi
 
 cd "$work"
 # Build dependencies first so only the generated crate is timed. The timed

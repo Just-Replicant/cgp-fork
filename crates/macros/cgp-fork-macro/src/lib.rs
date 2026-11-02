@@ -535,13 +535,21 @@ pub fn cgp_auto_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /**
     `#[cgp_auto_error]` turns a small error definition into the providers for
-    `HasErrorType`, `CanRaiseError`, and `CanWrapError`.
+    `HasErrorType`, `CanRaiseError`, and `CanWrapError`, or derives `Display`
+    and `core::error::Error` for an enum.
 
-    The impl names the provider. `type Error` selects the abstract error type.
-    `raise_error` and `wrap_error` are the provider bodies: a bare `Error` in
-    type position is that abstract error. Wire the generated provider on
-    `ErrorTypeProviderComponent`, `ErrorRaiserComponent`, and
+    On an inherent impl, the impl names the provider. `type Error` selects the
+    abstract error type. `raise_error` and `wrap_error` are the provider bodies:
+    a bare `Error` in type position is that abstract error. Wire the generated
+    provider on `ErrorTypeProviderComponent`, `ErrorRaiserComponent`, and
     `ErrorWrapperComponent`.
+
+    On an enum, add `#[derive(Debug)]`: `core::error::Error` requires it. Every
+    variant carries `#[error("...")]` or `#[error(transparent)]`.
+    `{field}` and `{field:?}` (or `{0}` on a tuple variant) fill the message.
+    `#[source]` is the `Error::source` field. `#[from]` on a one-field variant
+    implies `#[source]` and implements `From`. The attribute does not build the
+    error providers; wire `RaiseFrom` when the context's error is this enum.
 
     ## Example
 
@@ -566,6 +574,31 @@ pub fn cgp_auto_impl(attr: TokenStream, item: TokenStream) -> TokenStream {
             AppError { message: format!("{detail}: {}", error.message) }
         }
     }
+    ```
+
+    ## Enum
+
+    ```rust,ignore
+    # #[derive(Debug)]
+    # struct Detail(String);
+    # impl core::fmt::Display for Detail {
+    #     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    #         f.write_str(&self.0)
+    #     }
+    # }
+    # impl core::error::Error for Detail {}
+    #[derive(Debug)]
+    #[cgp_auto_error]
+    enum AppError {
+        #[error("missing {0}")]
+        Missing(#[source] Detail),
+        #[error("failed")]
+        Failed,
+    }
+
+    let error = AppError::Missing(Detail("n".to_owned()));
+    assert_eq!(error.to_string(), "missing n");
+    assert!(core::error::Error::source(&error).is_some());
     ```
 */
 #[proc_macro_attribute]

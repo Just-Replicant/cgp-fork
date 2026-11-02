@@ -766,6 +766,8 @@ name = "xtask"
 version = "1.0.0"
 dependencies = [
  "cgp-fork-macro-impl",
+ "proc-macro2",
+ "syn 3.0.9",
 ]
 
 [[package]]

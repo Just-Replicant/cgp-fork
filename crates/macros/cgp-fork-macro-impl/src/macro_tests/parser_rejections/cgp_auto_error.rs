@@ -5,7 +5,7 @@
 
 use quote::quote;
 
-use super::assert_macro_rejects;
+use super::{assert_macro_rejects, assert_macro_rejects_with};
 
 #[test]
 fn rejects_attribute_argument() {
@@ -262,5 +262,55 @@ fn rejects_each_malformed_definition_with_its_message() {
 
     for (label, message, item) in cases {
         assert_macro_rejects_with(label, message, run(item));
+    }
+}
+
+#[test]
+fn rejects_a_struct() {
+    assert_macro_rejects_with(
+        "cgp_auto_error on a struct",
+        "apply #[cgp_auto_error] to an inherent impl that names the provider, or to an error enum",
+        || {
+            crate::macro_lib::cgp_auto_error(
+                quote!(),
+                quote!(
+                    struct AppError {
+                        message: String,
+                    }
+                ),
+            )
+        },
+    );
+}
+
+#[test]
+fn reports_every_enum_mistake() {
+    let error = crate::macro_lib::cgp_auto_error(
+        quote!(),
+        quote!(
+            enum AppError {
+                Bare,
+                #[error("no such field {missing}")]
+                Named {
+                    present: String,
+                },
+                #[error(transparent)]
+                Wide(String, String),
+                #[error("same")]
+                First(#[from] String),
+                #[error("same")]
+                Second(#[from] String),
+            }
+        ),
+    )
+    .expect_err("enum mistakes");
+    let text = error.to_compile_error().to_string();
+    for message in [
+        "every variant needs #[error",
+        "`{missing}` is not a field",
+        "exactly one field",
+        "already implements From",
+    ] {
+        assert!(text.contains(message), "missing `{message}` in:\n{text}");
     }
 }
