@@ -1,0 +1,17 @@
+[package]
+name = "xtask"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+publish = false
+description = "Repository tasks. `cargo xtask wiring` prints a CGP wiring graph."
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "xtask"
+path = "src/main.rs"
+
+[dependencies]
+cgp-fork-macro-impl = { workspace = true }

@@ -9,6 +9,7 @@ members = [
     "crates/tests/doctests",
     "crates/tests/renamed-dep",
     "crates/tests/preset-consumer",
+    "xtask",
 ]
 
 [workspace.package]
