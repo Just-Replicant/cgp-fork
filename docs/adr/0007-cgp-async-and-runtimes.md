@@ -32,15 +32,31 @@ proxy method on the concrete context is how `Send` is proved. ADR 0001 (hard for
   cannot be named. A generated forwarder for `#[cgp_async(Send)]` returns the delegate's future
   instead of `async { ….await }`. The async block would capture `&Context`, which is not `Send`
   unless `Context: Sync`, and a generic component could not meet the bound.
-- `AsyncRuntime` is spawn, sleep, and timeout on the runtime value. `HasAsyncRuntime` implements
-  it for every context whose `HasRuntimeType::Runtime` implements it, so those three operations
-  need no extra wiring. `SleepWithRuntime`, `SpawnWithRuntime`, and `TimeoutWithRuntime` are the
-  providers for when the operation itself is wired and replaceable. A timeout's error is
-  `TimeoutElapsed`, raised through `CanRaiseError`.
+- `AsyncRuntime` is spawn, sleep, and timeout on the runtime value. `SleepFuture` and
+  `TimeoutFuture<T>` are associated types: `Send + 'static` futures that do not borrow the
+  runtime. The wait starts when the future is first polled, and dropping it cancels the wait.
+  `HasAsyncRuntime` implements the same operations for every context whose
+  `HasRuntimeType::Runtime` implements `AsyncRuntime`, by returning those associated types, so
+  the three operations need no extra wiring. `CanSleep` and `CanTimeout` are components with
+  the same shape (`type Sleep`, `type Timeout<T>`). They are not `#[cgp_async(Send)]`, because
+  that attribute's future still captures `&self` and would require `Context: Sync` to be
+  spawned. `impl Future + use<Self>` cannot express this on a trait method either: `Self` is an
+  alias, and the opaque type must mention `Self`. `SleepWithRuntime` returns the runtime's
+  `SleepFuture`. `TimeoutWithRuntime` wraps it in `RaisedTimeout`, which stores
+  `fn(TimeoutElapsed) -> Context::Error` and does not store the context, so `Context::Error:
+  'static`. `spawn_task` detaches the task; a panic inside it is discarded.
 - Features `tokio` and `smol` (not part of `default` or `full`) implement `AsyncRuntime` for
   `tokio::runtime::Handle` and for an owned `SmolRuntime`. Both need `std`. The `thumbv7m`
-  feature powerset excludes them, as it already excludes `eyre`. Sleep and timeout futures must
-  be polled on that runtime.
+  feature powerset excludes them, as it already excludes `eyre`. Tokio clones the handle into
+  the future and, on first poll, spawns a task that constructs `tokio::time::sleep` or
+  `tokio::time::timeout` on that handle, so the future can be polled on any thread. Dropping
+  the future aborts the task: dropping a `JoinHandle` only detaches it. Shutting the runtime
+  down while a sleep or timeout is still running panics, and a panic in the timed task is
+  resumed on the waiter. `current_thread` and `multi_thread` build that runtime with the time
+  driver. `SmolRuntime` is `async-executor` plus `async-io` timers. The timeout polls the task
+  first, then the timer. It does not depend on the `smol` meta-crate. Smol sleep and timeout
+  run on the `async-io` reactor; spawned tasks run only while `SmolRuntime::block_on` polls
+  the executor.
 
 ## Consequences
 
@@ -50,4 +66,6 @@ proxy method on the concrete context is how `Send` is proved. ADR 0001 (hard for
 - `cargo test --workspace --all-features` runs the tokio and smol tests. That is the command the
   Linux, macOS, and Windows CI jobs already use.
 - A `Send` bound is still not free on a generic async forwarder. Only the concrete context, or a
-  forwarder that returns the provider's future unchanged, can satisfy it.
+  forwarder that returns the provider's future unchanged, can satisfy it. `CanSleep` and
+  `CanTimeout` name their futures as associated types, so the returned future does not capture
+  `&self`.
