@@ -13,7 +13,7 @@ members = [
 ]
 
 [workspace.package]
-version         = "1.0.0"
+version         = "1.1.0"
 rust-version    = "1.89"
 edition         = "2024"
 license         = "Apache-2.0"
@@ -24,9 +24,9 @@ categories      = ["rust-patterns", "no-std"]
 homepage        = "https://github.com/Just-Replicant/cgp-fork"
 
 [workspace.dependencies]
-cgp-fork       = { version = "1.0.0", path = "./crates/main/cgp-fork" }
-cgp-fork-macro = { version = "1.0.0", path = "./crates/macros/cgp-fork-macro" }
-cgp-fork-macro-impl = { version = "1.0.0", path = "./crates/macros/cgp-fork-macro-impl" }
+cgp-fork       = { version = "1.1.0", path = "./crates/main/cgp-fork" }
+cgp-fork-macro = { version = "1.1.0", path = "./crates/macros/cgp-fork-macro" }
+cgp-fork-macro-impl = { version = "1.1.0", path = "./crates/macros/cgp-fork-macro-impl" }
 
 # A curated subset of `clippy::pedantic`, enforced by CI's `-D warnings`.
 [workspace.lints.clippy]

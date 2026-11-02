@@ -19,7 +19,7 @@ bench   = false
 [dependencies]
 # Renamed on purpose: generated code must name the facade `::cgp`, not `::cgp_fork`
 # (docs/adr/0003-crate-path-resolution.md). Do not add `cgp-fork` under its own name.
-cgp = { package = "cgp-fork", path = "../../main/cgp-fork", version = "1.0.0", features = ["std-error"] }
+cgp = { package = "cgp-fork", path = "../../main/cgp-fork", version = "1.1.0", features = ["std-error"] }
 
 [dev-dependencies]
 futures = { version = "0.3" }

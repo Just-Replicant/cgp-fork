@@ -2,6 +2,56 @@
 
 ## [Unreleased]
 
+## [1.1.0](https://github.com/Just-Replicant/cgp-fork/compare/v0.10.0...v1.1.0) - 2026-11-02
+
+### Added
+
+- *(error)* derive Display, Error, and From for cgp_auto_error enums
+- *(log)* add TracingLogger and DefmtLogger backends
+- *(mock)* generate Mock providers from cgp_component
+- *(wiring)* check tables, cfg profiles, preset override, and inspect consts
+- *(tokio)* spawn timers on Handle and abort them on drop
+- *(prelude)* prefer cgp_async in the core prelude
+- *(core)* re-export cgp_async from the core module
+- *(crate)* expose the tokio and smol adapter modules
+- *(smol)* add the smol runtime adapter
+- *(tokio)* add the tokio runtime adapter
+- *(runtime)* wire ops and providers into the runtime module
+- *(runtime)* add sleep spawn and timeout providers
+- *(runtime)* add sleep spawn and timeout ops
+- *(runtime)* export sleep spawn and timeout traits
+- *(runtime)* add the CanTimeout trait
+- *(runtime)* add the CanSpawn trait
+- *(runtime)* add the CanSleep trait
+- *(crate)* add optional tokio and smol features
+- *(macro)* expose cgp_async and deprecate async_trait
+
+### Changed
+
+- *(smol)* build SmolRuntime on async-executor and async-io
+- *(runtime)* raise timeouts without storing the context
+- *(runtime)* make sleep and timeout futures Send + 'static
+- *(handler)* use cgp_async in handler dispatch
+- *(handler)* use cgp_async in handler components
+- *(handler)* use cgp_async on the Handler component
+- *(handler)* use cgp_async on AsyncComputer
+- *(run)* migrate CanRun to cgp_async and deprecate CanSendRun
+
+### Documentation
+
+- *(macro)* clarify cgp_async futures are not 'static
+
+### Fixed
+
+- *(clippy)* allow large_enum_variant on DelegateKey
+
+### Other
+
+- Merge branch 'main' into phase-5
+- *(async)* migrate async_component to cgp_async
+- *(runtime)* demonstrate the tokio runtime adapter
+- Merge branch 'phase-3-fixes'
+
 ### Added
 
 - *(error)* `#[cgp_auto_error]` on an enum derives `Display`, `core::error::Error`,

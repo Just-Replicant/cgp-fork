@@ -17,5 +17,5 @@ bench   = false
 
 [dependencies]
 # The default crate name, on purpose: `cgp-fork-renamed-dep` imports the same package as `cgp`.
-cgp-fork             = { path = "../../main/cgp-fork", version = "1.0.0" }
+cgp-fork             = { path = "../../main/cgp-fork", version = "1.1.0" }
 cgp-fork-renamed-dep = { path = "../renamed-dep" }
