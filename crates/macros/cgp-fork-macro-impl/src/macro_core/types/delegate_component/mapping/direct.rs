@@ -51,6 +51,7 @@ impl EvalDelegateEntries for DirectDelegateMapping {
                 key: key_type,
                 value: direct_value_type,
                 span,
+                cfgs: key.cfgs,
             });
         }
 

@@ -30,7 +30,7 @@ snapshot_delegate_components! {
         }
     }
     expand_constant_table(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         pub struct ConstantTable<const N: u64>(pub ::core::marker::PhantomData<()>);
         #[diagnostic::do_not_recommend]
         impl<const N: u64> DelegateComponent<ConstantGetterComponent> for ConstantTable<N> {
@@ -44,7 +44,12 @@ snapshot_delegate_components! {
         where
             UseConstant<N>: IsProviderFor<ConstantGetterComponent, __Context__, __Params__>,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const
+            __CGP_WIRING_ConstantTableN_3360141a : & 'static str =
+            "{\"kind\":\"context\",\"context\":\"ConstantTable < N >\",\"generics\":\"< const N : u64 >\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"ConstantGetterComponent\",\"provider\":\"UseConstant < N >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 
@@ -89,7 +94,7 @@ snapshot_delegate_components! {
         }
     }
     expand_count_table(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         pub struct CountTable<const N: usize>(pub ::core::marker::PhantomData<()>);
         #[diagnostic::do_not_recommend]
         impl<const N: usize> DelegateComponent<CounterComponent> for Wrapper<N> {
@@ -115,7 +120,12 @@ snapshot_delegate_components! {
         where
             TimesN<N>: IsProviderFor<String, __Context__, __Params__>,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_WrapperN_891116f1 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"Wrapper < N >\",\"generics\":\"< const N : usize >\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"CounterComponent\",\"provider\":\"UseDelegate < CountTable < N > >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

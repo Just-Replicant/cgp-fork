@@ -2,6 +2,7 @@ use proc_macro2::Span;
 use syn::token::Bracket;
 use syn::{Attribute, Generics, ItemImpl, Type, parse_quote};
 
+use super::super::cfg_wiring::apply_cfgs;
 use crate::macro_core::exports::{DelegateComponent, IsProviderFor};
 use crate::macro_core::functions::{merge_generics, override_item_span, parse_internal};
 
@@ -12,6 +13,8 @@ pub struct EvaluatedDelegateEntry {
     pub generics: Generics,
     pub key: Type,
     pub value: Type,
+    /// `#[cfg(...)]` from `#[cfg_wiring(...)]` on the entry's key.
+    pub cfgs: Vec<Attribute>,
     /// The span the entry's impls are re-spanned onto, so a coherence conflict is
     /// reported on the entry the user wrote. Sourced from the key's original token
     /// rather than the (possibly synthesized) `key` type — see `respan_impl`.
@@ -55,6 +58,7 @@ impl EvaluatedDelegateEntry {
         };
 
         let mut item_impl = self.respan_impl(item_impl)?;
+        apply_cfgs(&mut item_impl, &self.cfgs);
 
         // Keep the other entries of a table out of rustc's "the following other types
         // implement" list when a key is missing (ADR 0005). The attribute's `#` and `[ ]`
@@ -99,7 +103,9 @@ impl EvaluatedDelegateEntry {
             {}
         };
 
-        self.respan_impl(item_impl)
+        let mut item_impl = self.respan_impl(item_impl)?;
+        apply_cfgs(&mut item_impl, &self.cfgs);
+        Ok(item_impl)
     }
 
     /// Re-span the generated impl onto the entry's own span (`self.span`, the
@@ -152,6 +158,8 @@ impl EvaluatedDelegateEntry {
         // is reported on the offending entry rather than the whole
         // `cgp_namespace!` block — critical for a path key, whose synthesized
         // `PathCons<..>` key type otherwise carries the macro's `call_site` span.
-        self.respan_impl(item_impl)
+        let mut item_impl = self.respan_impl(item_impl)?;
+        apply_cfgs(&mut item_impl, &self.cfgs);
+        Ok(item_impl)
     }
 }

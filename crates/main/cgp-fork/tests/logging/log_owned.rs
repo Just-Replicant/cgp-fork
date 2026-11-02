@@ -16,7 +16,7 @@ snapshot_cgp_auto_log! {
     }
 
     expand_can_log_count(output) {
-        insta::assert_snapshot!(output, @r#"
+        insta::assert_snapshot!(output, @"
         pub trait CanLogCount {
             fn log_count(&self, count: u64);
         }
@@ -31,7 +31,7 @@ snapshot_cgp_auto_log! {
                 self.log(__LogCount { count })
             }
         }
-        "#);
+        ");
     }
 }
 
@@ -49,6 +49,7 @@ impl Logger<App, __LogCount> for LogCountToCell {
 }
 
 delegate_components! {
+    #[unchecked]
     App {
         LoggerComponent: LogCountToCell,
     }

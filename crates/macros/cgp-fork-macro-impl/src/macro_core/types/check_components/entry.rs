@@ -1,3 +1,4 @@
+use syn::Attribute;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::token::Colon;
@@ -9,6 +10,7 @@ use crate::macro_core::types::check_components::{
 pub struct CheckEntry {
     pub key: CheckKey,
     pub value: Option<CheckValue>,
+    pub cfgs: Vec<Attribute>,
 }
 
 impl CheckEntry {
@@ -28,6 +30,7 @@ impl CheckEntry {
                         key: component_type.clone(),
                         value: None,
                         span: component_type.span(),
+                        cfgs: self.cfgs.clone(),
                     });
                 } else {
                     let component_params_count = values.len();
@@ -49,6 +52,7 @@ impl CheckEntry {
                                 generics: component_param_generics.clone(),
                             }),
                             span,
+                            cfgs: self.cfgs.clone(),
                         });
                     }
                 }
@@ -57,6 +61,7 @@ impl CheckEntry {
                     key: component_type.clone(),
                     value: None,
                     span: component_type.span(),
+                    cfgs: self.cfgs.clone(),
                 });
             }
         }
@@ -76,9 +81,14 @@ impl Parse for CheckEntry {
             Ok(Self {
                 key,
                 value: Some(value),
+                cfgs: Vec::new(),
             })
         } else {
-            Ok(Self { key, value: None })
+            Ok(Self {
+                key,
+                value: None,
+                cfgs: Vec::new(),
+            })
         }
     }
 }

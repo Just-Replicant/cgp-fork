@@ -1,5 +1,6 @@
-//! `delegate_components!` supports no attributes, so it rejects any attribute it
-//! finds — on the table, on a key, and, crucially, on a key nested inside a
+//! `delegate_components!` accepts `#[unchecked]` on the table and `#[cfg_wiring]`
+//! on the table or a key. It rejects every other attribute — on the table, on a
+//! key, and, crucially, on a key nested inside a
 //! `UseDelegate<new Inner { .. }>` value, which the validator must recurse into
 //! rather than silently drop. It also rejects a braceless `open` header that
 //! lists more than one component, since the braceless form opens exactly one.
@@ -16,6 +17,41 @@
 use quote::quote;
 
 use super::assert_macro_rejects;
+
+#[test]
+fn rejects_override_outside_a_preset() {
+    assert_macro_rejects("override written in a wiring table", || {
+        crate::macro_lib::delegate_components(quote!(
+            App {
+                override GreeterComponent: Loud,
+            }
+        ))
+    });
+}
+
+#[test]
+fn rejects_empty_cfg_wiring() {
+    assert_macro_rejects("cfg_wiring without a predicate", || {
+        crate::macro_lib::delegate_components(quote!(
+            #[cfg_wiring]
+            App {
+                GreeterComponent: Hello,
+            }
+        ))
+    });
+}
+
+#[test]
+fn rejects_unchecked_with_arguments() {
+    assert_macro_rejects("unchecked with arguments", || {
+        crate::macro_lib::delegate_components(quote!(
+            #[unchecked(true)]
+            App {
+                GreeterComponent: Hello,
+            }
+        ))
+    });
+}
 
 #[test]
 fn rejects_attribute_on_table() {

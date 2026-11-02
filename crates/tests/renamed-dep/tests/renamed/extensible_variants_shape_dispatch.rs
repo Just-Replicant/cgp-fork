@@ -145,6 +145,7 @@ fn test_dispatch_contains() {
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ComputerComponent: UseInputDelegate<new AreaComputers {
             [

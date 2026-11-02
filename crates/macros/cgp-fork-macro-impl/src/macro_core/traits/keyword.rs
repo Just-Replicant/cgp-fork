@@ -13,6 +13,11 @@ pub trait PeekKeyword {
 
 impl<'a> PeekKeyword for ParseBuffer<'a> {
     fn peek_keyword<K: IsKeyword>(&self) -> bool {
+        // `override` is a reserved keyword, so it is not an `Ident`.
+        if K::IDENT == "override" {
+            return self.peek(syn::Token![override]);
+        }
+
         if let Ok(ident) = self.fork().parse::<Ident>()
             && ident == K::IDENT
         {

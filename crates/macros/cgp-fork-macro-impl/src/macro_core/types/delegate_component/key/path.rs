@@ -3,6 +3,7 @@ use syn::Attribute;
 use syn::parse::{Parse, ParseStream};
 use syn::token::At;
 
+use super::super::cfg_wiring::cfg_attributes;
 use crate::macro_core::functions::merge_generics;
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::delegate_component::{EvalDelegateKey, EvaluatedDelegateKey};
@@ -44,6 +45,7 @@ impl EvalDelegateKey for PathDelegateKey {
         let paths = self.path.paths();
         let outer_generics = &self.generics;
         let mut keys = Vec::new();
+        let cfgs = cfg_attributes(&self.attributes)?;
 
         for (inner_generics, path) in paths {
             let mut generics = merge_generics(outer_generics, &inner_generics);
@@ -70,6 +72,7 @@ impl EvalDelegateKey for PathDelegateKey {
                 generics,
                 key: key_type,
                 span,
+                cfgs: cfgs.clone(),
             };
 
             keys.push(key);

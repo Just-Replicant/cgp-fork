@@ -33,6 +33,7 @@ macro_rules! backend_app {
         pub struct $app;
 
         delegate_components! {
+            #[unchecked]
             $app {
                 ErrorTypeProviderComponent: $use,
                 [ErrorRaiserComponent, ErrorWrapperComponent]: $raise,

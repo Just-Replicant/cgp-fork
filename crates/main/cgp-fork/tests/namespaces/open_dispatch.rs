@@ -58,7 +58,7 @@ snapshot_delegate_components! {
     }
 
     expand_open_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<FooProviderComponent, Nil>>;
@@ -225,7 +225,22 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        trait __CanUseApp<
+            __Component__,
+            __Params__: ?Sized,
+        >: CanUseComponent<__Component__, __Params__> {}
+        impl __CanUseApp<FooProviderComponent, String> for App {}
+        impl __CanUseApp<BarProviderComponent, u32> for App {}
+        impl __CanUseApp<BarProviderComponent, u64> for App {}
+        impl __CanUseApp<BarProviderComponent, bool> for App {}
+        impl __CanUseApp<BarProviderComponent, usize> for App {}
+        impl __CanUseApp<BarProviderComponent, isize> for App {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_6ff1b36e : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: Nil > , >\",\"cfgs\":[],\"override\":null},{\"component\":\"BarProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < BarProviderComponent, :: cgp_fork :: macro_prelude :: Nil > , >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < String, __Wildcard__ > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < BarProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < u32, __Wildcard__ > >\",\"provider\":\"DummyBar\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < BarProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < u64, __Wildcard__ > >\",\"provider\":\"DummyBar\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < BarProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < bool, __Wildcard__ > >\",\"provider\":\"DummyBar\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < BarProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < usize, __Wildcard__ > >\",\"provider\":\"DummyBar\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < BarProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < isize, __Wildcard__ > >\",\"provider\":\"DummyBar\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

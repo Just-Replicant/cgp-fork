@@ -119,7 +119,7 @@ snapshot_delegate_components! {
     }
 
     expand_combined_forms_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<AreaCalculatorComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<AreaCalculatorComponent, Nil>>;
@@ -292,7 +292,24 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        trait __CanUseApp<
+            __Component__,
+            __Params__: ?Sized,
+        >: CanUseComponent<__Component__, __Params__> {}
+        impl __CanUseApp<BarProviderComponent, ()> for App {}
+        impl __CanUseApp<BazProviderComponent, ()> for App {}
+        impl __CanUseApp<QuuxProviderComponent, ()> for App {}
+        impl __CanUseApp<AreaCalculatorComponent, Rectangle> for App {}
+        impl __CanUseApp<AreaCalculatorComponent, Circle> for App {}
+        impl __CanUseApp<AreaCalculatorComponent, Square> for App {}
+        impl __CanUseApp<AreaCalculatorComponent, Triangle> for App {}
+        impl<'a, T> __CanUseApp<AreaCalculatorComponent, &'a T> for App {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_882fd5cb : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"AreaCalculatorComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < AreaCalculatorComponent, :: cgp_fork :: macro_prelude :: Nil > , >\",\"cfgs\":[],\"override\":null},{\"component\":\"BarProviderComponent\",\"provider\":\"< Bundle as :: cgp_fork :: macro_prelude :: DelegateComponent < BarProviderComponent > > :: Delegate\",\"cfgs\":[],\"override\":null},{\"component\":\"BazProviderComponent\",\"provider\":\"DummyBaz\",\"cfgs\":[],\"override\":null},{\"component\":\"QuuxProviderComponent\",\"provider\":\"DummyBaz\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < AreaCalculatorComponent, :: cgp_fork :: macro_prelude :: PathCons < Rectangle, __Wildcard__ > >\",\"provider\":\"ShapeArea\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < AreaCalculatorComponent, :: cgp_fork :: macro_prelude :: PathCons < Circle, __Wildcard__ > >\",\"provider\":\"ShapeArea\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < AreaCalculatorComponent, :: cgp_fork :: macro_prelude :: PathCons < Square, __Wildcard__ > >\",\"provider\":\"ShapeArea\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < AreaCalculatorComponent, :: cgp_fork :: macro_prelude :: PathCons < Triangle, __Wildcard__ > >\",\"provider\":\"ShapeArea\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < AreaCalculatorComponent, :: cgp_fork :: macro_prelude :: PathCons < & 'a T, __Wildcard__ > >\",\"provider\":\"RefArea\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

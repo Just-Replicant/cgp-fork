@@ -54,6 +54,7 @@ pub struct MyContext {
 }
 
 delegate_components! {
+    #[unchecked]
     MyContext {
         ErrorTypeProviderComponent: UseType<String>,
         HandlerComponent:

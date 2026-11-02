@@ -61,6 +61,7 @@ struct ActionA;
 struct ActionB;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseType<Infallible>,
         RunnerComponent: UseDelegate<new AppRunnerComponents {

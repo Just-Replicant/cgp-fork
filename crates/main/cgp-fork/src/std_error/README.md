@@ -25,6 +25,7 @@ use cgp_fork::std_error::{DisplayBoxedStdError, RaiseBoxedStdError, UseBoxedStdE
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         open ErrorRaiserComponent;
 

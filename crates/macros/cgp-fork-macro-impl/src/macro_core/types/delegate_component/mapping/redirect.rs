@@ -46,6 +46,7 @@ impl EvalDelegateEntries for RedirectDelegateMapping {
                 key: key.key,
                 value: value_type.clone(),
                 span: key.span,
+                cfgs: key.cfgs,
             };
 
             entries.push(entry);

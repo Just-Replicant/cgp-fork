@@ -82,6 +82,11 @@ snapshot_delegate_and_check_components! {
         >: CanUseComponent<__Component__, __Params__> {}
         impl __CanUseMyContext<NameTypeProviderComponent, ()> for MyContext {}
         impl __CanUseMyContext<NameGetterComponent, ()> for MyContext {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_MyContext_499ac32d : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"MyContext\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"NameTypeProviderComponent\",\"provider\":\"UseType < String >\",\"cfgs\":[],\"override\":null},{\"component\":\"NameGetterComponent\",\"provider\":\"UseField < Symbol! (\\\"name\\\") >\",\"cfgs\":[],\"override\":null},{\"component\":\"AgeGetterComponent\",\"provider\":\"UseField < Symbol! (\\\"age\\\") >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
         "#)
     }
 }

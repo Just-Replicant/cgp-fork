@@ -63,6 +63,7 @@ fn match_values_derives_one_handler_per_variant() {
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         HandlerComponent: UseInputDelegate<new AreaHandlers {
             [

@@ -42,7 +42,7 @@ snapshot_delegate_components! {
     }
 
     expand_multi_param_app_b(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for AppB
         where
@@ -128,7 +128,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_AppB_99620904 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"AppB\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < String, :: cgp_fork :: macro_prelude :: PathCons < u64, __Wildcard__ > > > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < bool, :: cgp_fork :: macro_prelude :: PathCons < T, __Wildcard__ > > > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

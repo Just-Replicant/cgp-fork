@@ -56,7 +56,7 @@ snapshot_delegate_components! {
     }
 
     expand_open_later_param(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<DescriberComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<DescriberComponent, Nil>>;
@@ -123,7 +123,18 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        trait __CanUseApp<
+            __Component__,
+            __Params__: ?Sized,
+        >: CanUseComponent<__Component__, __Params__> {}
+        impl<Code> __CanUseApp<DescriberComponent, (Code, u64)> for App {}
+        impl<Code> __CanUseApp<DescriberComponent, (Code, String)> for App {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_7329d0ab : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"DescriberComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < DescriberComponent, :: cgp_fork :: macro_prelude :: Nil > , >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < DescriberComponent, :: cgp_fork :: macro_prelude :: PathCons < Code, :: cgp_fork :: macro_prelude :: PathCons < u64, __Wildcard__ > > >\",\"provider\":\"DescribeNumber\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < DescriberComponent, :: cgp_fork :: macro_prelude :: PathCons < Code, :: cgp_fork :: macro_prelude :: PathCons < String, __Wildcard__ > > >\",\"provider\":\"DescribeText\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

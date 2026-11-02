@@ -21,6 +21,7 @@ pub struct Rejected;
 pub struct PlainApp;
 
 delegate_components! {
+    #[unchecked]
     PlainApp {
         ErrorTypeProviderComponent: UseEyreError,
         [ErrorRaiserComponent, ErrorWrapperComponent]: RaiseEyreError,
@@ -54,6 +55,7 @@ delegate_components! {
 pub struct GenericApp;
 
 delegate_components! {
+    #[unchecked]
     GenericApp {
         ErrorTypeProviderComponent: UseType<Error>,
         ErrorRaiserComponent: RaiseFrom,

@@ -28,6 +28,7 @@ pub struct GreetHello;
 
 snapshot_delegate_components! {
     delegate_components! {
+        #[unchecked]
         new PersonComponents {
             type Name = String,
             getter name,
@@ -36,7 +37,7 @@ snapshot_delegate_components! {
     }
 
     expand_shorthand(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         pub struct PersonComponents;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameTypeProviderComponent> for PersonComponents {
@@ -75,12 +76,18 @@ snapshot_delegate_components! {
         where
             GreetHello: IsProviderFor<GreeterComponent, __Context__, __Params__>,
         {}
-        ");
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const
+            __CGP_WIRING_PersonComponents_f9176d8e : & 'static str =
+            "{\"kind\":\"context\",\"context\":\"PersonComponents\",\"generics\":\"\",\"unchecked\":true,\"cfgs\":[],\"entries\":[{\"component\":\"NameTypeProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: UseType < String >\",\"cfgs\":[],\"override\":null},{\"component\":\"NameGetterComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: UseField < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 'n', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'm', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Nil > > > > > >\",\"cfgs\":[],\"override\":null},{\"component\":\"GreeterComponent\",\"provider\":\"GreetHello\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#);
     }
 }
 
 snapshot_delegate_components! {
     delegate_components! {
+        #[unchecked]
         new ExplicitComponents {
             NameTypeProviderComponent: UseType<String>,
             NameGetterComponent: UseField<Symbol!("name")>,
@@ -127,6 +134,11 @@ snapshot_delegate_components! {
         where
             GreetHello: IsProviderFor<GreeterComponent, __Context__, __Params__>,
         {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const
+            __CGP_WIRING_ExplicitComponents_b5d6bd54 : & 'static str =
+            "{\"kind\":\"context\",\"context\":\"ExplicitComponents\",\"generics\":\"\",\"unchecked\":true,\"cfgs\":[],\"entries\":[{\"component\":\"NameTypeProviderComponent\",\"provider\":\"UseType < String >\",\"cfgs\":[],\"override\":null},{\"component\":\"NameGetterComponent\",\"provider\":\"UseField < Symbol! (\\\"name\\\") >\",\"cfgs\":[],\"override\":null},{\"component\":\"GreeterComponent\",\"provider\":\"GreetHello\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
         "#);
     }
 }

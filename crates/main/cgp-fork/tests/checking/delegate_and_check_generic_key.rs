@@ -105,6 +105,11 @@ snapshot_delegate_and_check_components! {
         impl __CanUseContext<FooTypeProviderComponent, ()> for Context {}
         impl __CanUseContext<BarTypeProviderComponent, ()> for Context {}
         impl<I> __CanUseContext<BarGetterAtComponent<I>, (I, Index<0>)> for Context {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_Context_571310a3 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"Context\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooTypeProviderComponent\",\"provider\":\"UseType < () >\",\"cfgs\":[],\"override\":null},{\"component\":\"BarTypeProviderComponent\",\"provider\":\"UseType < () >\",\"cfgs\":[],\"override\":null},{\"component\":\"BarGetterAtComponent < I >\",\"provider\":\"UseField < Symbol! (\\\"dummy\\\") >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
         "#)
     }
 }

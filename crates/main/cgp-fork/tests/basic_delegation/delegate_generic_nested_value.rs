@@ -18,6 +18,7 @@ pub struct BazKey;
 pub struct BazValue<T>(pub PhantomData<T>);
 
 delegate_components! {
+    #[unchecked]
     new MyComponents {
         FooKey: FooValue,
         <T> BarKey<T>: UseDelegate<new BarValue<T> {

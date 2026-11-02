@@ -1,5 +1,5 @@
 use proc_macro2::Span;
-use syn::{Generics, Type};
+use syn::{Attribute, Generics, Type};
 
 /// A lowered key: the key type plus the generics it introduces. One source key
 /// can yield several of these (array keys, brace groups in a path).
@@ -11,6 +11,8 @@ pub struct EvaluatedDelegateKey {
     /// `@`-path key) whose own span points at the macro `call_site` rather than
     /// at what the user wrote. It becomes the entry's diagnostic span.
     pub span: Span,
+    /// `#[cfg(...)]` attributes from `#[cfg_wiring(...)]` on the key.
+    pub cfgs: Vec<Attribute>,
 }
 
 /// Lower a key form into its evaluated keys.

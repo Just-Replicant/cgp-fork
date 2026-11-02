@@ -12,6 +12,7 @@ use crate::macro_core::parse_internal;
 use crate::macro_core::types::check_components::{
     CheckEntries, EvaluatedCheckEntry, TypeWithGenerics,
 };
+use crate::macro_core::types::delegate_component::apply_cfgs;
 use crate::macro_core::types::generics::ImplGenerics;
 use crate::macro_core::types::ident::PathWithTypeArgs;
 
@@ -64,6 +65,7 @@ impl CheckComponentsTable {
                 key: component_type,
                 value: component_params,
                 span,
+                cfgs,
             } = entry;
 
             let self_types = if let Some(check_providers) = &self.check_providers {
@@ -80,9 +82,16 @@ impl CheckComponentsTable {
                 generics: check_generics,
             } = component_params.unwrap_or_else(|| unit.clone().into());
 
-            let generics = merge_generics(&check_generics.generics, &impl_generics.generics);
+            let mut generics = merge_generics(&check_generics.generics, &impl_generics.generics);
 
-            let impl_generics = generics.split_for_impl().0;
+            if let Some(table_where) = where_clause {
+                generics
+                    .make_where_clause()
+                    .predicates
+                    .extend(table_where.predicates.iter().cloned());
+            }
+
+            let (impl_generics, _, where_clause) = generics.split_for_impl();
 
             for self_type in self_types {
                 // Only the `#[check_providers]` trait takes the context as an argument.
@@ -92,13 +101,14 @@ impl CheckComponentsTable {
                     quote! { #component_type, #component_param }
                 };
 
-                let item_impl: ItemImpl = parse_internal! {
+                let mut item_impl: ItemImpl = parse_internal! {
                     impl #impl_generics
                         #trait_name < #trait_args >
                         for #self_type
                     #where_clause
                     {}
                 };
+                apply_cfgs(&mut item_impl, &cfgs);
 
                 item_impls.push(item_impl);
             }

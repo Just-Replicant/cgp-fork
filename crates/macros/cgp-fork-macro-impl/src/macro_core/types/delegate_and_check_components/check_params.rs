@@ -39,7 +39,20 @@ impl CheckParamsAttribute {
     pub fn record_attributes(attributes: &[Attribute], diagnostics: &mut Diagnostics) -> Self {
         let mut result = Self::Default;
 
-        for (index, attribute) in attributes.iter().enumerate() {
+        let mut index = 0;
+
+        for attribute in attributes {
+            // `#[cfg_wiring]` selects a profile. It is not a check attribute, and a key may
+            // carry it beside `#[check_params]` or `#[skip_check]`.
+            if attribute.path().is_ident("cfg_wiring") {
+                if let Err(error) =
+                    crate::macro_core::types::delegate_component::cfg_attribute(attribute)
+                {
+                    diagnostics.push(error);
+                }
+                continue;
+            }
+
             let parsed = Self::parse_attribute(attribute);
 
             if index == 0 {
@@ -54,6 +67,8 @@ impl CheckParamsAttribute {
             } else {
                 diagnostics.check(parsed);
             }
+
+            index += 1;
         }
 
         result

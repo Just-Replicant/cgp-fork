@@ -115,6 +115,19 @@ use proc_macro::TokenStream;
     `Name<SomeHandler>`. It replaces the deprecated `#[derive_promote(Name)]`, which calls a
     0.10 `Computer`.
 
+    ## `mock`
+
+    `#[cgp_component(Greeter, mock)]`, or `mock: true` in the braced form, also generates
+    `MockGreeter` and `GreeterMock`. The test context stores `GreeterMock` in a `HasField`
+    field named `greeter_mock`. `GreeterMock::greet_returns` queues a value,
+    `greet_with` installs a closure that wins over the queue, and `greet_call_count`
+    reports how many times the method ran. The provider reads that field.
+
+    The methods take `&self` or `&mut self` and return an owned value. Async methods,
+    unsafe methods, generic methods, associated items, references, `impl Trait`, and
+    `Self` are rejected. The items are compiled only when the `mock` feature of
+    `cgp-fork` is on.
+
     ## Deprecation
 
     A `#[deprecated]` attribute on the consumer trait deprecates the provider trait and the
@@ -688,6 +701,21 @@ pub fn cgp_auto_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     `preset Name` expands to one `DelegateComponent` impl for every component
     in that preset. Two presets combine by listing both. An explicit entry for
     the same component overrides the preset. See [`cgp_preset!`](macro@cgp_preset).
+    `override` is a preset entry, not a wiring-table entry.
+
+    ## Checked wiring
+
+    A table whose context is not generic also emits the `check_components!` trait
+    `__CanUse{Context}` for every component it wires, including components that
+    come from a preset. `#[unchecked]` on the table skips that check. A generic
+    table is not checked, because the check parameters default to `()`.
+
+    ## Profiles
+
+    `#[cfg_wiring(predicate)]` on the table or on an entry is `#[cfg(predicate)]`
+    with the same grammar (`test`, `not(test)`, `feature = "mock"`). A table-level
+    predicate is copied onto every generated item. An entry-level predicate gates
+    that entry's wiring and its check.
 
     ## Generating Mapping Struct
 
@@ -832,6 +860,11 @@ pub fn cgp_for_each(body: TokenStream) -> TokenStream {
 
     `PersonPreset` expands to the `Name` type entry and the `name` getter entry.
     An explicit `Key: Provider` entry in the same table overrides the preset.
+
+    `#[version(N)]` stores `pub const VERSION: u64` in the preset module.
+    `override Key: Provider` replaces a component the single parent already wires.
+    With more than one parent, write `override(Parent) Key: Provider`. A preset
+    that overrides a component its parent does not wire fails to compile.
 */
 #[proc_macro]
 pub fn cgp_preset(body: TokenStream) -> TokenStream {

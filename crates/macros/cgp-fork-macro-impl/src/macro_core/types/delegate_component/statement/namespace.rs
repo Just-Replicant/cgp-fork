@@ -48,6 +48,7 @@ impl EvalForEntry for NamespaceDelegateStatement {
             mapping_value: parse_internal!(__Value__),
             namespace: self.ident.clone().into(),
             span: self.ident.span(),
+            cfgs: Vec::new(),
         };
 
         Ok(entry)

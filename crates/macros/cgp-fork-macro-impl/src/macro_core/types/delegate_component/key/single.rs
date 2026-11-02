@@ -2,6 +2,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::{Attribute, Type};
 
+use super::super::cfg_wiring::cfg_attributes;
 use crate::macro_core::types::delegate_component::{EvalDelegateKey, EvaluatedDelegateKey};
 use crate::macro_core::types::generics::ImplGenerics;
 
@@ -35,6 +36,7 @@ impl EvalDelegateKey for SingleDelegateKey {
             generics: self.generics.generics.clone(),
             span: self.ty.span(),
             key: self.ty.clone(),
+            cfgs: cfg_attributes(&self.attributes)?,
         };
 
         Ok(vec![key])

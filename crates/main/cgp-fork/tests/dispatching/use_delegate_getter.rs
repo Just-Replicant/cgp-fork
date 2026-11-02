@@ -593,6 +593,11 @@ mod derive_delegate {
             impl __CanUseMyContext<FooTypeProviderAtComponent, (Index<0>, Index<1>)> for MyContext {}
             impl __CanUseMyContext<FooGetterAtComponent, (Index<1>, Index<0>)> for MyContext {}
             impl __CanUseMyContext<FooGetterAtComponent, (Index<0>, Index<1>)> for MyContext {}
+            ::cgp_fork::__cgp_inspect! {
+                #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_MyContext_43c13b07 : &
+                'static str =
+                "{\"kind\":\"context\",\"context\":\"MyContext\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooTypeProviderAtComponent\",\"provider\":\"UseDelegate < FooTypes >\",\"cfgs\":[],\"override\":null},{\"component\":\"FooGetterAtComponent\",\"provider\":\"UseDelegate < FooGetters >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+            }
             "#)
         }
     }
@@ -635,6 +640,7 @@ mod derive_delegate2 {
 
     snapshot_delegate_components! {
         delegate_components! {
+            #[unchecked]
             MyContext {
                 FooTypeProviderAtComponent: UseDelegate2<
                     new FooTypes {
@@ -729,6 +735,11 @@ mod derive_delegate2 {
                     Symbol!("bar"),
                 >: IsProviderFor<(Index<0>, Index<1>), __Context__, __Params__>,
             {}
+            ::cgp_fork::__cgp_inspect! {
+                #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_MyContext_f8646a0a : &
+                'static str =
+                "{\"kind\":\"context\",\"context\":\"MyContext\",\"generics\":\"\",\"unchecked\":true,\"cfgs\":[],\"entries\":[{\"component\":\"FooTypeProviderAtComponent\",\"provider\":\"UseDelegate2 < FooTypes >\",\"cfgs\":[],\"override\":null},{\"component\":\"FooGetterAtComponent\",\"provider\":\"UseDelegate2 < FooGetters >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+            }
             "#)
         }
     }

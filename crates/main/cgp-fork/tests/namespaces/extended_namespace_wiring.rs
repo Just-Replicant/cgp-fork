@@ -46,7 +46,7 @@ snapshot_delegate_components! {
     }
 
     expand_extended_ns_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for App
         where
@@ -288,7 +288,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_b2c8ae70 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < ErrorTypeProviderComponent, __Wildcard__ > >\",\"provider\":\"UseType < String >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < ErrorRaiserComponent, :: cgp_fork :: macro_prelude :: PathCons < & 'static str, __Wildcard__ > > >\",\"provider\":\"RaiseFrom\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < ErrorRaiserComponent, :: cgp_fork :: macro_prelude :: PathCons < String, __Wildcard__ > > >\",\"provider\":\"RaiseFrom\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < ErrorWrapperComponent, __Wildcard__ > >\",\"provider\":\"RaiseFrom\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'c', :: cgp_fork :: macro_prelude :: Chars < 'g', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 5, :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 'x', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'r', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Nil > > > > > > , :: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 7, :: cgp_fork :: macro_prelude :: Chars < 'h', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'n', :: cgp_fork :: macro_prelude :: Chars < 'd', :: cgp_fork :: macro_prelude :: Chars < 'l', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 'r', :: cgp_fork :: macro_prelude :: Nil > > > > > > > > , :: cgp_fork :: macro_prelude :: PathCons < TryComputerComponent, __Wildcard__ > > > >\",\"provider\":\"Foo\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

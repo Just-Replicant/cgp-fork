@@ -61,6 +61,7 @@ impl EvalDelegateEntries for TypeDelegateShorthand {
             key: self.component_key(),
             value: self.provider_value()?,
             span: self.name.span(),
+            cfgs: Vec::new(),
         }])
     }
 }
@@ -106,6 +107,7 @@ impl EvalDelegateEntries for GetterDelegateShorthand {
             key: self.component_key(),
             value: self.provider_value()?,
             span: self.field.span(),
+            cfgs: Vec::new(),
         }])
     }
 }

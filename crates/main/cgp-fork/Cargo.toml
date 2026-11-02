@@ -43,6 +43,18 @@ std-error = ["alloc"]
 # it does not link the `smol` meta-crate.
 tokio = ["dep:tokio"]
 smol = ["dep:async-executor", "dep:async-io"]
+# Hidden JSON consts on every `delegate_components!` and `cgp_preset!` expansion, for
+# `cargo xtask wiring` and other tools. Off by default; the consts are not emitted
+# into the caller's crate unless this feature is on.
+inspect = []
+# `#[cgp_component(Name, mock)]` providers. Needs `alloc` for the return queue.
+mock = ["alloc"]
+# `TracingLogger` and `TracingDebugLogger` for `CanLog`. `tracing` is built without
+# its default features, so the provider does not pull `std`.
+"log-tracing" = ["dep:tracing"]
+# `DefmtLogger` for `CanLog` on embedded targets. `defmt` is `no_std`.
+# Host builds enable `defmt`'s `unstable-test` feature; see the target table below.
+"log-defmt" = ["dep:defmt"]
 
 [dependencies]
 cgp-fork-macro = { workspace = true }
@@ -62,9 +74,20 @@ tokio = { version = "1", default-features = false, features = ["rt-multi-thread"
 # crates are not dependencies.
 async-executor = { version = "1", optional = true }
 async-io = { version = "2", default-features = false, optional = true }
+tracing = { version = "0.1", default-features = false, optional = true }
+defmt = { version = "0.3", optional = true }
+
+# Host tests and examples link `defmt` without a device logger or its GNU linker
+# script. `unstable-test` stubs those symbols. Firmware (`target_os = "none"`)
+# keeps the real logger.
+[target.'cfg(not(target_os = "none"))'.dependencies]
+defmt = { version = "0.3", optional = true, features = ["unstable-test"] }
 
 [dev-dependencies]
 cgp-fork-macro = { workspace = true, features = ["snapshot"] }
+# Tests that enable `log-tracing` install a subscriber. The library dependency
+# stays `default-features = false`; this copy turns `std` on for those tests.
+tracing = { version = "0.1", features = ["std"] }
 insta = { version = "1" }
 futures = { version = "0.3" }
 trybuild = { version = "1" }
@@ -79,3 +102,15 @@ required-features = ["anyhow", "std-error"]
 [[example]]
 name              = "runtime"
 required-features = ["tokio"]
+
+[[example]]
+name              = "mock"
+required-features = ["mock"]
+
+[[example]]
+name              = "tracing"
+required-features = ["log-tracing"]
+
+[[example]]
+name              = "defmt"
+required-features = ["log-defmt"]

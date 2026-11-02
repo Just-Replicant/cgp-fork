@@ -38,6 +38,7 @@ impl EvalForEntry for InheritNamespaceStatement {
             mapping_value: parse_internal!(__Value__),
             span: self.namespace.ident().span(),
             namespace: self.namespace.clone(),
+            cfgs: Vec::new(),
         };
 
         Ok(for_entry)

@@ -20,6 +20,10 @@ impl ItemDelegateAndCheckComponents {
     pub fn validate(&self, diagnostics: &mut Diagnostics) {
         self.record_check_trait_ident(diagnostics);
         self.table.entries.to_keys_with_check_params(diagnostics);
+        crate::macro_core::types::delegate_component::reject_preset_only_syntax(
+            &self.table.entries,
+            diagnostics,
+        );
     }
 
     pub fn to_check_components(&self) -> syn::Result<CheckComponentsTable> {
@@ -74,6 +78,15 @@ impl ItemDelegateAndCheckComponents {
         let mut seen_check_trait = false;
 
         for attribute in &self.table.attributes {
+            if attribute.path().is_ident("cfg_wiring") {
+                if let Err(error) =
+                    crate::macro_core::types::delegate_component::cfg_attribute(attribute)
+                {
+                    diagnostics.push(error);
+                }
+                continue;
+            }
+
             if !attribute.path().is_ident("check_trait") {
                 diagnostics.push(Error::new(
                     attribute.span(),

@@ -42,6 +42,7 @@ struct App {
 }
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseType<AppError>,
         ErrorRaiserComponent: RaiseFrom,

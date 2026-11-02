@@ -52,6 +52,7 @@ pub struct MyContext {
 }
 
 delegate_components! {
+    #[unchecked]
     MyContext {
         ComputerComponent:
             PipeHandlers<

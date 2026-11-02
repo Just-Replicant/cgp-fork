@@ -61,6 +61,7 @@ export_constructs! {
     ErrorWrapper,
     ErrorWrapperComponent,
     CanLog,
+    PresetContains,
 
     Computer,
 }

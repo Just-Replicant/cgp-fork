@@ -24,7 +24,9 @@ where
 
 pub struct AnyhowApp;
 
+// `ErrorWrapper` is generic. The automatic check uses `()`, which is not a detail.
 delegate_components! {
+    #[unchecked]
     AnyhowApp {
         open ErrorRaiserComponent;
 
@@ -38,6 +40,7 @@ delegate_components! {
 pub struct StdApp;
 
 delegate_components! {
+    #[unchecked]
     StdApp {
         open ErrorRaiserComponent;
 

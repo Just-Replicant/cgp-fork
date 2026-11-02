@@ -48,6 +48,7 @@ pub struct Context {
 // checked below; the `delegate_components!` expansion is snapshotted in
 // `basic_delegation`, so we invoke it plainly here.
 delegate_components! {
+    #[unchecked]
     Context {
         [
             FooTypeProviderComponent,
@@ -95,7 +96,7 @@ snapshot_check_components! {
     }
 
     expand_check_context(output) {
-        insta::assert_snapshot!(output, @r#"
+        insta::assert_snapshot!(output, @"
         trait CanUseContext<
             __Component__,
             __Params__: ?Sized,
@@ -116,6 +117,6 @@ snapshot_check_components! {
         impl CanUseContext2<FooGetterAtComponent, (Index<7>, Index<8>)> for Context {}
         impl CanUseContext2<BarGetterAtComponent, (Index<5>, Index<6>)> for Context {}
         impl CanUseContext2<BarGetterAtComponent, (Index<7>, Index<8>)> for Context {}
-        "#)
+        ")
     }
 }

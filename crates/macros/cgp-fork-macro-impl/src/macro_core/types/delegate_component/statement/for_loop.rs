@@ -97,6 +97,7 @@ impl EvalForEntries for ForDelegateStatement {
                     mapping_key: key.key,
                     mapping_value: value_type.clone(),
                     span: key.span,
+                    cfgs: key.cfgs,
                 };
 
                 entries.push(entry);

@@ -142,6 +142,7 @@ pub struct ActionA;
 pub struct ActionB;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent:
             UseType<Infallible>,

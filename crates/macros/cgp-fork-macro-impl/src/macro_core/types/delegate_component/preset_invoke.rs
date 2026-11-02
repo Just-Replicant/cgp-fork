@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Generics, Ident, Path, Type};
+use syn::{Attribute, Generics, Ident, Path, Type};
 
 use crate::macro_core::exports::{DelegateComponent, IsProviderFor};
 
@@ -58,6 +58,42 @@ pub fn invoke_with_components(
     }
 }
 
+/// Emits one check-trait impl per component the preset carries, skipping `exclude`.
+///
+/// The check trait is the one [`super::default_check`] defined for the context. Preset
+/// keys are not known while `delegate_components!` parses, so the preset's own
+/// `with_components!` macro is what repeats the impl.
+pub fn invoke_preset_checks(
+    preset_module: &Path,
+    trait_name: &Ident,
+    context: &Type,
+    exclude: &[Type],
+) -> TokenStream {
+    let root = crate::crate_path::crate_root();
+
+    quote! {
+        #preset_module::with_components! {
+            @ #root::prelude::cgp_for_each,
+            exclude [ #(#exclude),* ],
+            __Component__ => {
+                impl #trait_name<__Component__, ()> for #context {}
+            }
+        }
+    }
+}
+
+/// One key a preset exposes, with the `#[cfg]` attributes from `#[cfg_wiring]`.
+///
+/// `fallback` is the parent an `override` replaces. A cfg-gated override stays in
+/// the replay when the predicate is false, because a `not(cfg)` impl forwards that
+/// key to the parent. A cfg-gated key that is not an override is absent when the
+/// predicate is false, so the replay and the consumer check are gated with it.
+pub struct ComponentKey {
+    pub ty: Type,
+    pub cfgs: Vec<Attribute>,
+    pub fallback: Option<Path>,
+}
+
 /// The `with_components!` macro a preset module exports. It repeats `body` for
 /// each of the preset's own keys, then forwards to each parent preset.
 ///
@@ -65,12 +101,50 @@ pub fn invoke_with_components(
 /// re-export it. A plain `macro_rules` cannot be `pub`.
 pub fn define_with_components_macro(
     macro_name: &Ident,
-    keys: &[Type],
+    keys: &[ComponentKey],
     parents: &[Path],
 ) -> TokenStream {
     // `@ $for_each` is the `cgp_for_each` path of the crate that expands the macro, passed by
     // [`invoke_with_components`]. Baking `::cgp_fork` in here would name the facade as the
     // preset's own crate sees it.
+    // A child's own keys are excluded from every parent, so an `override` does not
+    // emit the parent's provider for the same component. The override's fallback impl
+    // is emitted beside this macro, under the negated cfg.
+    let all_keys: Vec<&Type> = keys.iter().map(|key| &key.ty).collect();
+    let inherited_exclude = quote! { $($exclude,)* #(#all_keys),* };
+    let always: Vec<&Type> = keys
+        .iter()
+        .filter(|key| key.cfgs.is_empty() || key.fallback.is_some())
+        .map(|key| &key.ty)
+        .collect();
+    let gated: Vec<&ComponentKey> = keys
+        .iter()
+        .filter(|key| !key.cfgs.is_empty() && key.fallback.is_none())
+        .collect();
+    let always_expand = if always.is_empty() {
+        TokenStream::new()
+    } else {
+        quote! {
+            $for_each! {
+                [ #(#always),* ],
+                exclude [ $($exclude),* ],
+                $ph => { $($body)* }
+            }
+        }
+    };
+    let gated_expand = gated.iter().map(|key| {
+        let ty = &key.ty;
+        let cfgs = &key.cfgs;
+        quote! {
+            #(#cfgs)*
+            $for_each! {
+                [ #ty ],
+                exclude [ $($exclude),* ],
+                $ph => { $($body)* }
+            }
+        }
+    });
+
     quote! {
         #[macro_export]
         #[doc(hidden)]
@@ -79,15 +153,12 @@ pub fn define_with_components_macro(
                 #macro_name! { @ $for_each, exclude [], $ph => { $($body)* } }
             };
             ( @ $for_each:path, exclude [ $($exclude:ty),* $(,)? ], $ph:ident => { $($body:tt)* } ) => {
-                $for_each! {
-                    [ #(#keys),* ],
-                    exclude [ $($exclude),* ],
-                    $ph => { $($body)* }
-                }
+                #always_expand
+                #(#gated_expand)*
                 #(
                     #parents::with_components! {
                         @ $for_each,
-                        exclude [ $($exclude),* ],
+                        exclude [ #inherited_exclude ],
                         $ph => { $($body)* }
                     }
                 )*

@@ -37,6 +37,7 @@ async fn add_with_error(a: u64, b: u64) -> Result<u64, String> {
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent:
             UseType<String>,

@@ -1,4 +1,8 @@
+mod cfg_wiring;
+mod default_check;
+mod dispatch_check;
 mod entries;
+mod inspect;
 mod key;
 mod mapping;
 mod preset_invoke;
@@ -7,7 +11,10 @@ mod table;
 mod validate_attributes;
 mod value;
 
+pub use cfg_wiring::*;
+pub use default_check::*;
 pub use entries::*;
+pub use inspect::*;
 pub use key::*;
 pub use mapping::*;
 pub use preset_invoke::*;

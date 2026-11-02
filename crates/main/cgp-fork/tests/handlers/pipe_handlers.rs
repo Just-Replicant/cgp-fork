@@ -63,6 +63,7 @@ pub struct MyContext {
 }
 
 delegate_components! {
+    #[unchecked]
     MyContext {
         ErrorTypeProviderComponent: UseType<Infallible>,
         HandlerComponent:

@@ -92,6 +92,7 @@ use core::marker::PhantomData;
     pub struct App;
 
     delegate_components! {
+        #[unchecked]
         App {
             FormatterComponent: UseDelegate<new FormatterTable {
                 u32: FormatDisplay,

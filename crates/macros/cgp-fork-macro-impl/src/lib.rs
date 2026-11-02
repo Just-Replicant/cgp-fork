@@ -27,6 +27,8 @@ pub mod ir;
 pub mod macro_lib;
 #[doc(hidden)]
 pub mod registry;
+#[doc(hidden)]
+pub mod wiring;
 
 mod extra_macro_core;
 mod macro_core;

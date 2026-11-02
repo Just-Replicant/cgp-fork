@@ -1,5 +1,5 @@
 use syn::punctuated::Punctuated;
-use syn::{Type, parse_quote};
+use syn::{Attribute, Type, parse_quote};
 
 use crate::macro_core::types::check_components::{
     CheckEntries, CheckEntry, CheckKey, CheckValue, TypeWithGenerics,
@@ -15,6 +15,9 @@ pub struct KeyWithCheckParams {
     pub key_type: Type,
     pub generics: ImplGenerics,
     pub check_params: CheckParamsAttribute,
+    /// `#[cfg(...)]` from `#[cfg_wiring(...)]` on the key. The check impl is gated
+    /// the same way as the wiring impl, so a profile that is off is not checked.
+    pub cfgs: Vec<Attribute>,
 }
 
 impl KeyWithCheckParams {
@@ -38,6 +41,7 @@ impl KeyWithCheckParams {
                 let entry = CheckEntry {
                     key: CheckKey::Single(self.key_type.clone()),
                     value,
+                    cfgs: self.cfgs.clone(),
                 };
 
                 CheckEntries {
@@ -55,6 +59,7 @@ impl KeyWithCheckParams {
                             ty: param.clone(),
                             generics: self.generics.clone(),
                         }))),
+                        cfgs: self.cfgs.clone(),
                     });
                 }
 

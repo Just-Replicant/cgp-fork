@@ -42,6 +42,7 @@ impl EvalDelegateEntries for NormalDelegateMapping {
                 key: key.key,
                 value: value_type.clone(),
                 span: key.span,
+                cfgs: key.cfgs,
             });
         }
 

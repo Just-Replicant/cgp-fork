@@ -76,7 +76,7 @@ snapshot_delegate_components! {
     }
 
     expand_redirect_mapping_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for App {
             type Delegate = RedirectLookup<App, PathCons<FooProviderComponent, Nil>>;
@@ -229,7 +229,19 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        trait __CanUseApp<
+            __Component__,
+            __Params__: ?Sized,
+        >: CanUseComponent<__Component__, __Params__> {}
+        impl __CanUseApp<FooProviderComponent, String> for App {}
+        impl __CanUseApp<BarProviderComponent, ()> for App {}
+        impl __CanUseApp<BazProviderComponent, ()> for App {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_a19fae0b : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: Nil > >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < String, __Wildcard__ > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null},{\"component\":\"BarProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 6, :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 'h', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'r', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 'd', :: cgp_fork :: macro_prelude :: Nil > > > > > > > , :: cgp_fork :: macro_prelude :: Nil > >\",\"cfgs\":[],\"override\":null},{\"component\":\"BazProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < App, :: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 6, :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 'h', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'r', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 'd', :: cgp_fork :: macro_prelude :: Nil > > > > > > > , :: cgp_fork :: macro_prelude :: Nil > >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 6, :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 'h', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'r', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 'd', :: cgp_fork :: macro_prelude :: Nil > > > > > > > , __Wildcard__ >\",\"provider\":\"DummyImpl\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 
@@ -256,7 +268,7 @@ snapshot_delegate_components! {
     }
 
     expand_redirect_mapping_open_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for OpenApp {
             type Delegate = RedirectLookup<OpenApp, PathCons<FooProviderComponent, Nil>>;
@@ -294,7 +306,17 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        trait __CanUseOpenApp<
+            __Component__,
+            __Params__: ?Sized,
+        >: CanUseComponent<__Component__, __Params__> {}
+        impl __CanUseOpenApp<FooProviderComponent, String> for OpenApp {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_OpenApp_c6d50956 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"OpenApp\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < OpenApp, :: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: Nil > , >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < String, __Wildcard__ > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

@@ -1,5 +1,5 @@
 // The wired provider needs `HasName`, which the context does not provide.
-// `check_components!` reports the missing dependency at the wiring.
+// Both the default check and `check_components!` report that at the wiring.
 use cgp_fork::prelude::*;
 
 #[cgp_component(Greeter)]

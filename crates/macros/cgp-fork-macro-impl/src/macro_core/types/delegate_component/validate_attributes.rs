@@ -1,5 +1,5 @@
+use super::cfg_wiring::{read_table_flags, validate_key_attributes};
 use crate::ir::Diagnostics;
-use crate::macro_core::functions::record_unsupported_attributes;
 use crate::macro_core::types::delegate_component::{
     DelegateEntries, DelegateKey, DelegateMapping, DelegateStatement, DelegateTable, DelegateValue,
     DelegateValueWithInnerTable, ForDelegateStatement, MultiDelegateKey, PathDelegateKey,
@@ -9,9 +9,9 @@ use crate::macro_core::types::delegate_component::{
 /**
     Validate that the attributes in the delegate table constructs are valid.
 
-    At the moment, no attribute is supported, so all attributes are rejected. The walk
-    does not stop at the first error: every illegal attribute in the table is recorded in
-    `diagnostics`, so one compile reports all of them.
+    A key may carry `#[cfg_wiring(...)]`. A `delegate_components!` table may also carry
+    `#[unchecked]`. Every other attribute is rejected. The walk does not stop at the
+    first error: every illegal attribute in the table is recorded in `diagnostics`.
 */
 pub trait ValidateAttributes {
     fn validate_attributes(&self, diagnostics: &mut Diagnostics);
@@ -19,13 +19,13 @@ pub trait ValidateAttributes {
 
 impl ValidateAttributes for SingleDelegateKey {
     fn validate_attributes(&self, diagnostics: &mut Diagnostics) {
-        record_unsupported_attributes(&self.attributes, diagnostics);
+        validate_key_attributes(&self.attributes, diagnostics);
     }
 }
 
 impl ValidateAttributes for MultiDelegateKey {
     fn validate_attributes(&self, diagnostics: &mut Diagnostics) {
-        record_unsupported_attributes(&self.attributes, diagnostics);
+        validate_key_attributes(&self.attributes, diagnostics);
 
         for key in &self.keys {
             key.validate_attributes(diagnostics);
@@ -35,7 +35,7 @@ impl ValidateAttributes for MultiDelegateKey {
 
 impl ValidateAttributes for PathDelegateKey {
     fn validate_attributes(&self, diagnostics: &mut Diagnostics) {
-        record_unsupported_attributes(&self.attributes, diagnostics);
+        validate_key_attributes(&self.attributes, diagnostics);
     }
 }
 
@@ -81,10 +81,12 @@ impl ValidateAttributes for DelegateMapping {
             }
             // A Redirect value is a bare `@`-path with no inner table.
             DelegateMapping::Redirect(mapping) => mapping.key.validate_attributes(diagnostics),
-            // Shorthand and preset entries carry no attributes.
+            // Shorthand and preset entries carry no attributes. An override validates
+            // the entry it wraps.
             DelegateMapping::TypeShorthand(_)
             | DelegateMapping::GetterShorthand(_)
             | DelegateMapping::Preset(_) => {}
+            DelegateMapping::Override(entry) => entry.entry.validate_attributes(diagnostics),
         }
     }
 }
@@ -124,7 +126,10 @@ impl ValidateAttributes for DelegateEntries {
 
 impl ValidateAttributes for DelegateTable {
     fn validate_attributes(&self, diagnostics: &mut Diagnostics) {
-        record_unsupported_attributes(&self.attributes, diagnostics);
+        // `#[unchecked]` and `#[cfg_wiring]` are legal on `delegate_components!` only.
+        // Presets validate their entries directly and never call this impl.
+        let _flags = read_table_flags(&self.attributes, diagnostics);
         self.entries.validate_attributes(diagnostics);
+        super::default_check::reject_preset_only_syntax(&self.entries, diagnostics);
     }
 }

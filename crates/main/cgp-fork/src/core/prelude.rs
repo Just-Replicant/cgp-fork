@@ -14,8 +14,8 @@ pub use cgp_fork_macro::{
 
 pub use crate::core::base::macro_prelude::{ConcatPath, PathCons};
 pub use crate::core::component::{
-    CanUseComponent, DefaultNamespace, DelegateComponent, IsProviderFor, RedirectLookup,
-    UseContext, UseDelegate, UseFields, WithContext, WithProvider,
+    CanUseComponent, DefaultNamespace, DelegateComponent, IsProviderFor, PresetContains,
+    RedirectLookup, UseContext, UseDelegate, UseFields, WithContext, WithProvider,
 };
 pub use crate::core::error::{CanRaiseError, CanWrapError, HasErrorType};
 // The 0.10 names of the access modes and of their trait, kept so existing imports resolve.

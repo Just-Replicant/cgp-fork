@@ -59,6 +59,7 @@ impl HasScalarType for Types {
 }
 
 delegate_components! {
+    #[unchecked]
     Rectangle {
         ErrorTypeProviderComponent:
             UseType<Infallible>,

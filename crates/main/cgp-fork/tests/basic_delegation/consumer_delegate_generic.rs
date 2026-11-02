@@ -24,6 +24,7 @@ pub struct App {
 }
 
 delegate_components! {
+    #[unchecked]
     App {
         ValueGetterComponent<String>: UseField<Symbol!("name")>,
     }

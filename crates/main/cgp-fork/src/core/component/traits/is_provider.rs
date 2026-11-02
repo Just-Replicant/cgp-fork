@@ -126,6 +126,7 @@
    pub struct MyAppComponents;
 
    delegate_components! {
+       #[unchecked]
        MyAppComponents {
            FooGetterAtComponent: GetFooValue,
        }

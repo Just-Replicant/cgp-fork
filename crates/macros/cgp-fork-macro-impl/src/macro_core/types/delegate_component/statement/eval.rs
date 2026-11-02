@@ -1,5 +1,5 @@
 use proc_macro2::Span;
-use syn::{Generics, Ident, Type};
+use syn::{Attribute, Generics, Ident, Type};
 
 use crate::macro_core::parse_internal;
 use crate::macro_core::types::delegate_component::{EvalDelegateEntry, EvaluatedDelegateEntry};
@@ -30,6 +30,8 @@ pub struct EvaluatedForEntry {
     /// user token behind the statement (the `namespace` name, or a `for` mapping's
     /// key) since `mapping_key` may be a synthesized `__Key__`.
     pub span: Span,
+    /// `#[cfg(...)]` carried from the mapping key inside a `for` loop.
+    pub cfgs: Vec<Attribute>,
 }
 
 /// Lower every for-entry a `namespace`/`for` statement produces into evaluated
@@ -88,6 +90,7 @@ impl EvalDelegateEntry for EvaluatedForEntry {
             key: self.mapping_key.clone(),
             value: self.mapping_value.clone(),
             span: self.span,
+            cfgs: self.cfgs.clone(),
         };
 
         Ok(entry)

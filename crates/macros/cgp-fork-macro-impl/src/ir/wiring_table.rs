@@ -1,14 +1,17 @@
 //! The `WiringTable` IR family: wiring tables, their checks, and presets.
 
 use proc_macro2::TokenStream;
-use quote::{ToTokens, quote};
+use quote::quote;
 
 use crate::ir::{Diagnostics, FamilyIr, IrFamily};
 use crate::macro_core::types::cgp_for_each::CgpForEach;
 use crate::macro_core::types::cgp_preset::ItemCgpPreset;
 use crate::macro_core::types::check_components::CheckComponentsTables;
 use crate::macro_core::types::delegate_and_check_components::ItemDelegateAndCheckComponents;
-use crate::macro_core::types::delegate_component::{DelegateTable, ValidateAttributes};
+use crate::macro_core::types::delegate_component::{
+    DelegateTable, ValidateAttributes, prefix_item_cfgs, read_table_flags, table_cfgs,
+    table_inspect_item,
+};
 
 /// A wiring table or a check of one.
 pub enum WiringTable {
@@ -37,7 +40,10 @@ impl FamilyIr for WiringTable {
         match self {
             WiringTable::Delegate(table) => table.validate_attributes(diagnostics),
             WiringTable::DelegateAndCheck(item) => item.validate(diagnostics),
-            WiringTable::Preset(item) => item.entries.validate_attributes(diagnostics),
+            WiringTable::Preset(item) => {
+                item.entries.validate_attributes(diagnostics);
+                item.validate_overrides(diagnostics);
+            }
             WiringTable::Check(_) | WiringTable::ForEach(_) => {}
         }
     }
@@ -45,19 +51,42 @@ impl FamilyIr for WiringTable {
     /// Generates the wiring impls and check traits.
     fn emit(self) -> syn::Result<TokenStream> {
         match self {
-            WiringTable::Delegate(table) => Ok(table.eval()?.to_token_stream()),
+            WiringTable::Delegate(table) => {
+                let mut diagnostics = Diagnostics::new();
+                let flags = read_table_flags(&table.attributes, &mut diagnostics);
+                diagnostics.finish()?;
+
+                let evaluated = table.eval()?;
+                let check = crate::macro_core::types::delegate_component::default_check(&table)?;
+                let inspect =
+                    crate::macro_core::types::delegate_component::table_inspect_item(&table)?;
+
+                prefix_item_cfgs(
+                    &flags.cfgs,
+                    quote! {
+                        #evaluated
+                        #check
+                        #inspect
+                    },
+                )
+            }
             WiringTable::DelegateAndCheck(item) => {
+                let cfgs = table_cfgs(&item.table.attributes)?;
                 let check_table = item.to_check_components()?;
-
                 let evaluated_table = item.table.eval()?;
-
                 let check_items = check_table.to_items()?;
+                let inspect = table_inspect_item(&item.table)?;
 
-                Ok(quote! {
-                    #evaluated_table
+                prefix_item_cfgs(
+                    &cfgs,
+                    quote! {
+                        #evaluated_table
 
-                    #( #check_items )*
-                })
+                        #( #check_items )*
+
+                        #inspect
+                    },
+                )
             }
             WiringTable::Check(tables) => {
                 let items = tables.to_items()?;

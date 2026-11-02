@@ -48,6 +48,7 @@ where
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseType<String>,
         AsyncHandlerComponent: Pipe<Product![AddOneAsync, Promote<Square>]>,

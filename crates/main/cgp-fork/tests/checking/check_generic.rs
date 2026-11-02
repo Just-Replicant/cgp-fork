@@ -47,6 +47,7 @@ pub struct Context {
 // the `delegate_components!` expansion is snapshotted in `basic_delegation`, so we
 // invoke it plainly here.
 delegate_components! {
+    #[unchecked]
     Context {
         [
             FooTypeProviderComponent,

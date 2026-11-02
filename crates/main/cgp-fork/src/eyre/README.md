@@ -22,6 +22,7 @@ use cgp_fork::eyre::{DisplayEyreError, RaiseEyreError, UseEyreError};
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         open ErrorRaiserComponent;
 

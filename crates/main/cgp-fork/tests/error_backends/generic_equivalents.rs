@@ -15,6 +15,7 @@ use cgp_fork::prelude::*;
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseType<cgp_fork::anyhow::Error>,
         ErrorRaiserComponent: RaiseFrom,

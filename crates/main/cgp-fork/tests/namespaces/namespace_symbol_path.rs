@@ -191,7 +191,7 @@ snapshot_delegate_components! {
     }
 
     expand_symbol_path_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for App
         where
@@ -299,7 +299,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_069d87a8 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 6, :: cgp_fork :: macro_prelude :: Chars < 'm', :: cgp_fork :: macro_prelude :: Chars < 'y', :: cgp_fork :: macro_prelude :: Chars < '_', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > > > > , :: cgp_fork :: macro_prelude :: PathCons < MyFooComponent, __Wildcard__ > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 6, :: cgp_fork :: macro_prelude :: Chars < 'm', :: cgp_fork :: macro_prelude :: Chars < 'y', :: cgp_fork :: macro_prelude :: Chars < '_', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Chars < 'p', :: cgp_fork :: macro_prelude :: Nil > > > > > > > , :: cgp_fork :: macro_prelude :: PathCons < MyBarComponent, __Wildcard__ > >\",\"provider\":\"DummyBar\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

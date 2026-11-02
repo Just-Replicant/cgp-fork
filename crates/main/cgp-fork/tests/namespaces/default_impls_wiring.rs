@@ -39,7 +39,7 @@ snapshot_delegate_components! {
     }
 
     expand_default_impls_app_a(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for AppA
         where
@@ -131,7 +131,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_AppA_be4bc3b4 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"AppA\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Nil > > > > > , :: cgp_fork :: macro_prelude :: PathCons < ShowImplComponent, :: cgp_fork :: macro_prelude :: PathCons < T, __Wildcard__ > > >\",\"provider\":\"Provider\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Nil > > > > > , :: cgp_fork :: macro_prelude :: PathCons < ShowImplComponent, :: cgp_fork :: macro_prelude :: PathCons < u64, __Wildcard__ > > >\",\"provider\":\"ShowWithDisplay\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 
@@ -158,7 +163,7 @@ snapshot_delegate_components! {
     }
 
     expand_default_impls_app_b(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for AppB
         where
@@ -217,7 +222,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_AppB_1f986a13 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"AppB\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Nil > > > > > , :: cgp_fork :: macro_prelude :: PathCons < ShowImplComponent, :: cgp_fork :: macro_prelude :: PathCons < T, __Wildcard__ > > >\",\"provider\":\"Provider\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 
@@ -247,7 +257,7 @@ snapshot_delegate_components! {
     }
 
     expand_default_impls_app_c(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for AppC
         where
@@ -339,7 +349,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_AppC_ab0bb906 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"AppC\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Nil > > > > > , :: cgp_fork :: macro_prelude :: PathCons < ShowImplComponent, :: cgp_fork :: macro_prelude :: PathCons < T, __Wildcard__ > > >\",\"provider\":\"Provider\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Nil > > > > > , :: cgp_fork :: macro_prelude :: PathCons < ShowImplComponent, :: cgp_fork :: macro_prelude :: PathCons < u64, __Wildcard__ > > >\",\"provider\":\"ShowWithDisplay\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

@@ -19,6 +19,7 @@ pub struct Components;
 
 snapshot_delegate_components! {
     delegate_components! {
+        #[unchecked]
         Components {
             FooKey: FooValue,
             [
@@ -30,7 +31,7 @@ snapshot_delegate_components! {
     }
 
     expand_components(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooKey> for Components {
             type Delegate = FooValue;
@@ -58,7 +59,12 @@ snapshot_delegate_components! {
         where
             BarValue: IsProviderFor<BazKey, __Context__, __Params__>,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_Components_286b6974 :
+            & 'static str =
+            "{\"kind\":\"context\",\"context\":\"Components\",\"generics\":\"\",\"unchecked\":true,\"cfgs\":[],\"entries\":[{\"component\":\"FooKey\",\"provider\":\"FooValue\",\"cfgs\":[],\"override\":null},{\"component\":\"BarKey\",\"provider\":\"BarValue\",\"cfgs\":[],\"override\":null},{\"component\":\"BazKey\",\"provider\":\"BarValue\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

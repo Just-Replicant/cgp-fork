@@ -10,4 +10,6 @@ define_keyword!(Getter, "getter");
 
 define_keyword!(Preset, "preset");
 
+define_keyword!(Override, "override");
+
 define_keyword!(Exclude, "exclude");

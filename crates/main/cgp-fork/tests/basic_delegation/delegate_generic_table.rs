@@ -38,7 +38,7 @@ snapshot_delegate_components! {
         }
     }
     expand_components(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<'a, T1: Clone> DelegateComponent<FooKey<T1>> for Components {
             type Delegate = FooValue;
@@ -79,7 +79,12 @@ snapshot_delegate_components! {
         where
             BarValue<T1>: IsProviderFor<BazKey<T1, T2>, __Context__, __Params__>,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_Components_6e2d8526 :
+            & 'static str =
+            "{\"kind\":\"context\",\"context\":\"Components\",\"generics\":\"< 'a, T1 : Clone >\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooKey < T1 >\",\"provider\":\"FooValue\",\"cfgs\":[],\"override\":null},{\"component\":\"BarKey < 'a, T1 >\",\"provider\":\"BarValue < T1 >\",\"cfgs\":[],\"override\":null},{\"component\":\"BazKey < T1, T2 >\",\"provider\":\"BarValue < T1 >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

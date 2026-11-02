@@ -142,7 +142,7 @@ snapshot_delegate_components! {
     }
 
     expand_redirect_app(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<__Key__, __Value__> DelegateComponent<__Key__> for App
         where
@@ -193,7 +193,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_App_1c86bf7b : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"App\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"__Key__\",\"provider\":\"__Value__\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'b', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'r', :: cgp_fork :: macro_prelude :: Nil > > > > , :: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 3, :: cgp_fork :: macro_prelude :: Chars < 'b', :: cgp_fork :: macro_prelude :: Chars < 'a', :: cgp_fork :: macro_prelude :: Chars < 'z', :: cgp_fork :: macro_prelude :: Nil > > > > , __Wildcard__ > >\",\"provider\":\"TestProvider\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

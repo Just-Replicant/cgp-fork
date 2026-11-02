@@ -41,6 +41,15 @@ where
     K: IsKeyword,
 {
     fn parse(input: ParseStream) -> syn::Result<Self> {
+        // `override` is a reserved keyword, so it is not an `Ident`.
+        if K::IDENT == "override" {
+            let token: syn::Token![override] = input.parse()?;
+            return Ok(Self {
+                span: token.span,
+                phantom: PhantomData,
+            });
+        }
+
         let ident: Ident = input.parse()?;
 
         if ident != K::IDENT {

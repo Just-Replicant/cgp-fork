@@ -136,6 +136,11 @@ snapshot_delegate_and_check_components! {
         impl __CanUseContext<BarGetterAtComponent, (Index<7>, Index<8>)> for Context {}
         impl __CanUseContext<BarGetterAtComponent, (Index<0>, Index<1>)> for Context {}
         impl __CanUseContext<BarGetterAtComponent, (Index<1>, Index<0>)> for Context {}
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_Context_23e51ec4 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"Context\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\"FooTypeProviderComponent\",\"provider\":\"UseType < () >\",\"cfgs\":[],\"override\":null},{\"component\":\"BarTypeProviderComponent\",\"provider\":\"UseType < () >\",\"cfgs\":[],\"override\":null},{\"component\":\"FooGetterAtComponent\",\"provider\":\"UseField < Symbol! (\\\"dummy\\\") >\",\"cfgs\":[],\"override\":null},{\"component\":\"BarGetterAtComponent\",\"provider\":\"UseField < Symbol! (\\\"dummy\\\") >\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
         "#)
     }
 }

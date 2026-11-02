@@ -146,6 +146,7 @@ impl<Context, Shape: HasArea> AreaCalculator<Context, Shape> for ComputeArea {
 pub struct MyContext;
 
 delegate_components! {
+    #[unchecked]
     MyContext {
         AreaCalculatorComponent: ComputeArea,
     }

@@ -38,7 +38,7 @@ snapshot_delegate_components! {
     }
 
     expand_for_where(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl<
             __Wildcard__,
@@ -82,6 +82,11 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_WhereApp_5a3b1426 : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"WhereApp\",\"generics\":\"\",\"unchecked\":false,\"cfgs\":[],\"entries\":[{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < :: cgp_fork :: macro_prelude :: Symbol < 4, :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Chars < 'e', :: cgp_fork :: macro_prelude :: Chars < 's', :: cgp_fork :: macro_prelude :: Chars < 't', :: cgp_fork :: macro_prelude :: Nil > > > > > , :: cgp_fork :: macro_prelude :: PathCons < ShowImplComponent, :: cgp_fork :: macro_prelude :: PathCons < T, __Wildcard__ > > >\",\"provider\":\"Provider\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }

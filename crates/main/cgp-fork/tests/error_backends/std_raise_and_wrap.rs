@@ -14,6 +14,7 @@ use cgp_fork::std_error::{Error, RaiseBoxedStdError, UseBoxedStdError, WrapError
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseBoxedStdError,
         ErrorRaiserComponent: RaiseBoxedStdError,

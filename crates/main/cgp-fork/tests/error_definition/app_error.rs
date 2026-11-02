@@ -93,6 +93,7 @@ snapshot_cgp_auto_error! {
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: ProvideAppError,
         ErrorRaiserComponent: ProvideAppError,

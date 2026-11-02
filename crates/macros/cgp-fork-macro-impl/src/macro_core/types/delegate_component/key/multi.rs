@@ -4,6 +4,7 @@ use syn::spanned::Spanned;
 use syn::token::Comma;
 use syn::{Attribute, bracketed};
 
+use super::super::cfg_wiring::cfg_attributes;
 use crate::macro_core::types::delegate_component::{
     EvalDelegateKey, EvaluatedDelegateKey, SingleDelegateKey,
 };
@@ -32,12 +33,17 @@ impl Parse for MultiDelegateKey {
 impl EvalDelegateKey for MultiDelegateKey {
     fn eval(&self) -> syn::Result<Vec<EvaluatedDelegateKey>> {
         let mut keys = Vec::new();
+        let outer = cfg_attributes(&self.attributes)?;
 
         for key in &self.keys {
+            let mut cfgs = outer.clone();
+            cfgs.extend(cfg_attributes(&key.attributes)?);
+
             let key = EvaluatedDelegateKey {
                 generics: key.generics.generics.clone(),
                 span: key.ty.span(),
                 key: key.ty.clone(),
+                cfgs,
             };
 
             keys.push(key);

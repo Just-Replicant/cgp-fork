@@ -28,6 +28,10 @@ pub struct AppA;
 
 snapshot_delegate_components! {
     delegate_components! {
+        // `Foo<'a, T, U>` stores `Life<'a>` in `IsProviderFor`. The `@` path only
+        // names `T` and `U`, so the automatic check cannot name the real parameters.
+        // The explicit `check_components!` below does.
+        #[unchecked]
         AppA {
             open FooProviderComponent;
 
@@ -39,7 +43,7 @@ snapshot_delegate_components! {
     }
 
     expand_multi_param_app_a(output) {
-        insta::assert_snapshot!(output, @"
+        insta::assert_snapshot!(output, @r#"
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<FooProviderComponent> for AppA {
             type Delegate = RedirectLookup<AppA, PathCons<FooProviderComponent, Nil>>;
@@ -104,7 +108,12 @@ snapshot_delegate_components! {
                 __Params__,
             >,
         {}
-        ")
+        ::cgp_fork::__cgp_inspect! {
+            #[allow(dead_code, non_upper_case_globals)] const __CGP_WIRING_AppA_8de3091d : &
+            'static str =
+            "{\"kind\":\"context\",\"context\":\"AppA\",\"generics\":\"\",\"unchecked\":true,\"cfgs\":[],\"entries\":[{\"component\":\"FooProviderComponent\",\"provider\":\":: cgp_fork :: macro_prelude :: RedirectLookup < AppA, :: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: Nil > , >\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < String, :: cgp_fork :: macro_prelude :: PathCons < u32, __Wildcard__ > > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null},{\"component\":\":: cgp_fork :: macro_prelude :: PathCons < FooProviderComponent, :: cgp_fork :: macro_prelude :: PathCons < bool, :: cgp_fork :: macro_prelude :: PathCons < T, __Wildcard__ > > >\",\"provider\":\"DummyFoo\",\"cfgs\":[],\"override\":null}],\"presets\":[]}";
+        }
+        "#)
     }
 }
 

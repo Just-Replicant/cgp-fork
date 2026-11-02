@@ -102,6 +102,7 @@ where
 pub struct App;
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseType<String>,
     }
@@ -130,6 +131,7 @@ fn legacy_providers_as_unified_handlers() {
 pub struct Legacy;
 
 delegate_components! {
+    #[unchecked]
     Legacy {
         ErrorTypeProviderComponent: UseType<String>,
         ComputerComponent: Compat<Triple>,

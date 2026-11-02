@@ -4,7 +4,7 @@ use crate::macro_core::types::delegate_and_check_components::{
 };
 use crate::macro_core::types::delegate_component::{
     DelegateEntries, DelegateKey, DelegateMapping, MultiDelegateKey, SingleDelegateKey,
-    ValidateAttributes,
+    ValidateAttributes, cfg_attributes,
 };
 use crate::macro_core::types::generics::ImplGenerics;
 
@@ -30,6 +30,8 @@ impl ToKeysWithCheckParams for SingleDelegateKey {
             check_params,
             generics: self.generics.clone(),
             key_type: self.ty.clone(),
+            // `record_attributes` already reported a bad `#[cfg_wiring]`.
+            cfgs: cfg_attributes(&self.attributes).unwrap_or_default(),
         }]
     }
 }
@@ -37,6 +39,7 @@ impl ToKeysWithCheckParams for SingleDelegateKey {
 impl ToKeysWithCheckParams for MultiDelegateKey {
     fn to_keys_with_check_params(&self, diagnostics: &mut Diagnostics) -> Vec<KeyWithCheckParams> {
         let check_params = CheckParamsAttribute::record_attributes(&self.attributes, diagnostics);
+        let outer_cfgs = cfg_attributes(&self.attributes).unwrap_or_default();
 
         let mut out = Vec::new();
 
@@ -45,10 +48,13 @@ impl ToKeysWithCheckParams for MultiDelegateKey {
                 let inner_params = diagnostics
                     .check(check_params.merge(&inner.check_params))
                     .unwrap_or(CheckParamsAttribute::Default);
+                let mut cfgs = outer_cfgs.clone();
+                cfgs.extend(inner.cfgs);
                 out.push(KeyWithCheckParams {
                     key_type: inner.key_type,
                     generics: inner.generics,
                     check_params: inner_params,
+                    cfgs,
                 });
             }
         }
@@ -98,6 +104,7 @@ impl ToKeysWithCheckParams for DelegateMapping {
             }
             // A preset's keys are produced by `with_components!`, not by this macro.
             DelegateMapping::Preset(_) => Vec::new(),
+            DelegateMapping::Override(entry) => entry.entry.to_keys_with_check_params(diagnostics),
         }
     }
 }
@@ -107,6 +114,7 @@ fn shorthand_check_key(key_type: syn::Type) -> KeyWithCheckParams {
         check_params: CheckParamsAttribute::Default,
         generics: ImplGenerics::default(),
         key_type,
+        cfgs: Vec::new(),
     }
 }
 

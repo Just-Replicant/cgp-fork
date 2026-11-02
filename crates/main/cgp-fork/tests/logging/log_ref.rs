@@ -17,7 +17,7 @@ snapshot_cgp_auto_log! {
     }
 
     expand_can_log_hello(output) {
-        insta::assert_snapshot!(output, @r#"
+        insta::assert_snapshot!(output, @"
         pub trait CanLogHello {
             fn log_hello(&self, name: &str);
         }
@@ -32,7 +32,7 @@ snapshot_cgp_auto_log! {
                 self.log(__LogHello { name })
             }
         }
-        "#);
+        ");
     }
 }
 
@@ -50,6 +50,7 @@ impl<'a> Logger<App, __LogHello<'a>> for LogHelloToLines {
 }
 
 delegate_components! {
+    #[unchecked]
     App {
         LoggerComponent: LogHelloToLines,
     }

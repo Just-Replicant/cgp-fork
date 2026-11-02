@@ -15,6 +15,7 @@ pub struct BarKey;
 pub struct BarValue;
 
 delegate_components! {
+    #[unchecked]
     new MyComponents {
         FooKey: FooValue,
         BarKey: BarValue,

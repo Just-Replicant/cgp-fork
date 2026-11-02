@@ -70,6 +70,7 @@ impl EvalDelegateEntries for OpenDelegateStatement {
                 span: component.span(),
                 key,
                 value,
+                cfgs: Vec::new(),
             });
         }
 

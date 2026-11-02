@@ -68,6 +68,7 @@ where
 }
 
 delegate_components! {
+    #[unchecked]
     App {
         ErrorTypeProviderComponent: UseType<String>,
         ErrorRaiserComponent: RaiseParseError,
@@ -109,12 +110,14 @@ pub struct Outer {
 pub struct Inner;
 
 delegate_components! {
+    #[unchecked]
     Inner {
         HandlerComponent: DoubleU64,
     }
 }
 
 delegate_components! {
+    #[unchecked]
     Outer {
         HandlerComponent: UseField<Symbol!("inner")>,
     }
@@ -129,6 +132,7 @@ fn use_field_delegates_to_the_field() {
 pub struct ByInput;
 
 delegate_components! {
+    #[unchecked]
     ByInput {
         HandlerComponent: UseInputDelegate<new ByInputHandlers {
             u64: DoubleU64,
