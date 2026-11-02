@@ -1,10 +1,12 @@
 //! Canonical expansion of an async `#[cgp_fn]`.
 //!
-//! `#[async_trait]` combined with `#[cgp_fn]` turns an `async fn` into an async
+//! `#[cgp_async]` combined with `#[cgp_fn]` turns an `async fn` into an async
 //! blanket-impl trait: the generated trait method is `async fn`, both the trait
-//! and its blanket impl carry `#[async_trait]`, and `#[implicit]` arguments are
-//! still pulled from the context's fields. This is the async variant of the
-//! `#[cgp_fn]` expansion, which the `async_and_send` concept owns.
+//! and its blanket impl carry `#[cgp_async]`, and `#[implicit]` arguments are
+//! still pulled from the context's fields. A bare `#[async_trait]` on the
+//! function is rewritten to `#[cgp_async]` and warns once. This is the async
+//! variant of the `#[cgp_fn]` expansion, which the `async_and_send` concept owns.
+//!
 //!
 //! See cgp-knowledge-base-fork/cgp/reference/macros/async_trait.md.
 
