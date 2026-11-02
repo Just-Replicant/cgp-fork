@@ -30,6 +30,7 @@ impl ItemCgpComponent {
     /// the arguments against the trait.
     pub fn validate(&self, diagnostics: &mut Diagnostics) {
         self.check_component_name_params(diagnostics);
+        super::mock::validate_mock(self, diagnostics);
     }
 
     /// Reject a `name:` parameter the trait does not declare. The marker struct is

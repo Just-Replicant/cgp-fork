@@ -55,10 +55,12 @@ impl FamilyIr for ComponentDef {
     fn emit(self) -> syn::Result<TokenStream> {
         match self {
             ComponentDef::Component(component) => {
+                let mock = crate::macro_core::types::cgp_component::mock_items(&component)?;
                 let derived = component.preprocess()?.eval()?.to_items()?;
 
                 Ok(quote! {
                     #( #derived )*
+                    #mock
                 })
             }
             ComponentDef::AbstractType(component) => {

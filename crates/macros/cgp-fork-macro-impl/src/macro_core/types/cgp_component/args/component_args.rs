@@ -14,6 +14,8 @@ pub struct CgpComponentArgs {
     pub context_ident: Ident,
     pub provider_ident: Ident,
     pub component_name: IdentWithTypeGenerics,
+    /// Generate `Mock{Provider}` and a `{Provider}Mock` field the test context stores.
+    pub mock: bool,
 }
 
 impl Parse for CgpComponentArgs {
@@ -56,6 +58,7 @@ impl TryFrom<CgpComponentRawArgs> for CgpComponentArgs {
             context_ident,
             provider_ident,
             component_name,
+            mock: raw_args.mock,
         })
     }
 }

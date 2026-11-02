@@ -23,6 +23,37 @@ fn rejects_non_trait_item() {
 }
 
 #[test]
+fn rejects_mock_reference_return() {
+    assert_macro_rejects("mock on a method that returns a reference", || {
+        crate::macro_lib::cgp_component(
+            quote!(Greeter, mock),
+            quote!(
+                pub trait CanGreet {
+                    fn greet(&self) -> &str;
+                }
+            ),
+        )
+    });
+}
+
+#[test]
+fn rejects_mock_where_clause() {
+    assert_macro_rejects("mock on a trait with a where clause", || {
+        crate::macro_lib::cgp_component(
+            quote!(Greeter, mock),
+            quote!(
+                pub trait CanGreet
+                where
+                    Self: Sized,
+                {
+                    fn greet(&self) -> String;
+                }
+            ),
+        )
+    });
+}
+
+#[test]
 fn rejects_const_generic_parameter() {
     // A const value has no place in the `IsProviderFor` params tuple (a tuple of
     // types) and cannot key CGP's type-based wiring, so a const generic parameter
