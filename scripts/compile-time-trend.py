@@ -17,8 +17,12 @@ of runner noise. With fewer than `--min-history` entries there is no trend
 yet; the check reports that and passes (the fixed budget in
 `scripts/compile-time.sh` still applies).
 
+`--series` selects which rows count. A row with no series is series `1`.
+Bump the series when the benchmark or the runner image changes, so old
+numbers are kept in the file and are not compared with the new measurement.
+
     python3 scripts/compile-time-trend.py --history h.jsonl --value 12.3
-    python3 scripts/compile-time-trend.py --history h.jsonl --value 12.3 --record --sha abc
+    python3 scripts/compile-time-trend.py --history h.jsonl --value 12.3 --record --sha abc --series 2
 """
 
 from __future__ import annotations
@@ -61,22 +65,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--keep", type=int, default=200, help="entries kept when recording")
     parser.add_argument("--record", action="store_true", help="append this run to the history")
     parser.add_argument("--sha", default="")
+    parser.add_argument(
+        "--series",
+        default="1",
+        help="compare and record only this series (missing series on old rows is 1)",
+    )
     args = parser.parse_args(argv)
 
     history = load(args.history)
-    recent = [float(entry["secs"]) for entry in history[-args.window :]]
+    same_series = [entry for entry in history if str(entry.get("series", "1")) == args.series]
+    recent = [float(entry["secs"]) for entry in same_series[-args.window :]]
 
     failed = False
     if len(recent) < args.min_history:
         print(
-            f"compile-time-trend: {len(recent)} earlier run(s), need {args.min_history}; "
-            f"no trend check yet (now {args.value:.2f}s)"
+            f"compile-time-trend: series {args.series}: {len(recent)} earlier run(s), "
+            f"need {args.min_history}; no trend check yet (now {args.value:.2f}s)"
         )
     else:
         median = statistics.median(recent)
         limit = max(median * args.max_ratio, median + args.floor_secs)
         print(
-            f"compile-time-trend: now {args.value:.2f}s, median of last {len(recent)} "
+            f"compile-time-trend: series {args.series}: now {args.value:.2f}s, median of last {len(recent)} "
             f"{median:.2f}s, limit {limit:.2f}s "
             f"(x{args.max_ratio} and at least +{args.floor_secs}s)"
         )
@@ -92,6 +102,7 @@ def main(argv: list[str] | None = None) -> int:
                 "secs": round(args.value, 2),
                 "sha": args.sha,
                 "date": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "series": args.series,
             }
         )
         history = history[-args.keep :]

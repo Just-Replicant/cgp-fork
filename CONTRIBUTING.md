@@ -168,10 +168,11 @@ usually needs its paths mapped by hand: upstream `crates/*/cgp-*/src` correspond
   entrypoint list from its `registry` module, so a new macro implements `ir::Pipeline` and is added to
   the list in `registry.rs` only.
   See `fuzz/README.md`.
-- `python3 scripts/compile-time-trend.py --history FILE --value SECS [--record --sha SHA]` compares
-  a measurement with the median of the last 10 recorded runs and fails when it is more than 1.5×
-  that median and more than 2 s above it. In CI the `Compile-time budget` job keeps the series in
-  the Actions cache (`compile-time-history-<os>-*`): pushes to `main` append to it, pull requests
-  are only compared with it. Until three runs are recorded the trend check passes and only the
-  fixed budget applies. To reset the series (for example after a runner-image change makes every
-  build slower), delete those cache entries under *Actions → Caches*.
+- `python3 scripts/compile-time-trend.py --history FILE --value SECS [--record --sha SHA] [--series N]`
+  compares a measurement with the median of the last 10 recorded runs of that series and fails when
+  it is more than 1.5× that median and more than 2 s above it. A row with no series is series 1.
+  CI passes `--series 2` (offline best-of-three). In CI the `Compile-time budget` job keeps the
+  series in the Actions cache (`compile-time-history-<os>-*`): pushes to `main` append to it, pull
+  requests are only compared with it. Until three runs of the current series are recorded the trend
+  check passes and only the fixed budget applies. Bump `--series` when the benchmark or the runner
+  image changes; older rows stay in the file and drop out of the median.

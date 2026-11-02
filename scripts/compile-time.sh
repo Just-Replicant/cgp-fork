@@ -4,7 +4,9 @@
 # Generates a throwaway crate with N components, N providers, and one context
 # wiring all of them (plus a `check_components!` over every entry), then times a
 # clean `cargo build` of just that crate (dependencies are built first and not
-# counted). Fails when the build exceeds the budget.
+# counted). The recorded time is the fastest of three offline builds, so one
+# stalled runner does not look like a macro-expansion regression. Fails when
+# that time exceeds the budget.
 #
 #   bash scripts/compile-time.sh                 # N=200, budget from scripts/compile-budget.txt
 #   N=500 BUDGET_SECS=60 bash scripts/compile-time.sh
@@ -102,21 +104,41 @@ RS
 } > "$work/src/main.rs"
 
 cd "$work"
-# Build dependencies first so only the generated crate is timed.
+# Build dependencies first so only the generated crate is timed. The timed
+# builds stay offline: an index update is not compile time.
 cargo build --quiet --offline 2>/dev/null || cargo build --quiet
-touch src/main.rs
-start=$(date +%s.%N)
-case "$start" in
-  *N*)
-    echo "compile-time: this date(1) has no %N (nanoseconds); need GNU date" >&2
-    exit 1
-    ;;
-esac
-cargo build --quiet
-end=$(date +%s.%N)
-elapsed=$(awk -v s="$start" -v e="$end" 'BEGIN { printf "%.2f", e - s }')
 
-echo "compile-time: ${n} components wired and checked in ${elapsed}s (budget ${budget}s)"
+# One sample. `exit` inside this function only leaves the command substitution,
+# so the caller checks the status.
+sample() {
+  touch src/main.rs
+  local start end
+  start=$(date +%s.%N)
+  case "$start" in
+    *N*)
+      echo "compile-time: this date(1) has no %N (nanoseconds); need GNU date" >&2
+      exit 1
+      ;;
+  esac
+  if ! cargo build --quiet --offline; then
+    echo "compile-time: timed build failed" >&2
+    exit 1
+  fi
+  end=$(date +%s.%N)
+  awk -v s="$start" -v e="$end" 'BEGIN { printf "%.2f", e - s }'
+}
+
+t1=$(sample) || exit 1
+t2=$(sample) || exit 1
+t3=$(sample) || exit 1
+elapsed=$(awk -v a="$t1" -v b="$t2" -v c="$t3" 'BEGIN {
+  m = a
+  if (b + 0 < m + 0) m = b
+  if (c + 0 < m + 0) m = c
+  printf "%.2f", m
+}')
+
+echo "compile-time: ${n} components wired and checked in ${elapsed}s (samples ${t1}s ${t2}s ${t3}s, budget ${budget}s)"
 if [[ -n "${RESULT_FILE:-}" ]]; then
   echo "$elapsed" > "$RESULT_FILE"
 fi

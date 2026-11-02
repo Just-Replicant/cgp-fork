@@ -413,7 +413,9 @@ jobs:
         env:
           RECORD: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          args=(--history compile-time-history.jsonl --value "$(cat compile-time-secs.txt)")
+          # Series 2: offline best-of-three. Series 1 rows stay in the file and
+          # are not part of the median (runner image and the sample changed).
+          args=(--history compile-time-history.jsonl --series 2 --value "$(cat compile-time-secs.txt)")
           if [[ "$RECORD" == "true" ]]; then
             args+=(--record --sha "$GITHUB_SHA")
           fi
