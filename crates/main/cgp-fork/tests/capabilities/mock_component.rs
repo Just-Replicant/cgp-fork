@@ -41,8 +41,7 @@ fn closure_can_call_the_same_method() {
     });
     let again = Rc::clone(&app);
     app.greeter_mock.greet_returns("inner".to_owned());
-    app.greeter_mock
-        .greet_with(move |_| again.greet("nested"));
+    app.greeter_mock.greet_with(move |_| again.greet("nested"));
 
     assert_eq!(app.greet("outer"), "inner");
     assert_eq!(app.greeter_mock.greet_call_count(), 2);

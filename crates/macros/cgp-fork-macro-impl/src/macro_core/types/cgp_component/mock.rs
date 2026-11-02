@@ -12,9 +12,9 @@ use syn::{
 
 use crate::ir::Diagnostics;
 use crate::macro_core::exports::{HasField, IsProviderFor};
-use crate::macro_core::visitors::ReplaceSelfTypeVisitor;
 use crate::macro_core::functions::to_snake_case_str;
 use crate::macro_core::types::cgp_component::ItemCgpComponent;
+use crate::macro_core::visitors::ReplaceSelfTypeVisitor;
 
 /// Records every reason `mock` cannot be generated for this component.
 pub fn validate_mock(component: &ItemCgpComponent, diagnostics: &mut Diagnostics) {

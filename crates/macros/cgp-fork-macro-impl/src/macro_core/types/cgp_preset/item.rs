@@ -108,7 +108,10 @@ impl ItemCgpPreset {
             .build_impls(&provider_ty, &Default::default())?;
 
         let own_keys = self.component_keys(&provider_ty)?;
-        let own_key_types = own_keys.iter().map(|key| key.ty.clone()).collect::<Vec<_>>();
+        let own_key_types = own_keys
+            .iter()
+            .map(|key| key.ty.clone())
+            .collect::<Vec<_>>();
 
         let parent_impls = self.parents.iter().map(|parent| {
             invoke_with_components(parent, &provider_ty, &Default::default(), &own_key_types)
@@ -138,16 +141,20 @@ impl ItemCgpPreset {
                 #(#cfgs)*
                 impl #contains<#ty> for #name::Provider {}
             };
-            let missing = key.fallback.as_ref().filter(|_| !cfgs.is_empty()).map(|parent| {
-                let negated = negate_cfgs(cfgs);
-                quote! {
-                    #negated
-                    impl #contains<#ty> for #name::Provider
-                    where
-                        #parent::Provider: #contains<#ty>,
-                    {}
-                }
-            });
+            let missing = key
+                .fallback
+                .as_ref()
+                .filter(|_| !cfgs.is_empty())
+                .map(|parent| {
+                    let negated = negate_cfgs(cfgs);
+                    quote! {
+                        #negated
+                        impl #contains<#ty> for #name::Provider
+                        where
+                            #parent::Provider: #contains<#ty>,
+                        {}
+                    }
+                });
             quote! {
                 #present
                 #missing
