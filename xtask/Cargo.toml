@@ -4,7 +4,7 @@ version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
 publish = false
-description = "Repository tasks. `cargo xtask wiring` prints a CGP wiring graph."
+description = "Repository tasks: wiring graphs, the 1.0 codemod, and local CI."
 
 [lints]
 workspace = true
@@ -15,3 +15,5 @@ path = "src/main.rs"
 
 [dependencies]
 cgp-fork-macro-impl = { workspace = true }
+proc-macro2 = { version = "1", features = ["span-locations"] }
+syn = { version = "3", features = ["full", "visit"] }
