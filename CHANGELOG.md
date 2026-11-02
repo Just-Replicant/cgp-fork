@@ -5,13 +5,22 @@
 ### Added
 
 - *(async)* `#[cgp_async]` desugars `async fn` in a trait to `impl Future`. `#[cgp_async(Send)]`
-  adds `+ Send` to every desugared future. On an impl the attribute does nothing. It replaces
-  `#[async_trait]` (rewrite plan phase 4, ADR 0007).
+  adds `+ Send` to every desugared future. That future still borrows `&self`, so it is not
+  `'static`. On an impl the attribute does nothing. It replaces `#[async_trait]` (rewrite plan
+  phase 4, ADR 0007).
 - *(runtime)* `AsyncRuntime` (spawn, sleep, timeout) and `HasAsyncRuntime`, implemented for any
-  context whose runtime type implements it. `SleepWithRuntime`, `SpawnWithRuntime`, and
-  `TimeoutWithRuntime` are the providers. A timeout raises `TimeoutElapsed` through `CanRaiseError`.
-- *(runtime)* features `tokio` and `smol`, off by default. `tokio::runtime::Handle` and
-  `SmolRuntime` implement `AsyncRuntime`. Sleep and timeout futures are polled on that runtime.
+  context whose runtime type implements it. Sleep and timeout are associated types: `Send +
+  'static` futures that do not borrow the runtime. The wait starts when the future is first
+  polled, and dropping it cancels the wait. `CanSleep` and `CanTimeout` use the same shape, so
+  they can be spawned without `Context: Sync`. `TimeoutWithRuntime` maps `TimeoutElapsed`
+  through `CanRaiseError` and does not store the context (`Context::Error: 'static`).
+  `spawn_task` detaches the task, and a panic inside it is discarded.
+- *(runtime)* features `tokio` and `smol`, off by default. `tokio::runtime::Handle` implements
+  `AsyncRuntime`. On first poll it spawns the timer on that handle (`current_thread` and
+  `multi_thread` build the runtime), and dropping the future aborts the task. A sleep or
+  timeout whose runtime has already shut down panics. A panic in the timed task is resumed on
+  the waiter. `SmolRuntime` is an `async-executor` with `async-io` timers; the feature does not
+  depend on the `smol` meta-crate.
 - *(handler)* `#[cgp_handler]`: a function becomes a unified `Handler` provider (an `async`
   function, an `AsyncHandler`), also wired as an `AsyncHandler` through `Promote`. It takes the
   same arguments as `#[cgp_computer]` (`#[field]`/`#[implicit]` context arguments, an optional
