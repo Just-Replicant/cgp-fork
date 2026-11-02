@@ -38,8 +38,8 @@ anyhow = ["alloc", "dep:anyhow"]
 eyre = ["alloc", "dep:eyre"]
 std-error = ["alloc"]
 # Runtime adapters. Both need `std` and are not part of `full`, so a `no_std` build stays free
-# of them. `tokio` is the current-thread runtime plus its time driver (sleep, timeout). `smol`
-# is an executor the context owns.
+# of them. `tokio` is the current-thread and multi-thread runtimes plus the time driver
+# (sleep, timeout). `smol` is an executor the context owns.
 tokio = ["dep:tokio"]
 smol = ["dep:smol"]
 
@@ -53,9 +53,9 @@ anyhow = { version = "1", default-features = false, optional = true }
 # `#[track_caller]`, and so is every impl of it, which is what lets that location be the caller's
 # line rather than a line in this crate.
 eyre = { version = "0.6", default-features = false, features = ["auto-install", "track-caller"], optional = true }
-# `rt` is the scheduler and `spawn`; `time` is `sleep` and `timeout`. The net, io, and process
-# drivers stay off.
-tokio = { version = "1", default-features = false, features = ["rt", "time"], optional = true }
+# `rt-multi-thread` includes `rt` (the scheduler and `spawn`) and adds the worker-thread
+# runtime. `time` is `sleep` and `timeout`. The net, io, and process drivers stay off.
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "time"], optional = true }
 smol = { version = "2", optional = true }
 
 [dev-dependencies]
