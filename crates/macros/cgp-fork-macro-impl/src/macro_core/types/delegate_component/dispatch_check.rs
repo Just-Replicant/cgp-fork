@@ -19,8 +19,7 @@
 use std::collections::BTreeSet;
 
 use quote::ToTokens;
-use syn::parse_quote;
-use syn::{Generics, Type};
+use syn::{Generics, Type, parse_quote};
 
 use crate::macro_core::functions::merge_generics;
 use crate::macro_core::traits::ToType;

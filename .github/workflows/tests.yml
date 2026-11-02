@@ -124,10 +124,12 @@ jobs:
         run: cargo test --workspace --all-features --no-fail-fast
 
   # Early warning for the next toolchain bump: runs clippy and the tests on the
-  # newest stable and on beta instead of the pinned `rust-toolchain.toml`. A
-  # failure here is a heads-up (usually a changed diagnostic in a `tests/ui`
-  # `.stderr` snapshot or a new lint), not a broken `main`, so it never fails
-  # the workflow. Leave it out of the required checks.
+  # newest stable and on beta instead of the pinned `rust-toolchain.toml`.
+  # `tests/ui` snapshots are exact on the pinned minor; other compilers must
+  # still fail each case with the same leading error line (ADR 0005: rustc's
+  # `help:` text is not ours to freeze). A failure here is a heads-up, not a
+  # broken `main`, so it never fails the workflow. Leave it out of the required
+  # checks.
   canary:
     name: Toolchain canary (${{ matrix.toolchain }})
     runs-on: ubuntu-latest
@@ -411,7 +413,9 @@ jobs:
         env:
           RECORD: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          args=(--history compile-time-history.jsonl --value "$(cat compile-time-secs.txt)")
+          # Series 2: offline best-of-three. Series 1 rows stay in the file and
+          # are not part of the median (runner image and the sample changed).
+          args=(--history compile-time-history.jsonl --series 2 --value "$(cat compile-time-secs.txt)")
           if [[ "$RECORD" == "true" ]]; then
             args+=(--record --sha "$GITHUB_SHA")
           fi

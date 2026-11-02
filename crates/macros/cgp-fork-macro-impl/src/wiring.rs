@@ -9,12 +9,10 @@ use std::fmt::Write as _;
 
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
-use syn::visit::Visit;
 use syn::punctuated::Punctuated;
 use syn::token::Plus;
-use syn::{
-    Attribute, Ident, ItemImpl, Macro, Type, TypeParamBound, WherePredicate,
-};
+use syn::visit::Visit;
+use syn::{Attribute, Ident, ItemImpl, Macro, Type, TypeParamBound, WherePredicate};
 
 use crate::macro_core::types::cgp_preset::ItemCgpPreset;
 use crate::macro_core::types::delegate_component::{
@@ -515,10 +513,7 @@ fn graph_edges(files: &[WiringFile]) -> Vec<GraphEdge> {
 
     for file in files {
         for preset in &file.presets {
-            presets
-                .entry(preset.name.clone())
-                .or_default()
-                .push(preset);
+            presets.entry(preset.name.clone()).or_default().push(preset);
         }
     }
 
@@ -586,7 +581,12 @@ fn graph_edges(files: &[WiringFile]) -> Vec<GraphEdge> {
 }
 
 fn link_entry(edges: &mut BTreeSet<(String, String, String)>, from: &str, entry: &WiringEdge) {
-    add_edge(edges, from.to_owned(), entry.component.clone(), wires_label(&entry.cfgs));
+    add_edge(
+        edges,
+        from.to_owned(),
+        entry.component.clone(),
+        wires_label(&entry.cfgs),
+    );
     add_edge(
         edges,
         entry.component.clone(),
