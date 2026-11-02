@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [1.0.0](https://github.com/Just-Replicant/cgp-fork/compare/v0.10.0...v1.0.0) - 2026-11-02
 
 ### Added
 
