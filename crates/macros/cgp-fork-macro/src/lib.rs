@@ -1538,9 +1538,10 @@ pub fn cgp_auto_log(attr: TokenStream, body: TokenStream) -> TokenStream {
 
 /// Rewrites `async fn` in a trait to a method that returns `impl Future`.
 ///
-/// `#[cgp_async(Send)]` adds `+ Send` to every desugared future, so the future can be spawned
-/// on a work-stealing runtime. Without `Send` the future is not `Send`. A provided (default)
-/// method body is wrapped in `async move { … }`. Any other argument is rejected.
+/// `#[cgp_async(Send)]` adds `+ Send` to every desugared future. The future still borrows
+/// `&self`, so it is not `'static`: spawn a task that owns the context and call the method
+/// inside that task. Without `Send` the future is not `Send`. A provided (default) method
+/// body is wrapped in `async move { … }`. Any other argument is rejected.
 ///
 /// `#[cgp_component]` and `#[cgp_fn]` copy this attribute onto the traits and impls they
 /// generate. On an impl it does nothing: a native `async fn` already matches the desugared
