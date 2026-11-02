@@ -6,7 +6,6 @@ license      = { workspace = true }
 repository   = { workspace = true }
 authors      = { workspace = true }
 rust-version = { workspace = true }
-homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "Implementation of the cgp-fork procedural macros. Internal: depend on cgp-fork instead."

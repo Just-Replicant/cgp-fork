@@ -7,7 +7,6 @@ license      = { workspace = true }
 repository   = { workspace = true }
 authors      = { workspace = true }
 rust-version = { workspace = true }
-homepage     = { workspace = true }
 keywords     = { workspace = true }
 categories   = { workspace = true }
 description  = "A language extension for Rust, with pluggable trait implementations at compile-time."
