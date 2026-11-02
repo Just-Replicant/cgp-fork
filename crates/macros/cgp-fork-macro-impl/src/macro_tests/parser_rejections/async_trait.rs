@@ -185,3 +185,48 @@ fn component_send_impl_returns_the_delegate_future() {
         "a Send forwarder must not await, or the generic context is captured, got {rendered}"
     );
 }
+
+#[test]
+fn provider_trait_rewrites_self_inside_precise_captures() {
+    let output = crate::macro_lib::cgp_component(
+        quote!(Sleeper),
+        quote!(
+            pub trait CanSleep {
+                fn sleep(&self) -> impl ::core::future::Future<Output = ()> + use<Self>;
+            }
+        ),
+    )
+    .expect("a precise capture of Self expands");
+
+    let rendered = output.to_string();
+    assert!(
+        rendered.contains("use < Self >"),
+        "the consumer trait keeps use<Self>, got {rendered}"
+    );
+    assert!(
+        rendered.contains("use < __Context__ >"),
+        "the provider trait must capture the context, not the provider's Self, got {rendered}"
+    );
+}
+
+#[test]
+fn cgp_fn_rewrites_bare_async_trait_once() {
+    let output = crate::macro_lib::cgp_fn(
+        quote!(),
+        quote!(
+            #[async_trait]
+            pub async fn fetch(&self) -> u32 {
+                1
+            }
+        ),
+    )
+    .expect("#[cgp_fn] forwards #[async_trait]");
+
+    let rendered = output.to_string();
+    assert!(
+        !rendered.contains("async_trait"),
+        "the old attribute must be rewritten, got {rendered}"
+    );
+    assert!(rendered.contains("cgp_async"));
+    assert!(rendered.contains("ASYNC_TRAIT"));
+}
