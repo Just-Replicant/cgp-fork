@@ -72,7 +72,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "cgp-fork"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "async-executor",
@@ -99,7 +99,7 @@ dependencies = [
 
 [[package]]
 name = "cgp-fork-macro"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cgp-fork-macro-impl",
  "syn 3.0.9",
@@ -107,7 +107,7 @@ dependencies = [
 
 [[package]]
 name = "cgp-fork-macro-impl"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "insta",
  "prettyplease",
@@ -763,7 +763,7 @@ checksum = "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81"
 
 [[package]]
 name = "xtask"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cgp-fork-macro-impl",
  "proc-macro2",
