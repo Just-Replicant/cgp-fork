@@ -3,7 +3,7 @@
 Analysis of `main` @ `33842521` (2026-10-28, v0.10.1 prepared, unreleased).
 Every claim below cites a file in that checkout. Effort figures are estimates.
 
-## Status (2026-11-02, branch `phase-5`)
+## Status (2026-11-02, branch `phase-6`)
 
 | Phase | Status | Notes |
 |---|---|---|
@@ -14,7 +14,7 @@ Every claim below cites a file in that checkout. Effort figures are estimates.
 | 3 Handler/data unification | Done, with the 0.11 deprecations | `cgp_fork::handler`: `Handler`/`AsyncHandler`, one `Promote` family, `Pipe`/`TryPipe`, `MatchWith<Handlers, All\|First, Owned\|Ref\|Mut>` and record builders; access modes `Owned`/`Ref`/`Mut` with `ModeExtractor`/`ModeFields`. The 0.10 family is behind `compat-0.10` (on by default) and `cgp_fork::compat` bridges both ways ([ADR 0006](adr/0006-handler-unification.md)). Old tests pass with `compat-0.10`; ported tests in `tests/unified_handlers/`. Follow-up: the 0.10 names are `#[deprecated(since = "0.11.0")]` with replacements in the notes; `#[cgp_handler]` and `#[derive_handler]` replace the deprecated `#[cgp_computer]`/`#[cgp_producer]` and `#[derive_promote]`, `#[cgp_auto_dispatch]` emits the unified API (works without `compat-0.10`), `Downcast`/`DispatchHandlers` added; `MapTypeRef` merged into `Mode` (deprecated alias kept; `MapType` stays, E0309); 969 tests pass with all features, 475 for `-p cgp-fork --no-default-features`. Open: `unstable-monad` (no unified monad replacement, so the monad layer is not deprecated). ([after phase 3](baseline/2026-10-31-after-phase-3.md)) |
 | 4 Async/run/runtime | Done | `#[cgp_async]` and `#[cgp_async(Send)]`; `#[async_trait]` is deprecated and rewritten when `#[cgp_component]` or `#[cgp_fn]` forwards it. `CanRun` stays the runner; `CanSendRun` is deprecated in favour of the `Send` flag ([ADR 0007](adr/0007-cgp-async-and-runtimes.md)). `AsyncRuntime` (spawn, sleep, timeout) with `HasAsyncRuntime` and the providers `SleepWithRuntime`, `SpawnWithRuntime`, `TimeoutWithRuntime`. Features `tokio` and `smol`, not in `default`. 987 tests pass with `--all-features`, 979 with `--no-default-features` ([after phase 4](baseline/2026-11-01-after-phase-4.md)). |
 | 5 New capabilities | Done | Checked-by-default wiring (`#[unchecked]`, `#[cfg_wiring]`), preset `#[version]` and `override` (`PresetContains`), `inspect` JSON and `cargo xtask wiring`, `#[cgp_component(..., mock)]`, `TracingLogger` / `TracingDebugLogger` / `DefmtLogger` ([ADR 0008](adr/0008-new-capabilities.md)). Guides in [docs/guide](guide/README.md). A cfg-gated preset `override` falls back to the parent; a new cfg-gated key is absent when the predicate is false. The graph is context → component → provider, and the inspect const is private. 1003 tests pass with `--all-features`, 992 with `--no-default-features` ([after phase 5](baseline/2026-11-02-after-phase-5.md)). `#[cgp_auto_error]` from §7.6 and the `book/` from phase 6 are not in this phase. |
-| 6 Docs & 1.0 | Not started | |
+| 6 Docs & 1.0 | Done | [`book/`](../book/src/SUMMARY.md): guide, reference, one page per `on_unimplemented` message, and the 0.10 to 1.0 table. `cgp-fork-doctests` compiles the book's 15 Rust fences; a `rust,ignore` fence fails that build. `cargo xtask migrate` rewrites imports, paths, and attributes from that table. `cargo xtask ci` runs nightly fmt, both clippy feature sets, and both test commands. `#[cgp_auto_error]` on an enum derives `Display`, `Error`, and `From` ([ADR 0009](adr/0009-docs-and-migration.md)). Version stays 1.0.0 and `compat-0.10` stays in `default`. 1037 tests pass with `--all-features`, 1028 with `--no-default-features`, 59 ignored ([after phase 6](baseline/2026-11-02-after-phase-6.md)). |
 
 What changed from the plan as written:
 
@@ -45,6 +45,12 @@ What changed from the plan as written:
   without an entry and a provider without an impl, because rustc reports a method call on an
   unwired context through the provider trait (ADR 0005). Per-symbol readable aliases (§7.2) were
   not added; the `#[cgp_auto_getter]` message names its fields instead.
+- The book is compiled by `cgp-fork-doctests`. mdBook is not a CI dependency. The migration table
+  is generated from `xtask`, and the codemod does not rewrite method names. A rename that adds
+  type arguments runs only when the source writes the whole argument list. `#[cgp_auto_error]`
+  on an enum does not emit the error providers, and `#[derive(Debug)]` stays above the attribute
+  (ADR 0009). crates.io has no `cgp-fork` 1.0.0, so a registry semver-checks run baselines 0.10.0
+  and skips breaking checks; the same tool against the 1.0.0 release commit, as a patch, passes.
 
 ## 1. What the project is
 
