@@ -1,7 +1,7 @@
 use proc_macro2::{Group, Ident, TokenStream, TokenTree};
 use quote::{ToTokens, format_ident};
 use syn::visit_mut::{self, VisitMut};
-use syn::{Item, Macro, Path, Type};
+use syn::{CapturedParam, Item, Macro, Path, Type};
 
 /// Rewrites the `Self` type (and `Self::Foo` paths) to the context type,
 /// skipping any `Self::Assoc` whose associated type is declared locally in the
@@ -53,6 +53,21 @@ impl VisitMut for ReplaceSelfTypeVisitor<'_> {
         // Single-segment Self in type position is already handled by visit_type_mut above.
         self.replace_self_in_path(path);
         visit_mut::visit_path_mut(self, path);
+    }
+
+    fn visit_captured_param_mut(&mut self, param: &mut CapturedParam) {
+        // `use<Self>` names `Self` as an identifier, not a type, so `visit_type_mut`
+        // never sees it. The provider trait's `Self` is the provider, not the context.
+        if let CapturedParam::Ident(ident) = param
+            && ident == "Self"
+            && let Type::Path(replaced) = self.replaced_type
+            && replaced.qself.is_none()
+            && replaced.path.segments.len() == 1
+        {
+            *ident = replaced.path.segments[0].ident.clone();
+            return;
+        }
+        visit_mut::visit_captured_param_mut(self, param);
     }
 
     fn visit_macro_mut(&mut self, mac: &mut Macro) {
