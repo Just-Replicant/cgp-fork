@@ -38,12 +38,13 @@ TRYBUILD=overwrite cargo test -p cgp-fork --all-features --test ui_tests
 
 ## Before you push
 
+`cargo xtask ci` runs nightly `cargo fmt --all` (and `fuzz/`), clippy with
+`-D warnings` for `--all-features` and `--no-default-features`, and `cargo test --workspace`
+for both feature sets. CI's other jobs (nextest, the operating-system matrix,
+semver-checks, deny, fuzz) stay in `tests.yml`.
+
 ```sh
-cargo +nightly fmt --all
-cargo clippy --workspace --all-features --all-targets -- -D warnings
-cargo clippy --workspace --no-default-features --all-targets -- -D warnings
-cargo test --workspace --all-features            # unit, integration, ui, doctests
-cargo test --workspace --no-default-features
+cargo xtask ci
 RUSTDOCFLAGS="-D warnings --cfg docsrs" cargo doc --workspace --all-features --no-deps
 cargo check -p cgp-fork --target thumbv7m-none-eabi --no-default-features
 ```

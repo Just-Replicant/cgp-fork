@@ -16,4 +16,4 @@ test  = false
 bench = false
 
 [dependencies]
-cgp-fork = { workspace = true, features = ["anyhow", "eyre", "std-error"] }
+cgp-fork = { workspace = true, features = ["anyhow", "eyre", "std-error", "mock", "log-tracing"] }

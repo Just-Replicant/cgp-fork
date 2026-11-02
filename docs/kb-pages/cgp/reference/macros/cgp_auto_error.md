@@ -37,6 +37,20 @@ impl ProvideAppError {
 - An attribute argument, a trait impl, a missing piece of the definition, or a method that is not
   one of the provider functions is rejected.
 
+## On an enum
+
+The same attribute on an enum derives `Display`, `core::error::Error`, and `From`. It does not
+build the error providers. Put `#[derive(Debug)]` above `#[cgp_auto_error]`: `Error` requires
+`Debug`, and the derive is expanded after the attribute.
+
+- `#[error("...")]` is the `Display` text. `{field}` and `{field:?}`, or `{0}` on a tuple variant,
+  read the fields. `{{` and `}}` are literal braces.
+- `#[error(transparent)]` forwards `Display` and `source` to the single field.
+- `#[source]` is the field `Error::source` returns. It must be `'static`. At most one.
+- `#[from]` on a one-field variant implies `#[source]` and implements `From`.
+
+Wire `RaiseFrom` when the context's error is this enum.
+
 ## See also
 
 - The error components: [has_error_type](../components/has_error_type.md) and

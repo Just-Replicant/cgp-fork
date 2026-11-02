@@ -75,22 +75,28 @@ fn main() {
 }
 ```
 
-This example (and every Rust block in this README) is compiled as a doctest of `cgp-fork`. More programs live in
+This example (and every Rust block in this README) is compiled as a doctest. More programs live in
 [`crates/main/cgp-fork/examples`](crates/main/cgp-fork/examples): `hello`, `swap_context`,
-`error_backends` (`--features anyhow,std-error`), `async_component`, and `runtime`
-(`--features tokio`).
+`error_backends` (`--features anyhow,std-error`), `async_component`, `runtime`
+(`--features tokio`), `preset_override`, `profile`, `mock` (`--features mock`),
+`tracing` (`--features log-tracing`), `defmt` (`--features log-defmt`), and `error_enum`.
 
 ## Features
 
 | Feature | Default | Needs | What it enables |
 |---|---|---|---|
-| `full` | yes | — | `alloc` |
+| `full` | yes | — | `alloc` and `compat-0.10` |
 | `alloc` | via `full` | `alloc` | links `alloc`; the `DebugError` / `DisplayError` providers |
 | `anyhow` | no | `alloc` | `anyhow::Error` as the context error |
 | `eyre` | no | `std` | `eyre::Report` as the context error |
 | `std-error` | no | `alloc` | a boxed `core::error::Error` as the context error |
 | `tokio` | no | `std` | `tokio::runtime::Handle` as an `AsyncRuntime` (spawn, sleep, timeout) |
 | `smol` | no | `std` | an owned `async-executor` runtime as an `AsyncRuntime` |
+| `compat-0.10` | yes | — | the 0.10 handler names, deprecated |
+| `mock` | no | `alloc` | `#[cgp_component(Name, mock)]` |
+| `log-tracing` | no | — | `TracingLogger` and `TracingDebugLogger` |
+| `log-defmt` | no | — | `DefmtLogger` |
+| `inspect` | no | — | keeps the wiring JSON const |
 
 With `default-features = false` the crate needs only `core`.
 
@@ -113,9 +119,12 @@ getter reads. For a deeper analysis of a failed check, install
 
 ## Docs
 
-Guides and examples: [contextgeneric.dev](https://contextgeneric.dev/).
+The guide, reference, error catalog, and migration page: [`book/`](book/src/SUMMARY.md).
+`mdbook serve book` renders it. `cargo xtask migrate` rewrites 0.10 handler imports.
 
-Plans for the next major version: [docs/rewrite-plan.md](docs/rewrite-plan.md).
+Upstream guides: [contextgeneric.dev](https://contextgeneric.dev/).
+
+The rewrite plan: [docs/rewrite-plan.md](docs/rewrite-plan.md).
 
 Construct reference and macro internals: [cgp-knowledge-base-fork](https://github.com/Just-Replicant/cgp-knowledge-base-fork). Related repositories: [sibling-projects.md](sibling-projects.md).
 

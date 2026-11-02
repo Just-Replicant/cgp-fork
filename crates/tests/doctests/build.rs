@@ -140,6 +140,117 @@ fn main() {
         ),
     )
     .unwrap();
+
+    extract_book(&manifest_dir, &out_dir);
+}
+
+/// Compiles every `rust` fence in `book/src`. `rust,ignore` is a build error:
+/// a guide example that cannot run does not belong in the book.
+fn extract_book(manifest_dir: &std::path::Path, out_dir: &std::path::Path) {
+    let book = manifest_dir.join("../../../book/src");
+    println!("cargo::rerun-if-changed={}", book.display());
+    let mut files = Vec::new();
+    collect_markdown(&book, &mut files);
+    files.sort();
+
+    let mut out = String::new();
+    let mut compiled = 0usize;
+    for path in &files {
+        println!("cargo::rerun-if-changed={}", path.display());
+        let source = fs::read_to_string(path)
+            .unwrap_or_else(|error| panic!("reading {}: {error}", path.display()));
+        let relative = path
+            .strip_prefix(&book)
+            .unwrap_or(path)
+            .display()
+            .to_string()
+            .replace('\\', "/");
+        compiled += write_book_fences(&relative, &source, &mut out);
+    }
+    assert!(compiled > 0, "book/src has no rust examples");
+    fs::write(out_dir.join("book_examples.md"), out).unwrap();
+    fs::write(
+        out_dir.join("book_examples_count.txt"),
+        format!("compiled={compiled}\n"),
+    )
+    .unwrap();
+}
+
+fn collect_markdown(dir: &std::path::Path, files: &mut Vec<PathBuf>) {
+    let entries =
+        fs::read_dir(dir).unwrap_or_else(|error| panic!("reading {}: {error}", dir.display()));
+    for entry in entries {
+        let path = entry.unwrap().path();
+        if path.is_dir() {
+            collect_markdown(&path, files);
+        } else if path.extension().is_some_and(|extension| extension == "md") {
+            files.push(path);
+        }
+    }
+}
+
+fn write_book_fences(relative: &str, source: &str, out: &mut String) -> usize {
+    let mut compiled = 0usize;
+    let mut fence: Option<(usize, String, Vec<String>)> = None;
+    for (number, line) in source.lines().enumerate() {
+        let line_number = number + 1;
+        if let Some((start, kind, lines)) = fence.as_mut() {
+            if line.trim() == "```" {
+                compiled += 1;
+                let info = fence_info(kind);
+                writeln!(
+                    out,
+                    "`{relative}` example #{compiled} (line {start}):\n\n```{info}\n{}\n```\n",
+                    lines.join("\n"),
+                )
+                .unwrap();
+                fence = None;
+            } else {
+                lines.push(line.to_owned());
+            }
+            continue;
+        }
+        let trimmed = line.trim();
+        let Some(tag) = trimmed.strip_prefix("```") else {
+            continue;
+        };
+        if tag.is_empty() || !tag.split(',').next().is_some_and(|token| token == "rust") {
+            continue;
+        }
+        assert!(
+            !tag.split(',').any(|token| token == "ignore"),
+            "book/src/{relative}:{line_number}: a rust,ignore fence is not allowed; the example has to compile"
+        );
+        fence = Some((line_number, tag.to_owned(), Vec::new()));
+    }
+    assert!(
+        fence.is_none(),
+        "book/src/{relative}: a rust fence was not closed"
+    );
+    compiled
+}
+
+/// Keeps `no_run` and `should_panic`. Drops an edition tag; the doctest crate sets it.
+fn fence_info(tag: &str) -> &'static str {
+    let mut no_run = false;
+    let mut should_panic = false;
+    for token in tag.split(',') {
+        match token {
+            "rust" => {}
+            "no_run" => no_run = true,
+            "should_panic" => should_panic = true,
+            other if other.starts_with("edition") => {}
+            other => panic!(
+                "book fence `rust,{other}` is not compiled; use rust, rust,no_run, or rust,should_panic"
+            ),
+        }
+    }
+    match (no_run, should_panic) {
+        (false, false) => "rust",
+        (true, false) => "rust,no_run",
+        (false, true) => "rust,should_panic",
+        (true, true) => "rust,no_run,should_panic",
+    }
 }
 
 /// The name of a `pub fn` / `pub struct` item line, which owns the examples above it.

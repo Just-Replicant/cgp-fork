@@ -5,6 +5,8 @@
 //! - The `cgp-fork-macro` examples are `rust,ignore`, because a proc-macro crate
 //!   cannot depend on its own facade. `build.rs` extracts them and they compile
 //!   here against `cgp-fork` (see `build.rs` for the opt-out marker).
+//! - `book/src` fences tagged `rust` or `rust,no_run` are extracted the same way.
+//!   A `rust,ignore` fence in the book fails the build.
 //!
 //! This crate is a workspace member with `publish = false` whose only job is to
 //! compile and run those examples under `cargo test --workspace --doc`. Nothing
@@ -26,3 +28,11 @@ pub struct RepositoryReadme;
 #[cfg(doctest)]
 #[doc = include_str!(concat!(env!("OUT_DIR"), "/macro_examples.md"))]
 pub struct MacroCrateExamples;
+
+/// The `book/` guide examples, extracted by `build.rs`.
+///
+/// `rust` and `rust,no_run` fences compile here. A `rust,ignore` fence in the
+/// book fails the build.
+#[cfg(doctest)]
+#[doc = include_str!(concat!(env!("OUT_DIR"), "/book_examples.md"))]
+pub struct BookExamples;
