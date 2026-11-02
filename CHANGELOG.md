@@ -4,6 +4,23 @@
 
 ### Added
 
+- *(wiring)* A non-generic `delegate_components!` also emits the check trait
+  `__CanUse{Context}`. `#[unchecked]` skips it. A generic table is not checked.
+  `#[cfg_wiring(predicate)]` is `#[cfg(predicate)]` on the table or on one entry,
+  and an entry predicate also gates that entry's check (rewrite plan phase 5,
+  ADR 0008).
+- *(preset)* `#[version(N)]` stores `VERSION` on the preset module. `override`
+  replaces a component a parent already wires, checked with `PresetContains`.
+  A bare `override` uses the only parent.
+- *(inspect)* `delegate_components!` and `cgp_preset!` emit their wiring JSON
+  inside `__cgp_inspect!`. The `inspect` feature keeps the const. `cargo xtask wiring`
+  prints the same graph as JSON, Mermaid, or DOT.
+- *(mock)* `#[cgp_component(Name, mock)]` generates `MockName` and `NameMock`
+  when the `mock` feature is on. The context stores the state in `{name}_mock`.
+- *(log)* `TracingLogger` and `TracingDebugLogger` (`log-tracing`) and `DefmtLogger`
+  (`log-defmt`) implement `CanLog`. `tracing` is built without its default features.
+  Host builds enable `defmt`'s `unstable-test` so the call links; `target_os = "none"`
+  does not.
 - *(async)* `#[cgp_async]` desugars `async fn` in a trait to `impl Future`. `#[cgp_async(Send)]`
   adds `+ Send` to every desugared future. That future still borrows `&self`, so it is not
   `'static`. On an impl the attribute does nothing. It replaces `#[async_trait]` (rewrite plan
@@ -56,6 +73,15 @@
 
 ### Changed
 
+- *(wiring)* A cfg-gated preset entry that is not an `override` is absent when the
+  predicate is false. An `override` forwards to the parent in that configuration.
+  The same cfg wraps the replayed key and the check. `open` and `Key =>` paths are
+  part of the default check when the table delegates that component. The inspect
+  const is private, `delegate_and_check_components!` emits it and honors a
+  table-level `#[cfg_wiring]`, and `cargo xtask wiring` draws
+  context → component → provider, with preset parents and provider dependencies.
+- *(mock)* A mock method `where` clause rewrites `Self` to the context. The handler
+  closure runs without its cell borrowed, so the same method can be called again.
 - *(field)* `MapTypeRef` is merged into the access-mode trait: `Mode` (implemented by `Owned`,
   `Ref` and `Mut`) now carries `type Map<'a, T: 'a>`, the borrow-aware type map `MapTypeRef`
   provided, so one set of marker types selects both the extractor (`ModeExtractor`) and the
