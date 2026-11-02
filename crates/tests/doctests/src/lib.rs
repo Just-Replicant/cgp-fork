@@ -12,6 +12,11 @@
 //! cannot drop them.
 #![no_std]
 
+// The examples live in included markdown (`use cgp_fork::…` inside those
+// fences). Nightly cargo only looks at this source when deciding whether a
+// dependency is used, so the crate has to be named here.
+extern crate cgp_fork as _;
+
 /// The repository README's examples.
 #[cfg(doctest)]
 #[doc = include_str!("../../../../README.md")]
