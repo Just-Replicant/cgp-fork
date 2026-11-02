@@ -39,9 +39,10 @@ eyre = ["alloc", "dep:eyre"]
 std-error = ["alloc"]
 # Runtime adapters. Both need `std` and are not part of `full`, so a `no_std` build stays free
 # of them. `tokio` is the current-thread and multi-thread runtimes plus the time driver
-# (sleep, timeout). `smol` is an executor the context owns.
+# (sleep, timeout). `smol` is an `async-executor` the context owns, with `async-io` timers;
+# it does not link the `smol` meta-crate.
 tokio = ["dep:tokio"]
-smol = ["dep:smol"]
+smol = ["dep:async-executor", "dep:async-io"]
 
 [dependencies]
 cgp-fork-macro = { workspace = true }
@@ -56,7 +57,11 @@ eyre = { version = "0.6", default-features = false, features = ["auto-install", 
 # `rt-multi-thread` includes `rt` (the scheduler and `spawn`) and adds the worker-thread
 # runtime. `time` is `sleep` and `timeout`. The net, io, and process drivers stay off.
 tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "time"], optional = true }
-smol = { version = "2", optional = true }
+# The pieces `SmolRuntime` actually uses. `async-executor` runs spawned tasks. `async-io` is
+# the timer reactor and `block_on`. The `smol` meta-crate's net, filesystem, and process
+# crates are not dependencies.
+async-executor = { version = "1", optional = true }
+async-io = { version = "2", default-features = false, optional = true }
 
 [dev-dependencies]
 cgp-fork-macro = { workspace = true, features = ["snapshot"] }
