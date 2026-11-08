@@ -1,4 +1,7 @@
-# Bash and trybuild snapshots must stay LF. `core.autocrlf=true` would
-# otherwise check them out as CRLF and break both.
+# Keep text as LF in the repository and in the working tree.
+# Windows CI checks out with `core.autocrlf=true`. Without `eol=lf`, a test
+# that matches a marker and the next newline sees CRLF and fails. Bash and
+# trybuild snapshots break the same way.
+* text=auto eol=lf
 *.sh text eol=lf
 *.stderr text eol=lf

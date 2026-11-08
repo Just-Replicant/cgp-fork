@@ -1342,15 +1342,30 @@ fn apply_edits(source: &str, mut edits: Vec<(usize, usize, String)>) -> String {
 mod tests {
     use super::{MigrateOptions, migrate_source, migration_table};
 
-    #[test]
-    fn book_embeds_the_migration_table() {
-        let book = include_str!("../../book/src/migration.md");
+    /// The table between the markers, compared as LF. `include_str!` keeps the
+    /// bytes on disk, and a Windows checkout with `core.autocrlf=true` is CRLF.
+    fn migration_table_in(book: &str) -> String {
+        let book = book.replace("\r\n", "\n");
         let start = "<!-- migration-table:start -->\n";
         let end = "<!-- migration-table:end -->";
         let table_at = book.find(start).expect("start marker");
         let rest = &book[table_at + start.len()..];
         let end_at = rest.find(end).expect("end marker");
-        assert_eq!(&rest[..end_at], migration_table().as_str());
+        rest[..end_at].to_owned()
+    }
+
+    #[test]
+    fn book_embeds_the_migration_table() {
+        let book = include_str!("../../book/src/migration.md");
+        assert_eq!(migration_table_in(book), migration_table());
+    }
+
+    #[test]
+    fn book_embeds_the_migration_table_when_the_checkout_is_crlf() {
+        let book = include_str!("../../book/src/migration.md")
+            .replace("\r\n", "\n")
+            .replace('\n', "\r\n");
+        assert_eq!(migration_table_in(&book), migration_table());
     }
 
     fn migrated(source: &str) -> String {

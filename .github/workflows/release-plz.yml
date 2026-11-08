@@ -142,6 +142,38 @@ jobs:
             echo "::warning::$msg"
           fi
       - name: Run release-plz release-pr
-        run: release-plz release-pr --git-token "$GIT_TOKEN"
+        run: |
+          date +%s > "$RUNNER_TEMP/release-pr-started"
+          release-plz release-pr --git-token "$GIT_TOKEN"
         env:
           GIT_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || github.token }}
+      # release-plz bumps the workspace version and rewrites the root lockfile.
+      # `fuzz/` is its own workspace, so its lockfile still names the previous
+      # `cgp-fork-macro-impl` version and `cargo clippy --locked` fails. That
+      # failure blocks publishing. Update only that path entry on the release
+      # branch release-plz just pushed.
+      - name: Sync the fuzz lockfile on the release branch
+        run: |
+          set -euo pipefail
+          started=$(cat "$RUNNER_TEMP/release-pr-started")
+          git fetch origin '+refs/heads/release-plz-*:refs/remotes/origin/release-plz-*'
+          cutoff=$((started - 180))
+          branch=$(git for-each-ref --sort=-committerdate --format='%(committerdate:unix) %(refname:short)' refs/remotes/origin/release-plz-* | awk -v cutoff="$cutoff" '$1 >= cutoff { print $2; exit }')
+          if [ -z "${branch:-}" ]; then
+            echo "release-plz did not update a release branch"
+            exit 0
+          fi
+          git checkout --detach "$branch"
+          if cargo metadata --manifest-path fuzz/Cargo.toml --locked --offline --format-version 1 --no-deps >/dev/null; then
+            echo "fuzz lockfile already matches $branch"
+            exit 0
+          fi
+          cargo update --manifest-path fuzz/Cargo.toml -p cgp-fork-macro-impl
+          cargo metadata --manifest-path fuzz/Cargo.toml --locked --offline --format-version 1 --no-deps >/dev/null
+          git add fuzz/Cargo.lock
+          if git diff --cached --quiet -- fuzz/Cargo.lock; then
+            echo "fuzz lockfile unchanged on $branch"
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "chore(fuzz): sync the lockfile with the workspace version"
+          git push origin "HEAD:${branch#origin/}"
