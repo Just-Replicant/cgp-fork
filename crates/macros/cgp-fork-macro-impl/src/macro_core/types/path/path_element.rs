@@ -71,16 +71,41 @@ impl ToTokens for PathElement {
     }
 }
 
+/// Whether `ident` is a Rust primitive type name, which a path segment keeps as the type rather
+/// than reading as a `Symbol`. Only the real names match, so `f` or `u2` is a symbol.
 fn is_primitive_type(ident: &str) -> bool {
-    if (ident.starts_with("i") || ident.starts_with("u") || ident.starts_with("f"))
-        && ident[1..].chars().all(|c| c.is_numeric())
-    {
-        return true;
-    }
+    matches!(
+        ident,
+        "u8" | "u16"
+            | "u32"
+            | "u64"
+            | "u128"
+            | "usize"
+            | "i8"
+            | "i16"
+            | "i32"
+            | "i64"
+            | "i128"
+            | "isize"
+            | "f32"
+            | "f64"
+            | "char"
+            | "bool"
+            | "str"
+    )
+}
 
-    if ["char", "bool", "usize", "isize", "str"].contains(&ident) {
-        return true;
-    }
+#[cfg(test)]
+mod primitive_tests {
+    use super::is_primitive_type;
 
-    false
+    #[test]
+    fn only_real_primitive_names_are_types() {
+        for name in ["u8", "i32", "f64", "usize", "char", "bool", "str"] {
+            assert!(is_primitive_type(name), "{name}");
+        }
+        for name in ["f", "u2", "i999", "str2", "string"] {
+            assert!(!is_primitive_type(name), "{name}");
+        }
+    }
 }
