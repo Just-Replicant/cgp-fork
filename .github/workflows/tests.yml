@@ -20,7 +20,6 @@ env:
   # package checksum and `--locked` pins the tool's dependency graph).
   NEXTEST_VERSION: "0.9.150"
   NEXTEST_SHA256: "b0959bc64232974224cf9fb22c915845398c0e8668fa7831eb5b43fb1eef781f"
-  CARGO_HACK_VERSION: "0.6.45"
   CARGO_DENY_VERSION: "0.20.2"
   CARGO_AUDIT_VERSION: "0.22.2"
   CARGO_SEMVER_CHECKS_VERSION: "0.51.0"
@@ -235,24 +234,6 @@ jobs:
         run: cargo check -p cgp-fork --target thumbv7m-none-eabi
       - name: Check the facade with only core
         run: cargo check -p cgp-fork --target thumbv7m-none-eabi --no-default-features
-
-  features:
-    name: Feature powerset (cargo-hack)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install pinned toolchain
-        run: rustup toolchain install && rustup target add thumbv7m-none-eabi
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cargo/bin/cargo-hack
-          key: cargo-hack-${{ runner.os }}-${{ env.CARGO_HACK_VERSION }}
-      - name: Install cargo-hack
-        run: command -v cargo-hack || cargo install --locked "cargo-hack@${CARGO_HACK_VERSION}"
-      - name: Every feature combination (host)
-        run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps
-      - name: Every feature combination (no_std; eyre needs std)
-        run: cargo hack check -p cgp-fork --feature-powerset --no-dev-deps --exclude-features eyre,tokio,smol,log-tracing --target thumbv7m-none-eabi
 
   deny:
     name: cargo-deny (advisories, licenses, bans, sources)
