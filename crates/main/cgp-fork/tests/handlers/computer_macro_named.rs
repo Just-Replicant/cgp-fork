@@ -38,6 +38,7 @@ snapshot_cgp_computer! {
             __Context__,
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (u64, u64))> for MyAdder {}
+        /// Provider `MyAdder` for [`Computer`].
         pub struct MyAdder;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]

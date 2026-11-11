@@ -41,6 +41,7 @@ snapshot_cgp_computer! {
         #[allow(deprecated)]
         impl<__Context__, __Code__> IsProviderFor<ComputerComponent, __Context__, (__Code__, ())>
         for Zero {}
+        /// Provider `Zero` for [`Computer`].
         pub struct Zero;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]
@@ -234,6 +235,7 @@ snapshot_cgp_computer! {
             __Context__,
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (u64))> for Increment {}
+        /// Provider `Increment` for [`Computer`].
         pub struct Increment;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]

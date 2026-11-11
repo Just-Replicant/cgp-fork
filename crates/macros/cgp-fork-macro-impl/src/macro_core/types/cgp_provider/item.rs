@@ -118,17 +118,38 @@ impl ItemCgpProvider {
 
         let provider_type: IdentWithTypeGenerics = parse_internal!( #impl_self_type );
 
-        let docs = provider_impl
+        let user_docs: Vec<_> = provider_impl
             .attrs
             .iter()
             .filter(|attr| attr.path().is_ident("doc"))
-            .cloned();
+            .cloned()
+            .collect();
 
-        let provider_struct = EmptyStruct::new(
+        let mut provider_struct = EmptyStruct::new(
             provider_type.ident.clone(),
             provider_type.type_generics.to_generics(),
         )
-        .with_doc_attrs(docs);
+        .with_doc_attrs(user_docs.iter().cloned());
+
+        // A generated line fills a gap. It is never appended after a doc the user wrote.
+        if user_docs.is_empty() {
+            let provider_trait = provider_impl
+                .trait_
+                .as_ref()
+                .and_then(|(path, _)| {
+                    path.segments
+                        .last()
+                        .map(|segment| segment.ident.to_string())
+                })
+                .unwrap_or_default();
+            let provider_ident = &provider_type.ident;
+            let doc = if provider_trait.is_empty() {
+                format!(" Provider `{provider_ident}`.")
+            } else {
+                format!(" Provider `{provider_ident}` for [`{provider_trait}`].")
+            };
+            provider_struct = provider_struct.with_doc(doc);
+        }
 
         Ok(Some(provider_struct))
     }

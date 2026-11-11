@@ -30,7 +30,9 @@ snapshot_cgp_fn! {
 
     expand_scaled_rectangle_area(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `scaled_rectangle_area` operation.
         pub trait ScaledRectangleArea {
+            /// The `scaled_rectangle_area` operation.
             fn scaled_rectangle_area(&self) -> f64;
         }
         impl<__Context__> ScaledRectangleArea for __Context__
@@ -69,8 +71,9 @@ snapshot_cgp_fn! {
             >,
         {
             fn scaled_rectangle_area(&self) -> f64 {
-                let scale_factor: f64 = self
-                    .get_field(
+                let scale_factor: f64 = ::core::clone::Clone::clone(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<
                                 12,
@@ -101,8 +104,8 @@ snapshot_cgp_fn! {
                                 >,
                             >,
                         >,
-                    )
-                    .clone();
+                    ),
+                );
                 self.rectangle_area() * scale_factor * scale_factor
             }
         }

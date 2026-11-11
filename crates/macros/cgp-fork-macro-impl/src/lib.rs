@@ -45,6 +45,9 @@ mod crate_path_tests;
 #[path = "macro_tests/diagnostic_attrs_tests.rs"]
 mod diagnostic_attrs_tests;
 #[cfg(test)]
+#[path = "macro_tests/generated_docs_tests.rs"]
+mod generated_docs_tests;
+#[cfg(test)]
 #[path = "macro_tests/ident_with_type_params_tests.rs"]
 mod ident_with_type_params_tests;
 #[cfg(test)]

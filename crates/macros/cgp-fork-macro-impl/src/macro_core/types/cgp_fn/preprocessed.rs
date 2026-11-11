@@ -1,8 +1,9 @@
+use syn::ext::IdentExt;
 use syn::punctuated::Punctuated;
 use syn::token::Plus;
 use syn::{
     Generics, Ident, Item, ItemFn, ItemImpl, ItemTrait, TraitItemFn, Type, TypeParamBound,
-    Visibility,
+    Visibility, parse_quote,
 };
 
 use crate::macro_core::functions::{async_trait_deprecation, parse_internal};
@@ -41,8 +42,26 @@ impl PreprocessedItemCgpFn {
             ..
         } = self;
 
+        // The function's doc comment describes the operation, so it stays on the
+        // method, where the function's body lands. The trait gets a line of its
+        // own, and the method gets one when the function carries no doc, so a
+        // crate that enables `missing_docs` reports neither.
+        let (doc_attrs, other_attrs): (Vec<_>, Vec<_>) = attributes
+            .raw_attributes
+            .iter()
+            .cloned()
+            .partition(|attr| attr.path().is_ident("doc"));
+
+        let mut method_attrs = item_fn.attrs.clone();
+        method_attrs.extend(doc_attrs);
+        let fn_name = item_fn.sig.ident.unraw().to_string();
+        if !method_attrs.iter().any(|attr| attr.path().is_ident("doc")) {
+            let method_doc = format!(" The `{fn_name}` operation.");
+            method_attrs.push(parse_quote!(#[doc = #method_doc]));
+        }
+
         let trait_item_fn = TraitItemFn {
-            attrs: item_fn.attrs.clone(),
+            attrs: method_attrs,
             modifiers: syn::FnModifiers::default(),
             sig: item_fn.sig.clone(),
             default: None,
@@ -70,7 +89,9 @@ impl PreprocessedItemCgpFn {
 
         attributes.use_type.transform_item_trait(&mut item_trait)?;
 
-        item_trait.attrs.extend(attributes.raw_attributes.clone());
+        item_trait.attrs.extend(other_attrs);
+        let trait_doc = format!(" The trait for the `{fn_name}` operation.");
+        item_trait.attrs.push(parse_quote!(#[doc = #trait_doc]));
         item_trait.vis = visibility.clone();
 
         Ok(item_trait)
@@ -142,7 +163,13 @@ impl PreprocessedItemCgpFn {
             .use_provider
             .add_type_param_bounds(&self_type, &mut item_impl.generics)?;
 
-        item_impl.attrs.extend(attributes.raw_attributes.clone());
+        item_impl.attrs.extend(
+            attributes
+                .raw_attributes
+                .iter()
+                .filter(|attr| !attr.path().is_ident("doc"))
+                .cloned(),
+        );
 
         Ok(item_impl)
     }

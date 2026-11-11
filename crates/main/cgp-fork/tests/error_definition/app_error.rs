@@ -44,6 +44,7 @@ snapshot_cgp_auto_error! {
 
     expand_provide_app_error(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Error provider `ProvideAppError`.
         pub struct ProvideAppError;
         impl<__Context__> ErrorTypeProvider<__Context__> for ProvideAppError {
             type Error = AppError;

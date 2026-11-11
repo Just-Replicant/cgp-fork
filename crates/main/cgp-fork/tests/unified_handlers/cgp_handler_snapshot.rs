@@ -31,8 +31,9 @@ snapshot_cgp_handler! {
                 (arg_0): (f64),
             ) -> Self::Output {
                 scaled_width(
-                    context
-                        .get_field(
+                    ::core::clone::Clone::clone(
+                        HasField::get_field(
+                            context,
                             ::core::marker::PhantomData::<
                                 Symbol<
                                     5,
@@ -42,8 +43,8 @@ snapshot_cgp_handler! {
                                     >,
                                 >,
                             >,
-                        )
-                        .clone(),
+                        ),
+                    ),
                     arg_0,
                 )
             }
@@ -59,6 +60,7 @@ snapshot_cgp_handler! {
                 Value = f64,
             >,
         {}
+        /// Provider `ScaledWidth` for [`Handler`].
         pub struct ScaledWidth;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<unified::AsyncHandlerComponent> for ScaledWidth {

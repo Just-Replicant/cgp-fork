@@ -58,6 +58,7 @@ snapshot_cgp_computer! {
         where
             T: Display,
         {}
+        /// Provider `Describe` for [`Computer`].
         pub struct Describe;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]
@@ -253,6 +254,7 @@ snapshot_cgp_computer! {
             __Context__,
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (&'a str))> for FirstChar {}
+        /// Provider `FirstChar` for [`Computer`].
         pub struct FirstChar;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]
@@ -448,6 +450,7 @@ snapshot_cgp_computer! {
             __Context__,
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, ([u64; N]))> for SumArray {}
+        /// Provider `SumArray` for [`Computer`].
         pub struct SumArray;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]

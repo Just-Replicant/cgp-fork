@@ -44,6 +44,7 @@ snapshot_cgp_impl! {
             }
         }
         impl<__Context__> IsProviderFor<GreeterComponent, __Context__, ()> for GreetShout {}
+        /// Provider `GreetShout` for [`Greeter`].
         pub struct GreetShout;
         "#)
     }

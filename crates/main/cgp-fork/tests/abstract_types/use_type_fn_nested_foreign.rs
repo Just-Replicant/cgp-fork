@@ -45,11 +45,13 @@ snapshot_cgp_fn! {
 
     expand_rectangle_area(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `rectangle_area` operation.
         pub trait RectangleArea: HasTypes
         where
             <<Self as HasTypes>::Types as HasScalarType>::Scalar: Copy,
             <Self as HasTypes>::Types: HasScalarType,
         {
+            /// The `rectangle_area` operation.
             fn rectangle_area(&self) -> <<Self as HasTypes>::Types as HasScalarType>::Scalar;
         }
         impl<__Context__> RectangleArea for __Context__
@@ -76,18 +78,20 @@ snapshot_cgp_fn! {
             <Self as HasTypes>::Types: HasScalarType,
         {
             fn rectangle_area(&self) -> <<Self as HasTypes>::Types as HasScalarType>::Scalar {
-                let width: <<Self as HasTypes>::Types as HasScalarType>::Scalar = self
-                    .get_field(
+                let width: <<Self as HasTypes>::Types as HasScalarType>::Scalar = ::core::clone::Clone::clone(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<
                                 5,
                                 Chars<'w', Chars<'i', Chars<'d', Chars<'t', Chars<'h', Nil>>>>>,
                             >,
                         >,
-                    )
-                    .clone();
-                let height: <<Self as HasTypes>::Types as HasScalarType>::Scalar = self
-                    .get_field(
+                    ),
+                );
+                let height: <<Self as HasTypes>::Types as HasScalarType>::Scalar = ::core::clone::Clone::clone(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<
                                 6,
@@ -100,8 +104,8 @@ snapshot_cgp_fn! {
                                 >,
                             >,
                         >,
-                    )
-                    .clone();
+                    ),
+                );
                 let res: <<Self as HasTypes>::Types as HasScalarType>::Scalar = width * height;
                 res
             }

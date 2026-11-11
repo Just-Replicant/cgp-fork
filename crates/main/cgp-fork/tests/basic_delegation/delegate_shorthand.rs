@@ -38,6 +38,7 @@ snapshot_delegate_components! {
 
     expand_shorthand(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Wiring table `PersonComponents`.
         pub struct PersonComponents;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameTypeProviderComponent> for PersonComponents {
@@ -97,6 +98,7 @@ snapshot_delegate_components! {
 
     expand_explicit(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Wiring table `ExplicitComponents`.
         pub struct ExplicitComponents;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<NameTypeProviderComponent> for ExplicitComponents {

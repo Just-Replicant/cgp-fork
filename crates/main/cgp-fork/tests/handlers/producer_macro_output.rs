@@ -41,6 +41,7 @@ snapshot_cgp_producer! {
         #[allow(deprecated)]
         impl<__Context__, __Code__> IsProviderFor<ProducerComponent, __Context__, (__Code__)>
         for TheAnswer {}
+        /// Provider `TheAnswer` for [`Producer`].
         pub struct TheAnswer;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]

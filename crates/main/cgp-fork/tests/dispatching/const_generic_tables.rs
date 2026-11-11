@@ -31,6 +31,7 @@ snapshot_delegate_components! {
     }
     expand_constant_table(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Wiring table `ConstantTable`.
         pub struct ConstantTable<const N: u64>(pub ::core::marker::PhantomData<()>);
         #[diagnostic::do_not_recommend]
         impl<const N: u64> DelegateComponent<ConstantGetterComponent> for ConstantTable<N> {
@@ -95,6 +96,7 @@ snapshot_delegate_components! {
     }
     expand_count_table(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Wiring table `CountTable`.
         pub struct CountTable<const N: usize>(pub ::core::marker::PhantomData<()>);
         #[diagnostic::do_not_recommend]
         impl<const N: usize> DelegateComponent<CounterComponent> for Wrapper<N> {

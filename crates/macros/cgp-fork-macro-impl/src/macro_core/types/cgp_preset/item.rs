@@ -130,7 +130,8 @@ impl ItemCgpPreset {
         let provider = EmptyStruct::new(
             Ident::new("Provider", Span::call_site()),
             Default::default(),
-        );
+        )
+        .with_doc(" Provider bundle for this preset.");
 
         let contains = PresetContains;
         let root = crate::crate_path::crate_root();
