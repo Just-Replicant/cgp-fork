@@ -66,13 +66,16 @@ version_group = "cgp-fork"
 [[package]]
 name = "cgp-fork-doctests"
 release = false
+publish = false
 
 # Workspace-only check that renamed dependencies work (`publish = false`).
 [[package]]
 name = "cgp-fork-renamed-dep"
 release = false
+publish = false
 
 # Uses a preset from `cgp-fork-renamed-dep` under the default crate name (`publish = false`).
 [[package]]
 name = "cgp-fork-preset-consumer"
 release = false
+publish = false

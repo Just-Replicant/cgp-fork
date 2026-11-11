@@ -86,8 +86,8 @@ jobs:
       - name: Install release-plz
         run: |
           tmpdir=$(mktemp -d)
-          curl -fsSL -o "$tmpdir/release-plz.tar.gz" https://github.com/release-plz/release-plz/releases/download/release-plz-v0.3.169/release-plz-x86_64-unknown-linux-gnu.tar.gz
-          echo "1455106d3263712dd796ee04869eaee98b274e1e2e18011f67682b1f2840b64d  $tmpdir/release-plz.tar.gz" | sha256sum -c -
+          curl -fsSL -o "$tmpdir/release-plz.tar.gz" https://github.com/release-plz/release-plz/releases/download/release-plz-v0.4.3/release-plz-x86_64-unknown-linux-gnu.tar.gz
+          echo "f4b0cc404cd9a58cd1b33f49e439bba65186773f63e323ea47f3ea57e557a3d3  $tmpdir/release-plz.tar.gz" | sha256sum -c -
           tar -xzf "$tmpdir/release-plz.tar.gz" -C "$tmpdir"
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
@@ -124,8 +124,8 @@ jobs:
       - name: Install release-plz
         run: |
           tmpdir=$(mktemp -d)
-          curl -fsSL -o "$tmpdir/release-plz.tar.gz" https://github.com/release-plz/release-plz/releases/download/release-plz-v0.3.169/release-plz-x86_64-unknown-linux-gnu.tar.gz
-          echo "1455106d3263712dd796ee04869eaee98b274e1e2e18011f67682b1f2840b64d  $tmpdir/release-plz.tar.gz" | sha256sum -c -
+          curl -fsSL -o "$tmpdir/release-plz.tar.gz" https://github.com/release-plz/release-plz/releases/download/release-plz-v0.4.3/release-plz-x86_64-unknown-linux-gnu.tar.gz
+          echo "f4b0cc404cd9a58cd1b33f49e439bba65186773f63e323ea47f3ea57e557a3d3  $tmpdir/release-plz.tar.gz" | sha256sum -c -
           tar -xzf "$tmpdir/release-plz.tar.gz" -C "$tmpdir"
           install -m 755 "$tmpdir/release-plz" "${CARGO_HOME:-$HOME/.cargo}/bin/release-plz"
           release-plz --version
