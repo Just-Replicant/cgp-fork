@@ -1,0 +1,79 @@
+name: macOS tests
+
+# Kept out of Tests on purpose. release-plz publishes when the Tests workflow
+# finishes green. `macos-latest` is the arm64 pool, and GitHub has been
+# cancelling those jobs with "not acquired by Runner" before any step runs.
+# A cancelled job fails its workflow, so leaving this suite in Tests would
+# block publishing. It still runs on pull requests and on main; mark
+# `Test (macos-latest)` required there.
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: short
+  CARGO_NET_RETRY: 10
+  RUSTUP_MAX_RETRIES: 10
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # The required check stays `Test (macos-latest)`. When GitHub cancels the
+  # arm64 job before any step runs, the same suite runs on the Intel image,
+  # which still gets a machine. A real test failure is not retried.
+  test-macos:
+    name: macOS (arm64)
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - name: Run tests
+        run: cargo test --workspace --all-features --no-fail-fast
+
+  test-macos-intel:
+    name: macOS (intel)
+    needs: test-macos
+    if: ${{ needs.test-macos.result == 'cancelled' }}
+    runs-on: macos-15-intel
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned toolchain
+        run: rustup toolchain install
+      - name: Run tests
+        run: cargo test --workspace --all-features --no-fail-fast
+
+  test-macos-ok:
+    name: Test (macos-latest)
+    needs: [test-macos, test-macos-intel]
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require a finished macOS suite
+        run: |
+          set -euo pipefail
+          arm="${{ needs.test-macos.result }}"
+          intel="${{ needs.test-macos-intel.result }}"
+          case "$arm:$intel" in
+            success:success|success:skipped) exit 0 ;;
+            cancelled:success) exit 0 ;;
+            failure:*|*:failure) exit 1 ;;
+            *)
+              echo "macOS suite did not finish (arm=$arm intel=$intel)"
+              exit 1
+              ;;
+          esac

@@ -118,56 +118,6 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --all-features --no-fail-fast
 
-  # The required check stays `Test (macos-latest)`. `macos-latest` is the arm64
-  # pool, and GitHub has been cancelling those jobs with "not acquired by
-  # Runner" before any step runs. A cancelled job fails this workflow, so
-  # nothing publishes. When that happens, run the same suite on the Intel
-  # image, which still gets a machine. A real test failure is not retried.
-  test-macos:
-    name: macOS (arm64)
-    runs-on: macos-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install pinned toolchain
-        run: rustup toolchain install
-      - name: Run tests
-        run: cargo test --workspace --all-features --no-fail-fast
-
-  test-macos-intel:
-    name: macOS (intel)
-    needs: test-macos
-    if: ${{ needs.test-macos.result == 'cancelled' }}
-    runs-on: macos-15-intel
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install pinned toolchain
-        run: rustup toolchain install
-      - name: Run tests
-        run: cargo test --workspace --all-features --no-fail-fast
-
-  test-macos-ok:
-    name: Test (macos-latest)
-    needs: [test-macos, test-macos-intel]
-    if: ${{ always() && !cancelled() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Require a finished macOS suite
-        run: |
-          set -euo pipefail
-          arm="${{ needs.test-macos.result }}"
-          intel="${{ needs.test-macos-intel.result }}"
-          case "$arm:$intel" in
-            success:success|success:skipped) exit 0 ;;
-            cancelled:success) exit 0 ;;
-            failure:*|*:failure) exit 1 ;;
-            *)
-              echo "macOS suite did not finish (arm=$arm intel=$intel)"
-              exit 1
-              ;;
-          esac
-
   # Early warning for the next toolchain bump: runs clippy and the tests on the
   # newest stable and on beta instead of the pinned `rust-toolchain.toml`.
   # `tests/ui` snapshots are exact on the pinned minor; other compilers must
