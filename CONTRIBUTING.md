@@ -136,7 +136,9 @@ These are repository settings, so no file in this repository can enforce them. C
 ## Keeping up with upstream
 
 The fork tracks [contextgeneric/cgp](https://github.com/contextgeneric/cgp). `UPSTREAM_COMMIT`
-records the last upstream commit merged here, and the README repeats it.
+records the last upstream commit this fork has accounted for, and the README repeats it.
+Behavior changes through that commit are ported. A commit that does not apply here is not
+carried over.
 
 ```sh
 bash scripts/upstream-sync.sh          # fetch upstream and list the commits not merged yet
