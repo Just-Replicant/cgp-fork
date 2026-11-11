@@ -4,7 +4,9 @@ use syn::spanned::Spanned;
 use syn::token::Comma;
 use syn::{Error, Expr, FnArg, Ident, ItemFn, Type, parse2};
 
-use crate::extra_macro_core::functions::{derive_provider_ident, return_type};
+use crate::extra_macro_core::functions::{
+    derive_provider_ident, reject_output_only_params, return_type,
+};
 use crate::extra_macro_core::types::cgp_computer::{MaybeResultType, PreprocessedCgpComputer};
 use crate::extra_macro_core::visitors::find_impl_trait;
 use crate::macro_core::functions::{is_implicit_arg, parse_context_arg};
@@ -90,6 +92,10 @@ impl ItemCgpComputer {
         }
 
         let output = return_type(&item_fn.sig.output)?;
+
+        // Check the signature the user wrote, before implicit arguments are stripped, so a
+        // parameter named only by an implicit argument still counts as an input.
+        reject_output_only_params(&self.item_fn.sig, noun)?;
 
         if let Some(impl_trait) = find_impl_trait(&output) {
             return Err(Error::new_spanned(
