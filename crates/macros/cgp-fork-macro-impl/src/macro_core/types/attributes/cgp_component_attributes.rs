@@ -66,6 +66,24 @@ impl CgpComponentAttributes {
                 } else if ident == "prefix" {
                     let namespace_specs = attribute.parse_args_with(PrefixAttribute::parse)?;
                     parsed_attributes.prefixes.push(namespace_specs);
+                } else if ident == "uses" {
+                    // `#[uses]` imports a provider's dependencies. On a trait definition it would
+                    // only be left for the compiler, which knows no such attribute.
+                    let bounds = match &attribute.meta {
+                        syn::Meta::List(list) => list.tokens.to_string(),
+                        _ => String::new(),
+                    };
+                    let hint = if bounds.is_empty() {
+                        "write `#[extend(Bound)]` to make it a supertrait".to_owned()
+                    } else {
+                        format!("write `#[extend({bounds})]` to make it a supertrait")
+                    };
+                    return Err(syn::Error::new_spanned(
+                        &attribute,
+                        format!(
+                            "`#[uses]` declares the dependencies of a provider, not of a trait; {hint}"
+                        ),
+                    ));
                 } else if ident == "derive_delegate" {
                     let derive_delegate_attribute =
                         attribute.parse_args_with(DeriveDelegateAttribute::parse)?;

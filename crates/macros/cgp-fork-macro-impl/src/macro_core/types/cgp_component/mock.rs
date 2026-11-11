@@ -98,7 +98,7 @@ pub fn mock_items(component: &ItemCgpComponent) -> syn::Result<TokenStream> {
         if let Some(clause) = &mut method.where_clause {
             ReplaceSelfTypeVisitor {
                 replaced_type: &context_ty,
-                skip_assoc_types: &Vec::new(),
+                skip_assoc_items: &Vec::new(),
             }
             .visit_where_clause_mut(clause);
         }
