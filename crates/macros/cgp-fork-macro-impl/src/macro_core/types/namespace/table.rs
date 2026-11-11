@@ -1,7 +1,7 @@
 use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream};
 use syn::token::Colon;
-use syn::{Ident, ItemImpl, ItemStruct, ItemTrait, Type, braced};
+use syn::{Error, Ident, ItemImpl, ItemStruct, ItemTrait, Type, braced};
 
 use crate::macro_core::functions::parse_internal;
 use crate::macro_core::traits::ParseOptionalKeyword;
@@ -33,6 +33,7 @@ impl Parse for NamespaceTable {
         let parent_namespace = if input.peek(Colon) {
             let colon: Colon = input.parse()?;
             let parent_namespace_type = input.parse()?;
+            reject_self_inheritance(&namespace_type, &parent_namespace_type)?;
             Some((colon, parent_namespace_type))
         } else {
             None
@@ -57,6 +58,35 @@ impl Parse for NamespaceTable {
     }
 }
 
+/// Reject a namespace that names itself as its parent, `new Ns: Ns` or `new Ns: self::Ns`.
+/// The parent's arguments do not matter: every instance of the namespace has the same parent
+/// rule. A path the macro cannot resolve, such as `crate::Ns`, is left to the compiler.
+fn reject_self_inheritance(
+    namespace: &IdentWithTypeArgs,
+    parent: &PathWithTypeArgs,
+) -> syn::Result<()> {
+    let segments = &parent.path.segments;
+    let name = match segments.len() {
+        1 => Some(&segments[0]),
+        2 if segments[0].ident == "self" => Some(&segments[1]),
+        _ => None,
+    };
+    let names_itself = parent.path.leading_colon.is_none()
+        && name.is_some_and(|segment| segment.ident == namespace.ident);
+
+    if names_itself {
+        return Err(Error::new_spanned(
+            &parent.path,
+            format!(
+                "the namespace `{}` cannot inherit from itself; name another namespace as its parent, or omit the parent",
+                namespace.ident
+            ),
+        ));
+    }
+
+    Ok(())
+}
+
 impl NamespaceTable {
     pub fn build_namespace_trait(&self) -> syn::Result<Type> {
         let mut namespace = self.namespace.clone();
@@ -71,8 +101,14 @@ impl NamespaceTable {
         let namespace_trait = self.build_namespace_trait()?;
 
         let item_trait: Option<ItemTrait> = if self.new.is_some() {
+            let namespace_ident = &self.namespace.ident;
+            let trait_doc = format!(" The `{namespace_ident}` namespace's wiring table.");
+            let delegate_doc =
+                format!(" The provider table the `{namespace_ident}` namespace delegates to.");
             let item_trait = parse_internal! {
+                #[doc = #trait_doc]
                 pub trait #namespace_trait {
+                    #[doc = #delegate_doc]
                     type Delegate;
                 }
             };
@@ -118,7 +154,9 @@ impl NamespaceTable {
             namespace_ident.span(),
         );
 
+        let namespace_doc = format!(" Wiring table for the `{namespace_ident}` namespace.");
         let namespace_struct: ItemStruct = parse_internal! {
+            #[doc = #namespace_doc]
             pub struct #namespace_struct_ident;
         };
 
