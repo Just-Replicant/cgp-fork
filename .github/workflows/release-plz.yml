@@ -7,8 +7,9 @@ name: Release-plz
 #   for a push to main (`workflow_run`), and checks out exactly the commit
 #   Tests passed. It publishes when that version is newer than crates.io, tags
 #   `v<version>`, and creates the GitHub release. A red, cancelled, or still
-#   running Tests run never publishes. A manual `workflow_dispatch` runs the
-#   test suite itself first.
+#   running Tests run never publishes. The Feature powerset workflow is not
+#   part of that wait. A manual `workflow_dispatch` runs the test suite itself
+#   first.
 #
 # Publishing uses crates.io trusted publishing. There is no
 # `CARGO_REGISTRY_TOKEN`: release-plz exchanges this job's OIDC token for a
