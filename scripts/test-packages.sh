@@ -20,7 +20,7 @@ version="$(cargo metadata --no-deps --format-version 1 \
 # (publish = false) are workspace-only checks that read files outside their own
 # directory or depend on another workspace crate by path; they are never published.
 cargo package --workspace --exclude cgp-fork-doctests --exclude cgp-fork-renamed-dep \
-  --exclude cgp-fork-preset-consumer --locked --allow-dirty
+  --exclude cgp-fork-preset-consumer --allow-dirty
 
 for crate in cgp-fork cgp-fork-macro cgp-fork-macro-impl; do
   if ! cargo package -p "$crate" --list --allow-dirty | grep -qx LICENSE; then

@@ -1,4 +1,6 @@
 /target
+# Resolved on each build. A committed lock keeps a yanked crate and blocks release.
+Cargo.lock
 # insta review artifacts
 *.pending-snap
 *.snap.new
