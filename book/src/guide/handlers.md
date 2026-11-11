@@ -28,5 +28,11 @@ fn main() {
 `#[cgp_handler]` replaces `#[cgp_computer]` and `#[cgp_producer]`.
 `#[derive_handler(Name)]` on a component replaces `#[derive_promote]`.
 `Pipe` and `TryPipe` compose handlers. `MatchWith<Handlers, All | First, Owned | Ref | Mut>`
-dispatches on an extensible enum. The [handler reference](../reference/handlers.md)
-maps every 0.10 name.
+dispatches on an extensible enum. `#[cgp_auto_dispatch]` implements a trait for
+an enum by forwarding each variant to the same trait on its payload. The
+[handler reference](../reference/handlers.md) maps every 0.10 name.
+
+A type or const parameter of `#[cgp_handler]` or `#[cgp_computer]` has to appear
+in an argument type. A parameter only the return type names is rejected. Write
+an argument that names it, or write the `Handler` impl by hand on a provider
+that is generic over that parameter.

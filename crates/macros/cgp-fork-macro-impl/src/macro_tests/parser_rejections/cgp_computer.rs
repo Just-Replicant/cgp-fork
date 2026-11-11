@@ -90,6 +90,44 @@ fn rejects_impl_trait_return() {
 }
 
 #[test]
+fn rejects_parameter_used_only_by_the_return_type() {
+    let message = "the parameter `T` appears in no argument type, so the generated `Computer` impl cannot determine it; take an argument whose type names `T`, or write the provider by hand as a `Computer` impl on a provider generic over `T`";
+    assert_macro_rejects_with(
+        "cgp_computer generic only in the return type",
+        message,
+        || {
+            crate::extra_macro_lib::cgp_computer(
+                quote!(),
+                quote!(
+                    fn make<T>() -> T {
+                        unimplemented!()
+                    }
+                ),
+            )
+        },
+    );
+}
+
+#[test]
+fn rejects_handler_parameter_used_only_by_the_return_type() {
+    let message = "the parameter `T` appears in no argument type, so the generated `Handler` impl cannot determine it; take an argument whose type names `T`, or write the provider by hand as a `Handler` impl on a provider generic over `T`";
+    assert_macro_rejects_with(
+        "cgp_handler generic only in the return type",
+        message,
+        || {
+            crate::extra_macro_lib::cgp_handler(
+                quote!(),
+                quote!(
+                    fn make<T>() -> T {
+                        unimplemented!()
+                    }
+                ),
+            )
+        },
+    );
+}
+
+#[test]
 fn rejects_field_attr_with_arguments() {
     assert_macro_rejects("cgp_computer with a `#[field(...)]` attribute", || {
         crate::extra_macro_lib::cgp_computer(

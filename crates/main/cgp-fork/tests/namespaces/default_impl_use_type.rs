@@ -52,12 +52,12 @@ snapshot_cgp_impl! {
             __Context__: HasNameType,
         {
             fn greet(__context__: &__Context__) -> String {
-                let name: &<__Context__ as HasNameType>::Name = __context__
-                    .get_field(
-                        ::core::marker::PhantomData::<
-                            Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
-                        >,
-                    );
+                let name: &<__Context__ as HasNameType>::Name = HasField::get_field(
+                    __context__,
+                    ::core::marker::PhantomData::<
+                        Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
+                    >,
+                );
                 format!("Hello, {name}!")
             }
         }
@@ -69,6 +69,7 @@ snapshot_cgp_impl! {
             >,
             __Context__: HasNameType,
         {}
+        /// Provider `GreetByName` for [`Greeter`].
         pub struct GreetByName;
         impl<__Components__> AppNamespace<__Components__>
         for PathCons<

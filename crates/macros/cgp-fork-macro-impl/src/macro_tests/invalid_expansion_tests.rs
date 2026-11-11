@@ -15,9 +15,8 @@
 //! 3. record the limitation in the owning reference document's `## Known issues`
 //!    section (per cgp-knowledge-base-fork/cgp/AGENTS.md), and link from the test to that document.
 //!
-//! One case is captured so far: `reserved_variant_names`, where the variant derives name their
-//! own associated types through `Self::…` and so cannot be applied to an enum with a variant of
-//! a colliding name.
+//! `reserved_variant_names` pins the qualified associated-type paths. It used to record the
+//! ambiguous `Self::Item` expansion; that expansion now compiles.
 #![allow(dead_code)]
 
 pub mod invalid_expansion;

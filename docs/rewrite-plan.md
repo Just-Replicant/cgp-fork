@@ -58,7 +58,7 @@ What changed from the plan as written:
   "language extension" built from traits and proc macros. One interface (a *component*) can have many
   implementations (*providers*); each concrete type (*context*) picks its providers in one wiring table, and
   the choice compiles to a direct call (`README.md`, example in `README.md` lines "Example").
-- **Fork relationship.** It merges upstream through commit `69d2854` (`UPSTREAM_COMMIT`), records skipped
+- **Fork relationship.** It has reviewed upstream through commit `3a235198` (`UPSTREAM_COMMIT`) and ported the behavior changes since `69d2854`. It records skipped
   upstream commits (`UPSTREAM_REVIEWED`), and has a weekly sync job (`.github/workflows/upstream-sync.yml`,
   `scripts/upstream-sync.sh`). Its main difference: one facade crate + one macro crate instead of upstream's
   per-concept crates, error backends as features (`README.md` "Differences from upstream").

@@ -2,6 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Ident, ImplItemFn, Type};
 
+use crate::macro_core::exports::{HasField, HasFieldMut};
 use crate::macro_core::functions::parse_internal;
 use crate::macro_core::types::cgp_getter::GetterField;
 use crate::macro_core::types::getter::ContextArg;
@@ -71,6 +72,15 @@ impl GetterMethod {
             quote! { get_field_mut }
         };
 
+        // The context read is a fully qualified trait call, so an inherent method of
+        // the same name on the context cannot capture it. A wired provider is already
+        // called as `Provider::get_field`, which is not a method on the context.
+        let get_field_trait = if getter_field.receiver_mut.is_none() {
+            quote! { #HasField }
+        } else {
+            quote! { #HasFieldMut }
+        };
+
         let context_var = match &context_arg {
             ContextArg::SelfArg => {
                 quote! { self }
@@ -88,7 +98,7 @@ impl GetterMethod {
             }
             None => {
                 quote! {
-                    #context_var . #get_field_method ( ::core::marker::PhantomData::< #tag_type > )
+                    #get_field_trait :: #get_field_method ( #context_var, ::core::marker::PhantomData::< #tag_type > )
                 }
             }
         };

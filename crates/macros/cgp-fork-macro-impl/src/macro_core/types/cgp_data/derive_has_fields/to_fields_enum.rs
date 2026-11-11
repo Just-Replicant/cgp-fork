@@ -5,7 +5,7 @@ use syn::spanned::Spanned;
 use syn::token::Comma;
 use syn::{Error, Fields, Ident, ItemEnum, ItemImpl, Variant};
 
-use crate::macro_core::exports::{Either, ToFields};
+use crate::macro_core::exports::{Either, HasFields, ToFields};
 use crate::macro_core::functions::parse_internal;
 use crate::macro_core::types::cgp_data::{FieldLabel, derive_to_fields_constructor};
 
@@ -22,7 +22,7 @@ pub fn derive_to_fields_for_enum(item_enum: &ItemEnum) -> syn::Result<ItemImpl> 
         {
             fn to_fields(
                 self,
-            ) -> Self::Fields {
+            ) -> <Self as #HasFields>::Fields {
                 match self {
                     #match_arms
                 }

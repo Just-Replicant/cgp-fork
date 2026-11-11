@@ -1,9 +1,9 @@
 use proc_macro2::Span;
-use quote::ToTokens;
+use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
 use syn::token::For;
 use syn::visit_mut::VisitMut;
-use syn::{Error, Ident, ImplItem, Item, ItemImpl, Type};
+use syn::{Error, Ident, ImplItem, Item, ItemImpl, Path, Type};
 
 use crate::macro_core::functions::{parse_internal, to_snake_case_ident, tokens_eq};
 use crate::macro_core::types::cgp_impl::helpers::extract_helper_items;
@@ -11,7 +11,8 @@ use crate::macro_core::types::cgp_impl::{CgpProviderOrBareImpl, ImplArgs};
 use crate::macro_core::types::cgp_provider::{ItemCgpProvider, ProviderArgs};
 use crate::macro_core::types::ident::PathWithTypeArgs;
 use crate::macro_core::visitors::{
-    ReplaceSelfReceiverVisitor, ReplaceSelfTypeVisitor, ReplaceSelfValueVisitor,
+    QualifySelfConstVisitor, ReplaceSelfReceiverVisitor, ReplaceSelfTypeVisitor,
+    ReplaceSelfValueVisitor,
 };
 
 /// The header-normalized stage of `#[cgp_impl]`, carrying the resolved context
@@ -85,15 +86,24 @@ impl LoweredCgpImpl {
                 Ident::new("__context__", Span::call_site())
             };
 
+        // `Self::Item` naming an associated type the block declares means the
+        // provider's own type, so the rewrite leaves it alone. A const the block
+        // declares is qualified instead: a bare `Self::CONST` on the provider is
+        // ambiguous with the consumer trait's blanket impl.
         let local_assoc_types: Vec<Ident> = item_impl
             .items
             .iter()
-            .filter_map(|item| {
-                if let ImplItem::Type(assoc_type) = item {
-                    Some(assoc_type.ident.clone())
-                } else {
-                    None
-                }
+            .filter_map(|item| match item {
+                ImplItem::Type(assoc_type) => Some(assoc_type.ident.clone()),
+                _ => None,
+            })
+            .collect();
+        let local_assoc_consts: Vec<Ident> = item_impl
+            .items
+            .iter()
+            .filter_map(|item| match item {
+                ImplItem::Const(assoc_const) => Some(assoc_const.ident.clone()),
+                _ => None,
             })
             .collect();
 
@@ -121,14 +131,19 @@ impl LoweredCgpImpl {
             None => For(self.provider_trait_path.span()),
         };
 
-        out_impl.trait_ = Some((
-            parse_internal(provider_trait_path.to_token_stream())?,
-            for_token,
-        ));
+        let provider_trait: Path = parse_internal(provider_trait_path.to_token_stream())?;
+
+        QualifySelfConstVisitor {
+            local_consts: &local_assoc_consts,
+            qualified_self: &quote!(<#provider_type as #provider_trait>),
+        }
+        .visit_item_impl_mut(&mut out_impl);
+
+        out_impl.trait_ = Some((provider_trait, for_token));
 
         ReplaceSelfTypeVisitor {
             replaced_type: context_type,
-            skip_assoc_types: &local_assoc_types,
+            skip_assoc_items: &local_assoc_types,
         }
         .visit_item_impl_mut(&mut out_impl);
 

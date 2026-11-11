@@ -27,8 +27,8 @@ pub use crate::core::field::traits::MapTypeRef;
 pub use crate::core::field::traits::{
     BuildField, ExtractField, FieldGetter, FinalizeBuild, FinalizeExtract, FromFields, FromVariant,
     HasBuilder, HasExtractor, HasExtractorMut, HasExtractorRef, HasField, HasFieldMut, HasFields,
-    HasFieldsRef, IntoBuilder, MapType, Mode, MutFieldGetter, PartialData, ToFields, ToFieldsRef,
-    UpdateField,
+    HasFieldsRef, IntoBuilder, MapType, Mode, MutFieldGetter, OptionAsRef, PartialData, ToFields,
+    ToFieldsRef, UpdateField,
 };
 pub use crate::core::field::types::{
     Chars, Cons, Either, Field, Index, Life, MRef, Nil, Symbol, Void,

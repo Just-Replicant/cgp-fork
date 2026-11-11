@@ -22,6 +22,7 @@ snapshot_delegate_components! {
 
     expand_foo_component(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Wiring table `FooComponents`.
         pub struct FooComponents;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<Index<0>> for FooComponents {
@@ -65,6 +66,7 @@ snapshot_delegate_components! {
 
     expand_bar_component(output) {
         insta::assert_snapshot!(output, @r#"
+        /// Wiring table `BarComponents`.
         pub struct BarComponents;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<Index<0>> for BarComponents {

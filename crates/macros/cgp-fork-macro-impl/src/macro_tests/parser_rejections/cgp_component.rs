@@ -7,7 +7,44 @@
 
 use quote::quote;
 
-use super::assert_macro_rejects;
+use super::{assert_macro_rejects, assert_macro_rejects_with};
+
+#[test]
+fn rejects_uses_on_a_component() {
+    assert_macro_rejects_with(
+        "cgp_component with #[uses]",
+        "`#[uses]` declares the dependencies of a provider, not of a trait; write `#[extend(HasName)]` to make it a supertrait",
+        || {
+            crate::macro_lib::cgp_component(
+                quote!(Greeter),
+                quote!(
+                    #[uses(HasName)]
+                    pub trait CanGreet {
+                        fn greet(&self);
+                    }
+                ),
+            )
+        },
+    );
+}
+
+#[test]
+fn rejects_parameter_without_a_plain_name() {
+    assert_macro_rejects_with(
+        "cgp_component method that destructures a parameter",
+        "a component method parameter needs a plain name, since the generated impls forward each argument by name; write a name such as `_value`, and destructure inside a default body",
+        || {
+            crate::macro_lib::cgp_component(
+                quote!(Greeter),
+                quote!(
+                    pub trait CanGreet {
+                        fn greet(&self, (left, right): (u8, u8));
+                    }
+                ),
+            )
+        },
+    );
+}
 
 #[test]
 fn rejects_non_trait_item() {

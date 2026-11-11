@@ -51,3 +51,11 @@ The crate is `no_std`. Optional features add alloc, error backends, async
 runtimes, mocks, and loggers. The 0.10 handler names stay available behind the
 `compat-0.10` feature, which is on by default, and are deprecated. New code uses
 [`Handler` and `AsyncHandler`](guide/handlers.md).
+
+The rest of the guide is [fields](guide/fields.md), [functions](guide/functions.md),
+[records and variants](guide/data.md), [abstract types](guide/types.md),
+[namespaces](guide/namespaces.md), [async](guide/async.md), [errors](guide/errors.md),
+[checked wiring](guide/checked-wiring.md), [profiles](guide/profiles.md),
+[presets](guide/presets.md), [mocks](guide/mocks.md), [logging](guide/logging.md),
+and the [wiring graph](guide/wiring-graph.md). The [macro reference](reference/macros.md)
+is the full name list.

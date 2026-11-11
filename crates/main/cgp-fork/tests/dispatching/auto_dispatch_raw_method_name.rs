@@ -79,6 +79,7 @@ snapshot_cgp_auto_dispatch! {
             __Context__,
             (__Code__, (&'__a__ __Variants__)),
         > for ComputeType {}
+        /// Provider `ComputeType` for [`Handler`].
         pub struct ComputeType;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<unified::AsyncHandlerComponent> for ComputeType {

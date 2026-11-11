@@ -10,7 +10,7 @@ This repository is **cgp-fork**, a fork of Context-Generic Programming (CGP). CG
 
 The package name is `cgp-fork`. In Rust that crate is `cgp_fork`.
 
-This fork includes upstream [contextgeneric/cgp](https://github.com/contextgeneric/cgp) through commit [`69d2854`](https://github.com/contextgeneric/cgp/commit/69d285410fc2f7b40eceaafeef8536642a9390b1) (7 October 2026, pull request [#278](https://github.com/contextgeneric/cgp/pull/278)). The merged commit is recorded in [`UPSTREAM_COMMIT`](UPSTREAM_COMMIT). Newer upstream commits reviewed and deliberately not merged are listed in [`UPSTREAM_REVIEWED`](UPSTREAM_REVIEWED) (currently only [#280](https://github.com/contextgeneric/cgp/pull/280), docs about upstream's own release); `bash scripts/upstream-sync.sh` lists the rest.
+This fork has reviewed upstream [contextgeneric/cgp](https://github.com/contextgeneric/cgp) through commit [`3a235198`](https://github.com/contextgeneric/cgp/commit/3a23519885d00f07df7d9e26f80a619e928f5a51) (8 November 2026, pull request [#292](https://github.com/contextgeneric/cgp/pull/292)). The behavior changes in that range are ported here. Documentation and CI commits that only describe upstream's own crates are not carried over. The reviewed-through commit is recorded in [`UPSTREAM_COMMIT`](UPSTREAM_COMMIT). [`UPSTREAM_REVIEWED`](UPSTREAM_REVIEWED) lists anything newer that was reviewed and deliberately not merged; `bash scripts/upstream-sync.sh` lists the rest.
 
 **[Website](https://contextgeneric.dev/) · [Changelog](CHANGELOG.md) · [Repository](https://github.com/Just-Replicant/cgp-fork)**
 

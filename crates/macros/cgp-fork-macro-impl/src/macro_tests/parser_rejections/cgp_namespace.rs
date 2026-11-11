@@ -14,7 +14,7 @@
 
 use quote::quote;
 
-use super::assert_macro_rejects;
+use super::{assert_macro_rejects, assert_macro_rejects_with};
 
 #[test]
 fn rejects_attribute_on_mapping_key() {
@@ -66,6 +66,32 @@ fn rejects_stray_token_after_parent() {
             new MyNamespace: DefaultNamespace;
         ))
     });
+}
+
+#[test]
+fn rejects_namespace_that_inherits_itself() {
+    assert_macro_rejects_with(
+        "cgp_namespace inheriting itself",
+        "the namespace `Ns` cannot inherit from itself; name another namespace as its parent, or omit the parent",
+        || {
+            crate::macro_lib::cgp_namespace(quote!(
+                new Ns: Ns {}
+            ))
+        },
+    );
+}
+
+#[test]
+fn rejects_namespace_that_inherits_itself_through_self() {
+    assert_macro_rejects_with(
+        "cgp_namespace inheriting self::Ns",
+        "the namespace `Ns` cannot inherit from itself; name another namespace as its parent, or omit the parent",
+        || {
+            crate::macro_lib::cgp_namespace(quote!(
+                new Ns: self::Ns {}
+            ))
+        },
+    );
 }
 
 #[test]

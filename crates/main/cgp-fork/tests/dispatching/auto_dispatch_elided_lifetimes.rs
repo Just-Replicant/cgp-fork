@@ -98,6 +98,7 @@ snapshot_cgp_auto_dispatch! {
             __Context__,
             (__Code__, (&'__a__ __Variants__, (&'__a1__ str))),
         > for ComputeLabel {}
+        /// Provider `ComputeLabel` for [`Handler`].
         pub struct ComputeLabel;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<unified::AsyncHandlerComponent> for ComputeLabel {

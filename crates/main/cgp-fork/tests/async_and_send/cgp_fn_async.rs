@@ -23,7 +23,9 @@ snapshot_cgp_fn! {
     expand_greet(output) {
         insta::assert_snapshot!(output, @r#"
         #[cgp_async]
+        /// The trait for the `greet` operation.
         pub trait Greet {
+            /// The `greet` operation.
             async fn greet(&self) -> String;
         }
         #[cgp_async]
@@ -31,17 +33,18 @@ snapshot_cgp_fn! {
         where
             Self: HasField<
                 Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
-                Value = String,
+                Value: ::core::convert::AsRef<str> + 'static,
             >,
         {
             async fn greet(&self) -> String {
-                let name: &str = self
-                    .get_field(
+                let name: &str = ::core::convert::AsRef::as_ref(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
                         >,
-                    )
-                    .as_str();
+                    ),
+                );
                 format!("Hello, {name}!")
             }
         }

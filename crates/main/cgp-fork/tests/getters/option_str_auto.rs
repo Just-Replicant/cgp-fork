@@ -44,7 +44,9 @@ snapshot_cgp_auto_getter! {
             >,
         {
             fn nickname(&self) -> Option<&str> {
-                self.get_field(
+                OptionAsRef::option_as_ref(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<
                                 8,
@@ -63,8 +65,8 @@ snapshot_cgp_auto_getter! {
                                 >,
                             >,
                         >,
-                    )
-                    .as_deref()
+                    ),
+                )
             }
         }
         "#)

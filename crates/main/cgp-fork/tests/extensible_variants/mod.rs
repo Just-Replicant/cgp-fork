@@ -28,6 +28,7 @@ pub mod derive_cgp_data_shape;
 // constructor slice alone.
 pub mod extract_field_derive;
 pub mod from_variant_derive;
+pub mod reserved_variant_names;
 
 // Regression: `#[derive(CgpData)]` on an enum whose own lifetime is named `'a`,
 // which the borrowed extractor's reserved `'__a__` lifetime must not collide

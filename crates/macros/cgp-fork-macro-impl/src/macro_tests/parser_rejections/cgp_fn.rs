@@ -15,7 +15,7 @@
 
 use quote::quote;
 
-use super::assert_macro_rejects;
+use super::{assert_macro_rejects, assert_macro_rejects_with};
 
 #[test]
 fn rejects_implicit_arg_without_self() {
@@ -207,7 +207,26 @@ fn derives_trait_name_from_unrawed_function_name() {
     .expect("a raw function name expands")
     .to_string();
 
-    assert!(tokens.starts_with("trait Type {"), "{tokens}");
+    assert!(tokens.contains("trait Type {"), "{tokens}");
+    assert!(tokens.contains("fn r#type"), "{tokens}");
+}
+
+#[test]
+fn rejects_optional_reference_to_an_unsized_type() {
+    assert_macro_rejects_with(
+        "cgp_fn implicit Option<&[u8]>",
+        "`Option<&[u8]>` would read an `Option<[u8]>` field, which cannot exist because a slice is unsized; read an `Option<Vec<u8>>` field as `Option<&Vec<u8>>` instead",
+        || {
+            crate::macro_lib::cgp_fn(
+                quote!(),
+                quote!(
+                    pub fn bytes(&self, #[implicit] bytes: Option<&[u8]>) -> usize {
+                        bytes.map(<[u8]>::len).unwrap_or(0)
+                    }
+                ),
+            )
+        },
+    );
 }
 
 #[test]

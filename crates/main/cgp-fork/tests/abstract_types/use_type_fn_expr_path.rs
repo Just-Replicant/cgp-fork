@@ -75,7 +75,9 @@ snapshot_cgp_fn! {
 
     expand_begin_transaction(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `begin_transaction` operation.
         pub trait BeginTransaction: HasDbType + HasTransactionType {
+            /// The `begin_transaction` operation.
             fn begin_transaction(&self) -> <Self as HasTransactionType>::Transaction;
         }
         impl<__Context__> BeginTransaction for __Context__
@@ -89,10 +91,10 @@ snapshot_cgp_fn! {
             Self: HasTransactionType,
         {
             fn begin_transaction(&self) -> <Self as HasTransactionType>::Transaction {
-                let db: &Pool<<Self as HasDbType>::Db> = self
-                    .get_field(
-                        ::core::marker::PhantomData::<Symbol<2, Chars<'d', Chars<'b', Nil>>>>,
-                    );
+                let db: &Pool<<Self as HasDbType>::Db> = HasField::get_field(
+                    self,
+                    ::core::marker::PhantomData::<Symbol<2, Chars<'d', Chars<'b', Nil>>>>,
+                );
                 let started: <Self as HasTransactionType>::Transaction = <<Self as HasTransactionType>::Transaction>::begin_from(
                     db,
                 );
@@ -115,7 +117,9 @@ snapshot_cgp_fn! {
 
     expand_transaction_label(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `transaction_label` operation.
         pub trait TransactionLabel: HasDbType + HasTransactionType {
+            /// The `transaction_label` operation.
             fn transaction_label(&self) -> &'static str;
         }
         impl<__Context__> TransactionLabel for __Context__
@@ -147,7 +151,9 @@ snapshot_cgp_fn! {
 
     expand_tagged_transaction(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `tagged_transaction` operation.
         pub trait TaggedTransaction: HasDbType + HasTransactionType {
+            /// The `tagged_transaction` operation.
             fn tagged_transaction(&self) -> <Self as HasTransactionType>::Transaction;
         }
         impl<__Context__> TaggedTransaction for __Context__
@@ -161,10 +167,10 @@ snapshot_cgp_fn! {
             Self: HasTransactionType,
         {
             fn tagged_transaction(&self) -> <Self as HasTransactionType>::Transaction {
-                let db: &Pool<<Self as HasDbType>::Db> = self
-                    .get_field(
-                        ::core::marker::PhantomData::<Symbol<2, Chars<'d', Chars<'b', Nil>>>>,
-                    );
+                let db: &Pool<<Self as HasDbType>::Db> = HasField::get_field(
+                    self,
+                    ::core::marker::PhantomData::<Symbol<2, Chars<'d', Chars<'b', Nil>>>>,
+                );
                 <<Self as HasTransactionType>::Transaction>::tagged::<
                     <Self as HasDbType>::Db,
                 >(db)
@@ -186,7 +192,9 @@ snapshot_cgp_fn! {
 
     expand_unit_struct_untouched(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `unit_struct_untouched` operation.
         pub trait UnitStructUntouched: HasDbType {
+            /// The `unit_struct_untouched` operation.
             fn unit_struct_untouched(&self) -> Marker2;
         }
         impl<__Context__> UnitStructUntouched for __Context__
@@ -198,10 +206,10 @@ snapshot_cgp_fn! {
             Self: HasDbType,
         {
             fn unit_struct_untouched(&self) -> Marker2 {
-                let db: &Pool<<Self as HasDbType>::Db> = self
-                    .get_field(
-                        ::core::marker::PhantomData::<Symbol<2, Chars<'d', Chars<'b', Nil>>>>,
-                    );
+                let db: &Pool<<Self as HasDbType>::Db> = HasField::get_field(
+                    self,
+                    ::core::marker::PhantomData::<Symbol<2, Chars<'d', Chars<'b', Nil>>>>,
+                );
                 let _ = db;
                 Marker.into()
             }

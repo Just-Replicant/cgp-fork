@@ -40,6 +40,7 @@ snapshot_cgp_computer! {
             __Context__,
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (u64))> for Ignore {}
+        /// Provider `Ignore` for [`Computer`].
         pub struct Ignore;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]
@@ -235,6 +236,7 @@ snapshot_cgp_computer! {
             __Code__,
         > IsProviderFor<ComputerComponent, __Context__, (__Code__, (String))>
         for ParseQualified {}
+        /// Provider `ParseQualified` for [`Computer`].
         pub struct ParseQualified;
         #[diagnostic::do_not_recommend]
         #[allow(deprecated)]

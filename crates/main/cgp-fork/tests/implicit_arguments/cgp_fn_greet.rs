@@ -1,7 +1,7 @@
 //! `#[cgp_fn]` with a single `#[implicit]` `&str` argument.
 //!
 //! The implicit `name` is dropped from the signature and read from the context's
-//! `name` field via `HasField`, with `.as_str()` applied automatically. The
+//! `name` field via `HasField::get_field` and `AsRef::as_ref`. The
 //! `CheckPerson` bound proves any context with a `name: String` field implements
 //! the generated trait.
 //!
@@ -19,24 +19,27 @@ snapshot_cgp_fn! {
 
     expand_greet(output) {
         insta::assert_snapshot!(output, @r#"
+        /// The trait for the `greet` operation.
         pub trait Greet {
+            /// The `greet` operation.
             fn greet(&self);
         }
         impl<__Context__> Greet for __Context__
         where
             Self: HasField<
                 Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
-                Value = String,
+                Value: ::core::convert::AsRef<str> + 'static,
             >,
         {
             fn greet(&self) {
-                let name: &str = self
-                    .get_field(
+                let name: &str = ::core::convert::AsRef::as_ref(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
                         >,
-                    )
-                    .as_str();
+                    ),
+                );
                 println!("Hello, {name}!");
             }
         }

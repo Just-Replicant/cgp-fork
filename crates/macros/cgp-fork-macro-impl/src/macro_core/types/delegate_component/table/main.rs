@@ -94,7 +94,8 @@ impl DelegateTable {
                 }
             }
 
-            item_structs.push(EmptyStruct::new(struct_type.ident, generics));
+            let doc = format!(" Wiring table `{}`.", struct_type.ident);
+            item_structs.push(EmptyStruct::new(struct_type.ident, generics).with_doc(doc));
         }
 
         item_impls.extend(

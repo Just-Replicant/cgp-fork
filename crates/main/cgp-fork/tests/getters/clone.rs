@@ -118,13 +118,14 @@ snapshot_cgp_getter! {
             >,
         {
             fn name(__context__: &__Context__) -> __Context__::Name {
-                __context__
-                    .get_field(
+                ::core::clone::Clone::clone(
+                    HasField::get_field(
+                        __context__,
                         ::core::marker::PhantomData::<
                             Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
                         >,
-                    )
-                    .clone()
+                    ),
+                )
             }
         }
         impl<__Context__> IsProviderFor<NameGetterComponent, __Context__, ()> for UseFields
@@ -141,7 +142,9 @@ snapshot_cgp_getter! {
             __Context__: HasField<__Tag__, Value = __Context__::Name>,
         {
             fn name(__context__: &__Context__) -> __Context__::Name {
-                __context__.get_field(::core::marker::PhantomData::<__Tag__>).clone()
+                ::core::clone::Clone::clone(
+                    HasField::get_field(__context__, ::core::marker::PhantomData::<__Tag__>),
+                )
             }
         }
         impl<__Context__, __Tag__> IsProviderFor<NameGetterComponent, __Context__, ()>
@@ -160,11 +163,12 @@ snapshot_cgp_getter! {
             >,
         {
             fn name(__context__: &__Context__) -> __Context__::Name {
-                __Provider__::get_field(
+                ::core::clone::Clone::clone(
+                    __Provider__::get_field(
                         __context__,
                         ::core::marker::PhantomData::<NameGetterComponent>,
-                    )
-                    .clone()
+                    ),
+                )
             }
         }
         impl<__Context__, __Provider__> IsProviderFor<NameGetterComponent, __Context__, ()>

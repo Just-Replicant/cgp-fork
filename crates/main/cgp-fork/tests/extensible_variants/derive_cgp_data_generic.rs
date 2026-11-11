@@ -50,7 +50,7 @@ snapshot_derive_cgp_data! {
                 Self: '__a;
         }
         impl<Foo, Bar, Baz> FromFields for FooBarBazGeneric<Foo, Bar, Baz> {
-            fn from_fields(rest: Self::Fields) -> Self {
+            fn from_fields(rest: <Self as HasFields>::Fields) -> Self {
                 match rest {
                     Either::Left(field) => {
                         let field = field.value;
@@ -77,7 +77,7 @@ snapshot_derive_cgp_data! {
             }
         }
         impl<Foo, Bar, Baz> ToFields for FooBarBazGeneric<Foo, Bar, Baz> {
-            fn to_fields(self) -> Self::Fields {
+            fn to_fields(self) -> <Self as HasFields>::Fields {
                 match self {
                     Self::Foo(field) => Either::Left(field.into()),
                     Self::Bar(field) => Either::Right(Either::Left(field.into())),
@@ -86,7 +86,7 @@ snapshot_derive_cgp_data! {
             }
         }
         impl<Foo, Bar, Baz> ToFieldsRef for FooBarBazGeneric<Foo, Bar, Baz> {
-            fn to_fields_ref<'__a>(&'__a self) -> Self::FieldsRef<'__a>
+            fn to_fields_ref<'__a>(&'__a self) -> <Self as HasFieldsRef>::FieldsRef<'__a>
             where
                 Self: '__a,
             {
@@ -104,7 +104,9 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
                 >,
-                value: Self::Value,
+                value: <Self as FromVariant<
+                    Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
+                >>::Value,
             ) -> Self {
                 Self::Foo(value)
             }
@@ -116,7 +118,9 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
                 >,
-                value: Self::Value,
+                value: <Self as FromVariant<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
+                >>::Value,
             ) -> Self {
                 Self::Bar(value)
             }
@@ -128,11 +132,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
                 >,
-                value: Self::Value,
+                value: <Self as FromVariant<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
+                >>::Value,
             ) -> Self {
                 Self::Baz(value)
             }
         }
+        /// The partial extractor for [`FooBarBazGeneric`].
         pub enum __PartialFooBarBazGeneric<
             Foo,
             Bar,
@@ -145,6 +152,7 @@ snapshot_derive_cgp_data! {
             Bar(<__F1__ as MapType>::Map<Bar>),
             Baz(<__F2__ as MapType>::Map<Baz>),
         }
+        /// The borrowed partial extractor for [`FooBarBazGeneric`].
         pub enum __PartialRefFooBarBazGeneric<
             '__a__,
             __R__: Mode,
@@ -185,14 +193,14 @@ snapshot_derive_cgp_data! {
                 IsPresent,
                 IsPresent,
             >;
-            fn to_extractor(self) -> Self::Extractor {
+            fn to_extractor(self) -> <Self as HasExtractor>::Extractor {
                 match self {
                     Self::Foo(value) => __PartialFooBarBazGeneric::Foo(value),
                     Self::Bar(value) => __PartialFooBarBazGeneric::Bar(value),
                     Self::Baz(value) => __PartialFooBarBazGeneric::Baz(value),
                 }
             }
-            fn from_extractor(extractor: Self::Extractor) -> Self {
+            fn from_extractor(extractor: <Self as HasExtractor>::Extractor) -> Self {
                 match extractor {
                     __PartialFooBarBazGeneric::Foo(value) => Self::Foo(value),
                     __PartialFooBarBazGeneric::Bar(value) => Self::Bar(value),
@@ -213,7 +221,9 @@ snapshot_derive_cgp_data! {
             >
             where
                 Self: '__a__;
-            fn extractor_ref<'__a__>(&'__a__ self) -> Self::ExtractorRef<'__a__> {
+            fn extractor_ref<'__a__>(
+                &'__a__ self,
+            ) -> <Self as HasExtractorRef>::ExtractorRef<'__a__> {
                 match self {
                     Self::Foo(value) => __PartialRefFooBarBazGeneric::Foo(value),
                     Self::Bar(value) => __PartialRefFooBarBazGeneric::Bar(value),
@@ -234,7 +244,9 @@ snapshot_derive_cgp_data! {
             >
             where
                 Self: '__a__;
-            fn extractor_mut<'__a__>(&'__a__ mut self) -> Self::ExtractorMut<'__a__> {
+            fn extractor_mut<'__a__>(
+                &'__a__ mut self,
+            ) -> <Self as HasExtractorMut>::ExtractorMut<'__a__> {
                 match self {
                     Self::Foo(value) => __PartialRefFooBarBazGeneric::Foo(value),
                     Self::Bar(value) => __PartialRefFooBarBazGeneric::Bar(value),
@@ -269,7 +281,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialFooBarBazGeneric::Foo(value) => Ok(value),
                     __PartialFooBarBazGeneric::Bar(value) => {
@@ -296,7 +315,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialFooBarBazGeneric::Foo(value) => {
                         Err(__PartialFooBarBazGeneric::Foo(value))
@@ -323,7 +349,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialFooBarBazGeneric::Foo(value) => {
                         Err(__PartialFooBarBazGeneric::Foo(value))
@@ -370,7 +403,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<3, Chars<'F', Chars<'o', Chars<'o', Nil>>>>,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialRefFooBarBazGeneric::Foo(value) => Ok(value),
                     __PartialRefFooBarBazGeneric::Bar(value) => {
@@ -417,7 +457,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'r', Nil>>>>,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialRefFooBarBazGeneric::Foo(value) => {
                         Err(__PartialRefFooBarBazGeneric::Foo(value))
@@ -464,7 +511,14 @@ snapshot_derive_cgp_data! {
                 _tag: ::core::marker::PhantomData<
                     Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<3, Chars<'B', Chars<'a', Chars<'z', Nil>>>>,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialRefFooBarBazGeneric::Foo(value) => {
                         Err(__PartialRefFooBarBazGeneric::Foo(value))

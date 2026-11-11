@@ -41,7 +41,8 @@ snapshot_cgp_auto_getter! {
         {
             type Scalar = Scalar;
             fn scalar(&self) -> &Self::Scalar {
-                self.get_field(
+                HasField::get_field(
+                    self,
                     ::core::marker::PhantomData::<
                         Symbol<
                             6,

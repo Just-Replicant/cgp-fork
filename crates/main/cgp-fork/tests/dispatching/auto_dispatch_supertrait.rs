@@ -88,6 +88,7 @@ snapshot_cgp_auto_dispatch! {
             __Context__,
             (__Code__, (&'__a__ __Variants__)),
         > for ComputeGreet {}
+        /// Provider `ComputeGreet` for [`Handler`].
         pub struct ComputeGreet;
         #[diagnostic::do_not_recommend]
         impl DelegateComponent<unified::AsyncHandlerComponent> for ComputeGreet {

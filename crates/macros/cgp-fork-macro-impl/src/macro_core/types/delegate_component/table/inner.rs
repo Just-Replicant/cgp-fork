@@ -56,7 +56,8 @@ impl InnerDelegateTable {
         let ident = self.table_ident.clone();
         let generics = self.table_generics.generics.clone();
 
-        EmptyStruct::new(ident, generics)
+        let doc = format!(" Wiring table `{ident}`.");
+        EmptyStruct::new(ident, generics).with_doc(doc)
     }
 
     pub fn build_impls(&self) -> syn::Result<Vec<ItemImpl>> {

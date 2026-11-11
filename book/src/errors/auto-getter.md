@@ -30,4 +30,6 @@ fn main() {
 ```
 
 The label says "the field `name`" for one field and "the fields `a`, `b`" for
-several. A `String` field satisfies a getter that returns `&str`.
+several. A `String` field satisfies a getter that returns `&str`. An
+`#[implicit]` argument of type `&str` also accepts any `AsRef<str>`. The
+[fields](../guide/fields.md) page is the full table.

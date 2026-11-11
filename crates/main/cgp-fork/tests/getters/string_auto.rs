@@ -1,6 +1,6 @@
 //! `#[cgp_auto_getter]` returning `&str`: the blanket impl reads a `String`
-//! field named after the method and calls `.as_str()`, exposing a `String` field
-//! as `&str` without any wiring.
+//! field named after the method through `HasField::get_field` and `AsRef::as_ref`,
+//! exposing a `String` field as `&str` without any wiring.
 //!
 //! See cgp-knowledge-base-fork/cgp/reference/macros/cgp_auto_getter.md.
 
@@ -31,12 +31,14 @@ snapshot_cgp_auto_getter! {
             >,
         {
             fn foo(&self) -> &str {
-                self.get_field(
+                ::core::convert::AsRef::as_ref(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<3, Chars<'f', Chars<'o', Chars<'o', Nil>>>>,
                         >,
-                    )
-                    .as_str()
+                    ),
+                )
             }
         }
         "#)

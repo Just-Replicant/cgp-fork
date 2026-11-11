@@ -394,21 +394,18 @@ snapshot_cgp_getter! {
                 __context__: &__Context__,
                 _phantom: PhantomData<(I, J)>,
             ) -> &__Context__::Foo {
-                __context__
-                    .get_field(
-                        ::core::marker::PhantomData::<
-                            Symbol<
-                                6,
-                                Chars<
-                                    'f',
-                                    Chars<
-                                        'o',
-                                        Chars<'o', Chars<'_', Chars<'a', Chars<'t', Nil>>>>,
-                                    >,
-                                >,
+                HasField::get_field(
+                    __context__,
+                    ::core::marker::PhantomData::<
+                        Symbol<
+                            6,
+                            Chars<
+                                'f',
+                                Chars<'o', Chars<'o', Chars<'_', Chars<'a', Chars<'t', Nil>>>>>,
                             >,
                         >,
-                    )
+                    >,
+                )
             }
         }
         impl<__Context__, I, J> IsProviderFor<FooGetterAtComponent, __Context__, (I, J)>
@@ -432,7 +429,7 @@ snapshot_cgp_getter! {
                 __context__: &__Context__,
                 _phantom: PhantomData<(I, J)>,
             ) -> &__Context__::Foo {
-                __context__.get_field(::core::marker::PhantomData::<__Tag__>)
+                HasField::get_field(__context__, ::core::marker::PhantomData::<__Tag__>)
             }
         }
         impl<__Context__, I, J, __Tag__> IsProviderFor<FooGetterAtComponent, __Context__, (I, J)>
@@ -521,7 +518,9 @@ mod derive_delegate {
 
         expand_my_context(output) {
             insta::assert_snapshot!(output, @r#"
+            /// Wiring table `FooTypes`.
             pub struct FooTypes;
+            /// Wiring table `FooGetters`.
             pub struct FooGetters;
             #[diagnostic::do_not_recommend]
             impl DelegateComponent<FooTypeProviderAtComponent> for MyContext {
@@ -659,7 +658,9 @@ mod derive_delegate2 {
 
         expand_my_context(output) {
             insta::assert_snapshot!(output, @r#"
+            /// Wiring table `FooTypes`.
             pub struct FooTypes;
+            /// Wiring table `FooGetters`.
             pub struct FooGetters;
             #[diagnostic::do_not_recommend]
             impl DelegateComponent<FooTypeProviderAtComponent> for MyContext {

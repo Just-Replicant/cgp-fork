@@ -1,6 +1,7 @@
 //! `#[cgp_getter]` returning `&str`: the getter reads a `String` field and the
-//! generated provider impls call `.as_str()`, so a `String` field can be exposed
-//! as `&str`. The context binds the source field by wiring to `UseField`.
+//! generated provider impls call `AsRef::as_ref`, so a `String` field can be exposed
+//! as `&str`. The bound stays `Value = String`, because `WithProvider` needs the
+//! field type itself. The context binds the source field by wiring to `UseField`.
 //!
 //! See cgp-knowledge-base-fork/cgp/reference/macros/cgp_getter.md and
 //! cgp-knowledge-base-fork/cgp/reference/providers/use_field.md.
@@ -101,13 +102,14 @@ snapshot_cgp_getter! {
             >,
         {
             fn foo(__context__: &__Context__) -> &str {
-                __context__
-                    .get_field(
+                ::core::convert::AsRef::as_ref(
+                    HasField::get_field(
+                        __context__,
                         ::core::marker::PhantomData::<
                             Symbol<3, Chars<'f', Chars<'o', Chars<'o', Nil>>>>,
                         >,
-                    )
-                    .as_str()
+                    ),
+                )
             }
         }
         impl<__Context__> IsProviderFor<FooGetterComponent, __Context__, ()> for UseFields
@@ -122,7 +124,9 @@ snapshot_cgp_getter! {
             __Context__: HasField<__Tag__, Value = String>,
         {
             fn foo(__context__: &__Context__) -> &str {
-                __context__.get_field(::core::marker::PhantomData::<__Tag__>).as_str()
+                ::core::convert::AsRef::as_ref(
+                    HasField::get_field(__context__, ::core::marker::PhantomData::<__Tag__>),
+                )
             }
         }
         impl<__Context__, __Tag__> IsProviderFor<FooGetterComponent, __Context__, ()>
@@ -135,11 +139,12 @@ snapshot_cgp_getter! {
             __Provider__: FieldGetter<__Context__, FooGetterComponent, Value = String>,
         {
             fn foo(__context__: &__Context__) -> &str {
-                __Provider__::get_field(
+                ::core::convert::AsRef::as_ref(
+                    __Provider__::get_field(
                         __context__,
                         ::core::marker::PhantomData::<FooGetterComponent>,
-                    )
-                    .as_str()
+                    ),
+                )
             }
         }
         impl<__Context__, __Provider__> IsProviderFor<FooGetterComponent, __Context__, ()>

@@ -10,10 +10,11 @@
 //! that declares it. Every other `Self` in the same block, including the `Self`
 //! of an inherited abstract type, is still rewritten to the context.
 //!
-//! An associated *const* is deliberately not covered by the skip, since only
-//! `ImplItem::Type` items are collected; `#[cgp_impl]`'s Known issues records
-//! that asymmetry and the `<Provider as Trait<Self>>::CONST` form that works
-//! around it.
+//! An associated const the block declares is qualified to
+//! `<Provider as Trait<Context>>::CONST` before `Self` is rewritten, because a
+//! bare `Self::CONST` on the provider is ambiguous with the consumer trait.
+//! A component default method keeps `Self::CONST`, since there `Self` is already
+//! the provider trait. See `self_local_assoc_const`.
 //!
 //! See cgp-knowledge-base-fork/cgp/implementation/entrypoints/cgp_impl.md (Behavior and corner cases)
 //! and cgp-knowledge-base-fork/cgp/reference/macros/cgp_impl.md.
