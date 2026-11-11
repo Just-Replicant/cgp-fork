@@ -1,5 +1,8 @@
 # Logging
 
+`#[cgp_auto_log]` turns each method of a logger trait into a `CanLog` call. The
+detail struct is named after the method (`log_hello` becomes `__LogHello`).
+
 `CanLog<Detail>` records a value. `TracingLogger` formats it with `Display` and
 `tracing::info`. `TracingDebugLogger` formats it with `Debug`. Both need the
 `log-tracing` feature. `DefmtLogger` needs `log-defmt`.

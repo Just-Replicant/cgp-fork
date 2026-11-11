@@ -6,6 +6,11 @@
 # Guide
 
 - [A component](guide/components.md)
+- [Fields](guide/fields.md)
+- [Functions](guide/functions.md)
+- [Records and variants](guide/data.md)
+- [Abstract types](guide/types.md)
+- [Namespaces](guide/namespaces.md)
 - [Handlers](guide/handlers.md)
 - [Async](guide/async.md)
 - [Errors](guide/errors.md)

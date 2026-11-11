@@ -45,3 +45,54 @@ fn main() {
 `#[unchecked]` skips that check. Use it for a type-level map that is not a
 context, or for a component whose parameters are not `()`. See
 [checked wiring](checked-wiring.md).
+
+A const the `#[cgp_impl]` block declares is that provider's const. `Self::LIMIT`
+inside the block reads it. A default method the provider does not replace reads
+the const of whichever provider was wired.
+
+```rust
+use cgp_fork::prelude::*;
+
+#[cgp_component(Limiter)]
+pub trait CanLimit {
+    const LIMIT: u32;
+
+    fn below(&self, count: u32) -> bool {
+        count < Self::LIMIT
+    }
+}
+
+#[cgp_impl(new LimitTen)]
+impl Limiter {
+    const LIMIT: u32 = 10;
+
+    fn below(&self, count: u32) -> bool {
+        count < Self::LIMIT
+    }
+}
+
+pub struct App;
+
+delegate_components! {
+    App {
+        LimiterComponent: LimitTen,
+    }
+}
+
+fn main() {
+    assert!(App.below(9));
+    assert!(!App.below(10));
+}
+```
+
+A method parameter is a plain name. `mut count` is accepted. `(left, right)` is
+not: destructure inside the body. The forwarding impl drops a `mut` it does not
+use. `&mut self` stays.
+
+`#[extend(HasName)]` adds a supertrait. `#[uses]` belongs on a provider, where
+it names the provider's dependencies. `#[cgp_new_provider]` defines the provider
+struct for you. `UseContext` forwards a provider back to the context's own
+consumer impl. Do not wire a context to `UseContext` for that same component.
+
+A public item the macro emits gets a doc comment when you wrote none. A doc you
+wrote is left where you put it.

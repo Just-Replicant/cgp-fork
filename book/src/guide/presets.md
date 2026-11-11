@@ -63,3 +63,8 @@ fn main() {
 A bare `override` uses the only parent. With several parents, write
 `override(Parent) Key: Provider`. `override` inside `delegate_components!` is an
 error; a table replaces a preset entry by writing the key again.
+
+`cgp_for_each!` repeats a body once per type in a list. An `exclude` list drops
+types the caller already implements. A preset's `with_components!` expands
+through it. A `#[cfg]` on a preset entry keeps the parent's entry when the
+predicate is false, and a new cfg-gated key is absent in that case.
