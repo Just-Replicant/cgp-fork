@@ -95,11 +95,11 @@ reads them on every push to `main`:
 
 - `feat`, `fix`, and `perf` commits (or any type with `!`) open or update a release PR that bumps
   the shared workspace version and writes `CHANGELOG.md`.
-- Merging that PR publishes both crates with crates.io trusted publishing and tags `v<version>`,
-  but only after the Tests workflow has passed on that merge commit: the release job runs on
-  Tests' `workflow_run` completion and checks out the exact commit Tests passed. A failed or
-  cancelled Tests run publishes nothing; the next green run on `main` does. The Feature powerset
-  and macOS tests workflows are not part of that wait.
+- Merging that PR publishes the crates with crates.io trusted publishing and tags `v<version>`,
+  but only after the Tests workflow has passed on that merge commit. The release job starts on
+  the push to `main` and waits for the Tests run for that exact commit (crates.io rejects
+  trusted publishing for `workflow_run`). A failed or cancelled Tests run publishes nothing.
+  The Feature powerset and macOS tests workflows are not part of that wait.
 - Breaking changes need a `!` and a `BREAKING CHANGE:` footer, and a minor bump while the version
   is `0.x`.
 
@@ -134,8 +134,8 @@ These are repository settings, so no file in this repository can enforce them. C
 3. **Actions permissions:** Workflow permissions "read and write", and allow GitHub Actions to
    create pull requests (release-plz). The `Upstream sync check` workflow needs `issues: write`,
    which it requests itself.
-4. **crates.io trusted publishers** for both crates: repository `Just-Replicant/cgp-fork`, workflow
-   `release-plz.yml`.
+4. **crates.io trusted publishers** for `cgp-fork`, `cgp-fork-macro`, and `cgp-fork-macro-impl`:
+   repository `Just-Replicant/cgp-fork`, workflow `release-plz.yml`.
 
 ## Keeping up with upstream
 
