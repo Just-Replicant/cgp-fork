@@ -98,7 +98,8 @@ reads them on every push to `main`:
 - Merging that PR publishes both crates with crates.io trusted publishing and tags `v<version>`,
   but only after the Tests workflow has passed on that merge commit: the release job runs on
   Tests' `workflow_run` completion and checks out the exact commit Tests passed. A failed or
-  cancelled Tests run publishes nothing; the next green run on `main` does.
+  cancelled Tests run publishes nothing; the next green run on `main` does. The Feature powerset
+  workflow is not part of that wait.
 - Breaking changes need a `!` and a `BREAKING CHANGE:` footer, and a minor bump while the version
   is `0.x`.
 
@@ -116,10 +117,12 @@ These are repository settings, so no file in this repository can enforce them. C
      Mark these Tests jobs as required: `Rustfmt (nightly)`, `Clippy`,
      `Test (nextest, --all-features)`, `Test (nextest, --no-default-features)`,
      `Test (macos-latest)`, `Test (windows-latest)`, `Rustdoc (-D warnings)`, `MSRV (1.89)`,
-     `no_std target`, `Feature powerset (cargo-hack)`,
+     `no_std target`,
      `cargo-deny (advisories, licenses, bans, sources)`, `cargo-audit (RustSec)`,
      `Semver (cargo-semver-checks)`, `Package (publish dry run)`, `Coverage (cargo-llvm-cov)`,
-     `Macro fuzzing (deep)`, and `Compile-time budget`. Leave `Toolchain canary (stable)`,
+     `Macro fuzzing (deep)`, and `Compile-time budget`. Also require
+     `Feature powerset (cargo-hack)` from the Feature powerset workflow: it still gates
+     merging, and release-plz does not wait for it. Leave `Toolchain canary (stable)`,
      `Toolchain canary (beta)`, `Knowledge-base references`, and
      `Coverage-guided fuzzing (cargo-fuzz)` optional (the last runs only on the schedule).
    - Block force pushes and deletion of `main`.
