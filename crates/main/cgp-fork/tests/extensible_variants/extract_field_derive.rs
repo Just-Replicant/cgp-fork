@@ -45,10 +45,12 @@ snapshot_derive_extract_field! {
 
     expand_shape(output) {
         insta::assert_snapshot!(output, @"
+        /// The partial extractor for [`Shape`].
         pub enum __PartialShape<__F0__: MapType, __F1__: MapType> {
             Circle(<__F0__ as MapType>::Map<Circle>),
             Rectangle(<__F1__ as MapType>::Map<Rectangle>),
         }
+        /// The borrowed partial extractor for [`Shape`].
         pub enum __PartialRefShape<'__a__, __R__: Mode, __F0__: MapType, __F1__: MapType> {
             Circle(<__F0__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Circle>>),
             Rectangle(<__F1__ as MapType>::Map<<__R__ as Mode>::Map<'__a__, Rectangle>>),
@@ -62,13 +64,13 @@ snapshot_derive_extract_field! {
         }
         impl HasExtractor for Shape {
             type Extractor = __PartialShape<IsPresent, IsPresent>;
-            fn to_extractor(self) -> Self::Extractor {
+            fn to_extractor(self) -> <Self as HasExtractor>::Extractor {
                 match self {
                     Self::Circle(value) => __PartialShape::Circle(value),
                     Self::Rectangle(value) => __PartialShape::Rectangle(value),
                 }
             }
-            fn from_extractor(extractor: Self::Extractor) -> Self {
+            fn from_extractor(extractor: <Self as HasExtractor>::Extractor) -> Self {
                 match extractor {
                     __PartialShape::Circle(value) => Self::Circle(value),
                     __PartialShape::Rectangle(value) => Self::Rectangle(value),
@@ -79,7 +81,9 @@ snapshot_derive_extract_field! {
             type ExtractorRef<'__a__> = __PartialRefShape<'__a__, Ref, IsPresent, IsPresent>
             where
                 Self: '__a__;
-            fn extractor_ref<'__a__>(&'__a__ self) -> Self::ExtractorRef<'__a__> {
+            fn extractor_ref<'__a__>(
+                &'__a__ self,
+            ) -> <Self as HasExtractorRef>::ExtractorRef<'__a__> {
                 match self {
                     Self::Circle(value) => __PartialRefShape::Circle(value),
                     Self::Rectangle(value) => __PartialRefShape::Rectangle(value),
@@ -90,7 +94,9 @@ snapshot_derive_extract_field! {
             type ExtractorMut<'__a__> = __PartialRefShape<'__a__, Mut, IsPresent, IsPresent>
             where
                 Self: '__a__;
-            fn extractor_mut<'__a__>(&'__a__ mut self) -> Self::ExtractorMut<'__a__> {
+            fn extractor_mut<'__a__>(
+                &'__a__ mut self,
+            ) -> <Self as HasExtractorMut>::ExtractorMut<'__a__> {
                 match self {
                     Self::Circle(value) => __PartialRefShape::Circle(value),
                     Self::Rectangle(value) => __PartialRefShape::Rectangle(value),
@@ -129,7 +135,26 @@ snapshot_derive_extract_field! {
                         >,
                     >,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<
+                        6,
+                        Chars<
+                            'C',
+                            Chars<'i', Chars<'r', Chars<'c', Chars<'l', Chars<'e', Nil>>>>>,
+                        >,
+                    >,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<
+                        6,
+                        Chars<
+                            'C',
+                            Chars<'i', Chars<'r', Chars<'c', Chars<'l', Chars<'e', Nil>>>>>,
+                        >,
+                    >,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialShape::Circle(value) => Ok(value),
                     __PartialShape::Rectangle(value) => Err(__PartialShape::Rectangle(value)),
@@ -181,7 +206,50 @@ snapshot_derive_extract_field! {
                         >,
                     >,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<
+                        9,
+                        Chars<
+                            'R',
+                            Chars<
+                                'e',
+                                Chars<
+                                    'c',
+                                    Chars<
+                                        't',
+                                        Chars<
+                                            'a',
+                                            Chars<'n', Chars<'g', Chars<'l', Chars<'e', Nil>>>>,
+                                        >,
+                                    >,
+                                >,
+                            >,
+                        >,
+                    >,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<
+                        9,
+                        Chars<
+                            'R',
+                            Chars<
+                                'e',
+                                Chars<
+                                    'c',
+                                    Chars<
+                                        't',
+                                        Chars<
+                                            'a',
+                                            Chars<'n', Chars<'g', Chars<'l', Chars<'e', Nil>>>>,
+                                        >,
+                                    >,
+                                >,
+                            >,
+                        >,
+                    >,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialShape::Circle(value) => Err(__PartialShape::Circle(value)),
                     __PartialShape::Rectangle(value) => Ok(value),
@@ -211,7 +279,26 @@ snapshot_derive_extract_field! {
                         >,
                     >,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<
+                        6,
+                        Chars<
+                            'C',
+                            Chars<'i', Chars<'r', Chars<'c', Chars<'l', Chars<'e', Nil>>>>>,
+                        >,
+                    >,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<
+                        6,
+                        Chars<
+                            'C',
+                            Chars<'i', Chars<'r', Chars<'c', Chars<'l', Chars<'e', Nil>>>>>,
+                        >,
+                    >,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialRefShape::Circle(value) => Ok(value),
                     __PartialRefShape::Rectangle(value) => {
@@ -267,7 +354,50 @@ snapshot_derive_extract_field! {
                         >,
                     >,
                 >,
-            ) -> Result<Self::Value, Self::Remainder> {
+            ) -> Result<
+                <Self as ExtractField<
+                    Symbol<
+                        9,
+                        Chars<
+                            'R',
+                            Chars<
+                                'e',
+                                Chars<
+                                    'c',
+                                    Chars<
+                                        't',
+                                        Chars<
+                                            'a',
+                                            Chars<'n', Chars<'g', Chars<'l', Chars<'e', Nil>>>>,
+                                        >,
+                                    >,
+                                >,
+                            >,
+                        >,
+                    >,
+                >>::Value,
+                <Self as ExtractField<
+                    Symbol<
+                        9,
+                        Chars<
+                            'R',
+                            Chars<
+                                'e',
+                                Chars<
+                                    'c',
+                                    Chars<
+                                        't',
+                                        Chars<
+                                            'a',
+                                            Chars<'n', Chars<'g', Chars<'l', Chars<'e', Nil>>>>,
+                                        >,
+                                    >,
+                                >,
+                            >,
+                        >,
+                    >,
+                >>::Remainder,
+            > {
                 match self {
                     __PartialRefShape::Circle(value) => Err(__PartialRefShape::Circle(value)),
                     __PartialRefShape::Rectangle(value) => Ok(value),

@@ -1,7 +1,7 @@
 use quote::quote;
 use syn::{ItemEnum, ItemImpl};
 
-use crate::macro_core::exports::ToFieldsRef;
+use crate::macro_core::exports::{HasFieldsRef, ToFieldsRef};
 use crate::macro_core::functions::parse_internal;
 use crate::macro_core::types::cgp_data::derive_to_fields_match_arms;
 
@@ -29,7 +29,7 @@ pub fn derive_to_fields_ref_for_enum(item_enum: &ItemEnum) -> syn::Result<ItemIm
         {
             fn to_fields_ref< #life >(
                 & #life self,
-            ) -> Self::FieldsRef< #life >
+            ) -> <Self as #HasFieldsRef>::FieldsRef< #life >
             where
                 Self: #life,
             {
