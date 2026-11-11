@@ -21,24 +21,27 @@ snapshot_cgp_fn! {
 
     expand_count_matches(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `count_matches` operation.
         pub trait CountMatches {
+            /// The `count_matches` operation.
             fn count_matches(&mut self, byte: u8) -> usize;
         }
         impl<__Context__> CountMatches for __Context__
         where
             Self: HasField<
                 Symbol<4, Chars<'d', Chars<'a', Chars<'t', Chars<'a', Nil>>>>>,
-                Value: AsRef<[u8]> + 'static,
+                Value: ::core::convert::AsRef<[u8]> + 'static,
             >,
         {
             fn count_matches(&mut self, byte: u8) -> usize {
-                let data: &[u8] = self
-                    .get_field(
+                let data: &[u8] = ::core::convert::AsRef::as_ref(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<4, Chars<'d', Chars<'a', Chars<'t', Chars<'a', Nil>>>>>,
                         >,
-                    )
-                    .as_ref();
+                    ),
+                );
                 data.iter().filter(|b| **b == byte).count()
             }
         }

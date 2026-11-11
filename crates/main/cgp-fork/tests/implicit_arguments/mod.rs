@@ -18,6 +18,8 @@ pub mod cgp_fn_slice;
 // `#[implicit]` arguments inside `#[cgp_impl]` providers, and the implicit
 // context parameter.
 pub mod cgp_fn_mut_self_immutable;
+pub mod cgp_fn_option_mut_str;
 pub mod cgp_impl_implicit;
 pub mod cgp_impl_implicit_generic;
+pub mod cgp_impl_implicit_str;
 pub mod implicit_context;

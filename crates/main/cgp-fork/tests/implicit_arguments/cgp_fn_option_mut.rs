@@ -23,7 +23,9 @@ snapshot_cgp_fn! {
 
     expand_clear_slot(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `clear_slot` operation.
         pub trait ClearSlot {
+            /// The `clear_slot` operation.
             fn clear_slot(&mut self);
         }
         impl<__Context__> ClearSlot for __Context__
@@ -34,13 +36,14 @@ snapshot_cgp_fn! {
             >,
         {
             fn clear_slot(&mut self) {
-                let slot: Option<&mut u8> = self
-                    .get_field_mut(
+                let slot: Option<&mut u8> = ::core::option::Option::as_mut(
+                    HasFieldMut::get_field_mut(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<4, Chars<'s', Chars<'l', Chars<'o', Chars<'t', Nil>>>>>,
                         >,
-                    )
-                    .as_mut();
+                    ),
+                );
                 if let Some(value) = slot {
                     *value = 0;
                 }

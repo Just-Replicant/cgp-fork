@@ -23,7 +23,9 @@ snapshot_cgp_fn! {
 
     expand_capitalize_name(output) {
         insta::assert_snapshot!(output, @"
+        /// The trait for the `capitalize_name` operation.
         pub trait CapitalizeName {
+            /// The `capitalize_name` operation.
             fn capitalize_name(&mut self);
         }
         impl<__Context__> CapitalizeName for __Context__
@@ -34,12 +36,12 @@ snapshot_cgp_fn! {
             >,
         {
             fn capitalize_name(&mut self) {
-                let name: &mut String = self
-                    .get_field_mut(
-                        ::core::marker::PhantomData::<
-                            Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
-                        >,
-                    );
+                let name: &mut String = HasFieldMut::get_field_mut(
+                    self,
+                    ::core::marker::PhantomData::<
+                        Symbol<4, Chars<'n', Chars<'a', Chars<'m', Chars<'e', Nil>>>>>,
+                    >,
+                );
                 if let Some(first_char) = name.chars().next() && first_char.is_lowercase() {
                     let char_len = first_char.len_utf8();
                     let capitalized = first_char.to_uppercase().to_string();

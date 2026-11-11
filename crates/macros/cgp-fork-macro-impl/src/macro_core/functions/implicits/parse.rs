@@ -5,7 +5,7 @@ use syn::token::Comma;
 use syn::visit::{self, Visit};
 use syn::{Attribute, FnArg, Meta, Pat, PatIdent, PatType, Receiver};
 
-use crate::macro_core::functions::parse_field_type;
+use crate::macro_core::functions::parse_field_type_with;
 use crate::macro_core::types::implicits::{ImplicitArgField, ImplicitArgFields};
 
 pub fn extract_and_parse_implicit_args(
@@ -169,7 +169,9 @@ fn parse_named_field_arg(
     }
 
     let arg_type = arg.ty.as_ref().clone();
-    let (field_type, field_mode, field_mut) = parse_field_type(&arg_type, receiver_mut)?;
+    // Implicits borrow a shared `&str` / `Option<&str>` from any `AsRef<str>` field.
+    // Getters keep calling `parse_field_type`, which still requires `String`.
+    let (field_type, field_mode, field_mut) = parse_field_type_with(&arg_type, receiver_mut, true)?;
 
     Ok(ImplicitArgField {
         field_name: pat_ident.ident.clone(),

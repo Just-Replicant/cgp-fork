@@ -1,9 +1,8 @@
 //! `#[cgp_fn]` with an `Option<&str>` `#[implicit]` argument.
 //!
-//! `Option<&str>` is backed by an `Option<String>` field and read with
-//! `.as_deref()` — the `&str`/`String` special case composed with the
-//! `Option<&T>` reference case — so the body receives an `Option<&str>` while the
-//! context stores an `Option<String>`.
+//! `Option<&str>` reads any `Option<U>` whose `U: AsRef<str>`, through `OptionAsRef`.
+//! An `Option<String>` field still satisfies that bound. A getter of `Option<&str>`
+//! keeps the `Option<String>` field; this test is the implicit form.
 //!
 //! See cgp-knowledge-base-fork/cgp/reference/macros/cgp_fn.md and
 //! cgp-knowledge-base-fork/cgp/reference/attributes/implicit.md.
@@ -22,7 +21,9 @@ snapshot_cgp_fn! {
 
     expand_describe(output) {
         insta::assert_snapshot!(output, @r#"
+        /// The trait for the `describe` operation.
         pub trait Describe {
+            /// The `describe` operation.
             fn describe(&self) -> String;
         }
         impl<__Context__> Describe for __Context__
@@ -41,12 +42,13 @@ snapshot_cgp_fn! {
                         >,
                     >,
                 >,
-                Value = Option<String>,
+                Value: OptionAsRef<str> + 'static,
             >,
         {
             fn describe(&self) -> String {
-                let nickname: Option<&str> = self
-                    .get_field(
+                let nickname: Option<&str> = OptionAsRef::option_as_ref(
+                    HasField::get_field(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<
                                 8,
@@ -65,8 +67,8 @@ snapshot_cgp_fn! {
                                 >,
                             >,
                         >,
-                    )
-                    .as_deref();
+                    ),
+                );
                 match nickname {
                     Some(name) => format!("aka {name}"),
                     None => "anonymous".to_owned(),

@@ -414,8 +414,8 @@ pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     where
         Context: HasField<Tag, Value = String>,
     {
-        fn get(context: &Context) -> &str {
-            context.get_field(PhantomData).as_str()
+        fn name(context: &Context) -> &str {
+            ::core::convert::AsRef::as_ref(HasField::get_field(context, PhantomData))
         }
     }
 
@@ -424,8 +424,8 @@ pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     where
         Context: HasField<Symbol!("name"), Value = String>,
     {
-        fn get(context: &Context) -> &str {
-            context.get_field(PhantomData).as_str()
+        fn name(context: &Context) -> &str {
+            ::core::convert::AsRef::as_ref(HasField::get_field(context, PhantomData))
         }
     }
 
@@ -434,8 +434,8 @@ pub fn cgp_new_provider(attr: TokenStream, item: TokenStream) -> TokenStream {
     where
         Provider: FieldGetter<Context, NameGetterComponent, Value = String>,
     {
-        fn get(context: &Context) -> &str {
-            Provider::get_field(context, PhantomData).as_str()
+        fn name(context: &Context) -> &str {
+            ::core::convert::AsRef::as_ref(Provider::get_field(context, PhantomData))
         }
     }
     ```

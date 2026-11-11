@@ -32,12 +32,14 @@ snapshot_cgp_auto_getter! {
             >,
         {
             fn foo(&mut self) -> &mut str {
-                self.get_field_mut(
+                ::core::convert::AsMut::as_mut(
+                    HasFieldMut::get_field_mut(
+                        self,
                         ::core::marker::PhantomData::<
                             Symbol<3, Chars<'f', Chars<'o', Chars<'o', Nil>>>>,
                         >,
-                    )
-                    .as_mut_str()
+                    ),
+                )
             }
         }
         "#)

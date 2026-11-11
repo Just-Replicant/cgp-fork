@@ -349,3 +349,23 @@ fn accepts_phantom_tag_and_typed_receiver() {
         );
     }
 }
+
+#[test]
+fn rejects_optional_reference_to_an_unsized_type() {
+    use super::assert_macro_rejects_with;
+
+    assert_macro_rejects_with(
+        "getter returning Option<&[u8]>",
+        "`Option<&[u8]>` would read an `Option<[u8]>` field, which cannot exist because a slice is unsized; read an `Option<Vec<u8>>` field as `Option<&Vec<u8>>` instead",
+        || {
+            crate::macro_lib::cgp_auto_getter(
+                quote!(),
+                quote!(
+                    pub trait HasBytes {
+                        fn bytes(&self) -> Option<&[u8]>;
+                    }
+                ),
+            )
+        },
+    );
+}

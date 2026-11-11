@@ -12,9 +12,26 @@ use crate::macro_core::types::getter::FieldMode;
 /// outer `&mut` of a `&mut T`/`&mut [T]`, or the inner `&mut` of an
 /// `Option<&mut T>` — and a mutable read always requires a `&mut self` receiver,
 /// which `receiver_mut` reports.
+///
+/// A getter calls this. A shared `&str` or `Option<&str>` getter keeps a `String`
+/// or `Option<String>` field, because the `HasField` bound is also used by
+/// `WithProvider`, which expects the field type itself.
 pub fn parse_field_type(
     return_type: &Type,
     receiver_mut: Option<&Mut>,
+) -> syn::Result<(Type, FieldMode, Option<Mut>)> {
+    parse_field_type_with(return_type, receiver_mut, false)
+}
+
+/// Like [`parse_field_type`], but `borrow_str` lets a *shared* `&str` or
+/// `Option<&str>` read any `AsRef<str>` field, so an `#[implicit]` argument needs
+/// no allocator. A mutable `Option<&mut str>` keeps the `Option<String>` field
+/// either way, because `OptionAsRef` borrows the field shared and has no mutable
+/// counterpart.
+pub fn parse_field_type_with(
+    return_type: &Type,
+    receiver_mut: Option<&Mut>,
+    borrow_str: bool,
 ) -> syn::Result<(Type, FieldMode, Option<Mut>)> {
     match &return_type {
         Type::Reference(type_ref) => {
@@ -23,14 +40,22 @@ pub fn parse_field_type(
             let field_mut = type_ref.mutability;
 
             if tokens_eq(type_ref.elem.as_ref(), &parse_internal! { str }) {
-                // Special case to handle &str as String field
+                if borrow_str {
+                    // A `&str` reads any `AsRef<str>` field with `AsRef::as_ref`, so a
+                    // `String`, a `Cow<str>`, or a `Box<str>` field all work, and a
+                    // mutable `&mut str` reads any `AsMut<str>` field. None of them
+                    // needs an allocator.
+                    let field_type: Type = parse_internal! { str };
 
-                let field_type: Type = parse_internal! { String };
+                    Ok((field_type, FieldMode::Str, field_mut))
+                } else {
+                    let field_type: Type = parse_internal! { String };
 
-                Ok((field_type, FieldMode::Str, field_mut))
+                    Ok((field_type, FieldMode::Str, field_mut))
+                }
             } else if let Type::Slice(slice) = type_ref.elem.as_ref() {
-                // A shared `&[T]` reads any `AsRef<[T]>` field with `.as_ref()`; a
-                // `&mut [T]` reads any `AsMut<[T]>` field with `.as_mut()`. Both use
+                // A shared `&[T]` reads any `AsRef<[T]>` field with `AsRef::as_ref`; a
+                // `&mut [T]` reads any `AsMut<[T]>` field with `AsMut::as_mut`. Both use
                 // `FieldMode::Slice`; the mutability carried alongside selects the
                 // bound and the read method.
                 let field_type = slice.elem.as_ref().clone();
@@ -44,8 +69,10 @@ pub fn parse_field_type(
         }
         Type::Path(type_path) => {
             if let Some(type_ref) = try_parse_option_ref(type_path) {
-                // `Option<&T>` reads an `Option<T>` field with `.as_ref()`;
-                // `Option<&mut T>` reads it with `.as_mut()`. The read borrows the
+                reject_unsized_option_ref(type_path, type_ref)?;
+
+                // `Option<&T>` reads an `Option<T>` field with `Option::as_ref`;
+                // `Option<&mut T>` reads it with `Option::as_mut`. The read borrows the
                 // field with the *inner* reference's mutability, so a `&mut` inner
                 // reference likewise requires a `&mut self` receiver.
                 require_mut_receiver(type_ref, receiver_mut)?;
@@ -54,14 +81,20 @@ pub fn parse_field_type(
                 let field_type = type_ref.elem.as_ref();
 
                 if tokens_eq(field_type, &parse_internal! { str }) {
-                    // `Option<&str>` is backed by an `Option<String>` field and read
-                    // with `.as_deref()` (or `.as_deref_mut()` for `Option<&mut str>`),
-                    // mirroring the `&str`/`String` special case for a plain reference.
-                    Ok((
-                        parse_internal! { Option< String > },
-                        FieldMode::OptionStr,
-                        field_mut,
-                    ))
+                    if borrow_str && field_mut.is_none() {
+                        // A shared `Option<&str>` implicit reads any `Option<U>` whose
+                        // `U` implements `AsRef<str>` through `OptionAsRef`.
+                        Ok((parse_internal! { str }, FieldMode::OptionStr, field_mut))
+                    } else {
+                        // A getter keeps the `Option<String>` field. A mutable
+                        // `Option<&mut str>` implicit does the same and reads it with
+                        // `Option::as_deref_mut`.
+                        Ok((
+                            parse_internal! { Option< String > },
+                            FieldMode::OptionStr,
+                            field_mut,
+                        ))
+                    }
                 } else {
                     Ok((
                         parse_internal! { Option< #field_type > },
@@ -81,6 +114,84 @@ pub fn parse_field_type(
         // cloned, exactly like an owned path type.
         _ => Ok((return_type.clone(), FieldMode::Copy, None)),
     }
+}
+
+/// `Option<&T>` reads an `Option<T>` field, and an `Option` holds only a sized value, so an optional
+/// reference to a slice or a trait object has no field to read. Rejected here, naming the sized
+/// container to read instead, rather than lowered to a bound over an unsized `Option`.
+fn reject_unsized_option_ref(type_path: &TypePath, type_ref: &TypeReference) -> syn::Result<()> {
+    let mut referent = type_ref.elem.as_ref();
+    while let Type::Paren(paren) = referent {
+        referent = paren.elem.as_ref();
+    }
+
+    let (kind, container) = match referent {
+        Type::Slice(slice) => ("a slice", format!("Vec<{}>", type_text(&slice.elem))),
+        Type::TraitObject(_) => ("a trait object", format!("Box<{}>", type_text(referent))),
+        _ => return Ok(()),
+    };
+
+    let reference = if type_ref.mutability.is_some() {
+        "&mut "
+    } else {
+        "&"
+    };
+
+    Err(Error::new_spanned(
+        type_path,
+        format!(
+            "`Option<{}>` would read an `Option<{}>` field, which cannot exist because {kind} is unsized; read an `Option<{container}>` field as `Option<{reference}{container}>` instead",
+            type_text(type_ref),
+            type_text(referent),
+        ),
+    ))
+}
+
+/// A type as the reader writes it, with the spaces the token printer puts around
+/// punctuation removed.
+fn type_text(ty: &impl ToTokens) -> String {
+    let mut text = ty.to_token_stream().to_string();
+    for (spaced, tight) in [
+        (" :: ", "::"),
+        (" < ", "<"),
+        ("< ", "<"),
+        (" <", "<"),
+        (" >", ">"),
+        (" ,", ","),
+        (" ;", ";"),
+        ("[ ", "["),
+        (" ]", "]"),
+        ("( ", "("),
+        (" )", ")"),
+        ("& ", "&"),
+    ] {
+        text = text.replace(spaced, tight);
+    }
+    join_argument_lists(&text)
+}
+
+/// Removes the space before a parenthesized argument list, which follows a name, as in `Fn (u8)`.
+/// A parenthesized type keeps its space, so `-> (u8, u16)`, `&'a (dyn Debug)`, and
+/// `&mut (dyn Debug)` are unchanged.
+fn join_argument_lists(text: &str) -> String {
+    let mut joined = String::with_capacity(text.len());
+    let mut rest = text;
+    while let Some(at) = rest.find(" (") {
+        let before = &rest[..at];
+        let prefix = before.trim_end_matches(|c: char| c.is_alphanumeric() || c == '_');
+        let word = &before[prefix.len()..];
+        let is_argument_list =
+            !word.is_empty() && !prefix.ends_with('\'') && !matches!(word, "mut" | "dyn" | "impl");
+
+        joined.push_str(before);
+        if !is_argument_list {
+            joined.push(' ');
+        }
+        joined.push('(');
+        rest = &rest[at + 2..];
+    }
+    joined.push_str(rest);
+    joined
 }
 
 /// A mutable field read borrows the whole context exclusively through

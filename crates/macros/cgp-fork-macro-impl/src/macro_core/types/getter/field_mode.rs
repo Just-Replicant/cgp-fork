@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::token::Mut;
 
-use crate::macro_core::exports::MRef;
+use crate::macro_core::exports::{MRef, OptionAsRef};
 
 /// The conversion a getter body applies to a raw field read, chosen from the
 /// getter method's return type by [`parse_field_type`](crate::macro_core::functions::parse_field_type).
@@ -22,37 +22,42 @@ impl FieldMode {
     /// the shared or mutable variant from `field_mut`. This is the single source of
     /// truth shared by the getter-method body and the `#[implicit]` argument
     /// binding, so both families convert a given field identically.
+    ///
+    /// Every conversion is a fully qualified trait call, so a local trait or an
+    /// inherent method of the same name cannot capture it.
     pub fn apply(&self, call_expr: TokenStream, field_mut: Option<&Mut>) -> TokenStream {
         match self {
             FieldMode::Reference => call_expr,
             FieldMode::OptionRef => {
+                // The field is an `Option<T>`, so the read is `Option`'s own method,
+                // not the `AsRef`/`AsMut` conversion.
                 if field_mut.is_none() {
-                    quote! { #call_expr .as_ref() }
+                    quote! { ::core::option::Option::as_ref( #call_expr ) }
                 } else {
-                    quote! { #call_expr .as_mut() }
+                    quote! { ::core::option::Option::as_mut( #call_expr ) }
                 }
             }
             FieldMode::OptionStr => {
                 if field_mut.is_none() {
-                    quote! { #call_expr .as_deref() }
+                    quote! { #OptionAsRef::option_as_ref( #call_expr ) }
                 } else {
-                    quote! { #call_expr .as_deref_mut() }
+                    quote! { ::core::option::Option::as_deref_mut( #call_expr ) }
                 }
             }
             FieldMode::MRef => quote! { #MRef::Ref( #call_expr ) },
             FieldMode::Str => {
                 if field_mut.is_none() {
-                    quote! { #call_expr .as_str() }
+                    quote! { ::core::convert::AsRef::as_ref( #call_expr ) }
                 } else {
-                    quote! { #call_expr .as_mut_str() }
+                    quote! { ::core::convert::AsMut::as_mut( #call_expr ) }
                 }
             }
-            FieldMode::Copy => quote! { #call_expr .clone() },
+            FieldMode::Copy => quote! { ::core::clone::Clone::clone( #call_expr ) },
             FieldMode::Slice => {
                 if field_mut.is_none() {
-                    quote! { #call_expr .as_ref() }
+                    quote! { ::core::convert::AsRef::as_ref( #call_expr ) }
                 } else {
-                    quote! { #call_expr .as_mut() }
+                    quote! { ::core::convert::AsMut::as_mut( #call_expr ) }
                 }
             }
         }
